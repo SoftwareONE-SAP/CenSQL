@@ -87,7 +87,7 @@ ScreenManager.prototype.printCommandOutput = function(command, output) {
     process.stdin.resume();
 
     charm.foreground(output[0] == 0 ? "green" : "red");
-    charm.write(command + "\n\n");
+    charm.write("> " + command + "\n\n");
 
     if (output[0] == 0) {
 
@@ -98,6 +98,12 @@ ScreenManager.prototype.printCommandOutput = function(command, output) {
             case "table":
                 this.drawTable(output[1]);
                 break;
+            case "group":
+                this.drawGroup(output[1]);
+                break;
+            case "json":
+                charm.write(JSON.stringify(output[1]) + "\n\n")
+                break;
             default:
                 charm.write("NO DISPLAY TYPE: " + output[1] + "\n\n");
                 break;
@@ -105,9 +111,21 @@ ScreenManager.prototype.printCommandOutput = function(command, output) {
 
     } else {
 
-        charm.write(JSON.stringify(output[1]))
+        switch (output[2]) {
+            case "message":
+                charm.write(output[1] + "\n\n");
+                break;
+            case "table":
+                this.drawTable(output[1]);
+                break;
+            case "json":
+                charm.write(JSON.stringify(output[1]) + "\n\n")
+                break;
+            default:
+                charm.write("NO DISPLAY TYPE: " + output[1] + "\n\n");
+                break;
+        }
 
-        charm.write("\n\n");
     }
 
     charm.foreground("cyan");
@@ -118,15 +136,19 @@ ScreenManager.prototype.printCommandOutput = function(command, output) {
 ScreenManager.prototype.drawTable = function(data) {
     for (var i = data.length - 1; i >= 0; i--) {
 
-        var keys = Object.keys(data[i][0]);
+        var keys = [];
 
         if (data[i].length > 0) {
+
+            keys = Object.keys(data[i][0]);
+
             charm.write(keys.join(" | "))
             charm.write("\n" + new Array(process.stdout.columns / 2).join("- ") + "\n");
         } else {
             charm.write("No Results\n");
         }
 
+        keys.reverse()
 
         for (var k = data[i].length - 1; k >= 0; k--) {
             var rows = [];
@@ -136,7 +158,35 @@ ScreenManager.prototype.drawTable = function(data) {
             };
 
             charm.write(rows.join(" | ") + "\n");
-            charm.write(new Array(process.stdout.columns / 2).join("- ") + "\n");
+            // charm.write(new Array(process.stdout.columns / 2).join("- ") + "\n");
+        };
+    };
+
+    charm.write("\n");
+}
+
+ScreenManager.prototype.drawGroup = function(data) {
+    for (var i = data.length - 1; i >= 0; i--) {
+
+        var keys = [];
+
+        if (data[i].length > 0) {
+
+            keys = Object.keys(data[i][0]);
+        } else {
+            charm.write("No Results\n");
+        }
+
+        keys.reverse()
+
+        for (var k = 0; k < data[i].length; k++) {
+
+            charm.write("No: " + k + " " + new Array(process.stdout.columns - ("        " + k).length).join("-") + "\n");
+            
+            for (var j = keys.length - 1; j >= 0; j--) {
+                charm.write(" " + keys[j] + ": " + data[i][k][keys[j]] + "\n")
+            };
+
         };
     };
 

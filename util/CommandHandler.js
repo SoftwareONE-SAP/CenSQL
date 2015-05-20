@@ -13,37 +13,59 @@ CommandHandler.prototype.init = function(callback) {
 
 CommandHandler.prototype.onCommand = function(command, callback) {
 
-    if(command.charAt(0) == "\\"){
-        callback(this.runInternalCommand(command.substring(1)));
+    if (command.charAt(0) == "\\") {
+        this.runInternalCommand(command.substring(1), callback);
         return;
     }
 
     /**
      * If we have got this far, it is not an internal command and should instead be ran on HANA
      */
-    
-    this.conn.exec("conn", command, function(err, data){
-        callback([err == null ? 0 : 1, err == null ? data : err, "table"]);
+
+    this.conn.exec("conn", command, function(err, data) {
+        callback([err == null ? 0 : 1, err == null ? data : err, err == null ? "table" : "json"]);
     })
 }
 
-CommandHandler.prototype.runInternalCommand = function(command){
-    switch(command){
+CommandHandler.prototype.runInternalCommand = function(command, callback) {
+
+    var cParts = command.split(/ /g);
+
+    switch (cParts[0]) {
         case "h":
-            return [
-                0, 
-                [
+            callback([
+                0, [
                     "CenSQL v1.0.0 Help",
                     "-------------------",
-                    "\\h\t- For Help",
-                    // "\\s\t- For Status"
-                ].join("\n"), 
+                    "\\h\t\t\t- For Help",
+                    "\\sc\t\t\t- To list schemas",
+                    "\\ta {SCHEMA_NAME}\t- To list lables for a schema",
+                ].join("\n"),
                 "message"
-            ];
+            ]);
+            return;
+            break;
+        case "sc":
+            this.conn.exec("conn", "SELECT * FROM SYS.SCHEMAS", function(err, data) {
+                callback([err == null ? 0 : 1, err == null ? data : err, err == null ? (cParts[cParts.length - 1].slice(-2) == "\\g" ? "group" : "table") : "json"]);
+            })
+            return;
+            break;
+        case "ta":
+
+            if(cParts.length != 2 || cParts[1].length == 0){
+                callback([1, "Invalid input! Try: \\h for help", "message"]);
+                return;
+            }
+
+            this.conn.exec("conn", "SELECT * FROM SYS.TABLES WHERE SCHEMA_NAME LIKE '" + cParts[1] + "'", function(err, data) {
+                callback([err == null ? 0 : 1, err == null ? data : err, err == null ? "table" : "json"]);
+            })
+            return;
             break;
     }
 
-    return [1, "Invalid command! Try \\h", "message"];
+    callback([1, "Invalid command! Try \\h", "message", "message"]);
 }
 
 module.exports = CommandHandler;
