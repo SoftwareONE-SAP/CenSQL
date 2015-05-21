@@ -53,13 +53,20 @@ CommandHandler.prototype.runInternalCommand = function(command, callback) {
             break;
         case "ta":
 
-            if(cParts.length != 2 || cParts[1].length == 0){
+            if(cParts.length < 2 || cParts[1].length == 0){
                 callback([1, "Invalid input! Try: \\h for help", "message"]);
                 return;
             }
 
             this.conn.exec("conn", "SELECT * FROM SYS.TABLES WHERE SCHEMA_NAME LIKE '" + cParts[1] + "'", function(err, data) {
-                callback([err == null ? 0 : 1, err == null ? data : err, err == null ? "table" : "json"]);
+                callback([err == null ? 0 : 1, err == null ? data : err, err == null ? (cParts[cParts.length - 1].slice(-2) == "\\g" ? "group" : "table") : "json"]);
+            })
+            return;
+            break;
+        case "st":
+            this.conn.exec("conn", 
+                "SELECT HOST,HOST_ACTIVE,HOST_STATUS FROM SYS.M_LANDSCAPE_HOST_CONFIGURATION", function(err, data) {
+                callback([err == null ? 0 : 1, err == null ? data : err, err == null ? (cParts[cParts.length - 1].slice(-2) == "\\g" ? "group" : "table") : "json"]);
             })
             return;
             break;
