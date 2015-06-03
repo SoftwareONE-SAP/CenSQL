@@ -68,7 +68,7 @@ ScreenManager.prototype.ready = function() {
     charm.display("bright");
     charm.foreground("cyan");
 
-    charm.write("For help type \\h\n------------------------------------------------------\n\n");
+    charm.write("For help type \\h\n-----------------------------------------------------\n\n");
 
     charm.display("reset");
 
@@ -143,7 +143,7 @@ ScreenManager.prototype.drawTable = function(data) {
             keys = Object.keys(data[i][0]);
 
             charm.write(keys.join(" | "))
-            charm.write("\n" + new Array(process.stdout.columns / 2).join("- ") + "\n");
+            charm.write("\n" + new Array(10).join("- ") + "\n");
         } else {
             charm.write("No Results\n");
         }
@@ -158,7 +158,7 @@ ScreenManager.prototype.drawTable = function(data) {
             };
 
             charm.write(rows.join(" | ") + "\n");
-            // charm.write(new Array(process.stdout.columns / 2).join("- ") + "\n");
+            // charm.write(new Array(10).join("- ") + "\n");
         };
     };
 
@@ -181,7 +181,7 @@ ScreenManager.prototype.drawGroup = function(data) {
 
         for (var k = 0; k < data[i].length; k++) {
 
-            charm.write("No: " + k + " " + new Array(process.stdout.columns - ("        " + k).length).join("-") + "\n");
+            charm.write("No: " + k + " " + new Array(10).join("-") + "\n");
             
             for (var j = keys.length - 1; j >= 0; j--) {
                 charm.write(" " + keys[j] + ": " + data[i][k][keys[j]] + "\n")
