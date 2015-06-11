@@ -3,6 +3,18 @@
 
 <h5>A better CLI client for SAP HANA</h5>
 
+<p>
+CenSQL (Pronounced "<i>Sen-Sea-Quel</i>") is an unofficial replacement for the hdbsql CLI provided by SAP. It was created because using hdbsql is difficult and clunky due to issues with the interface.
+</p>
+
+<p>
+As well as having a smoother user interface, CenSQL also provides a lot more extra functionality which is not present in hdbsql, such as short-hands for sql queries useful for any DB admin or developer for example <code>\al</code> for viewing open alerts on the instance you are connected to.
+</p>
+
+<p>
+Finally, CenSQL has support for bar charts and line graphs inside of the CLI interface for showing a 'at-a-glanse' view of the status and history of the instance, for example <code>\cpu</code> for showing the CPU usage for each host on the instance and <code>\smem</code> for showing the current shared memory.
+</p>
+
 <h3>Installation</h3>
 <ol>
   
