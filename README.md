@@ -78,10 +78,9 @@ CenSQL v1.0.0 Help
 -----------------------------------------------------
 Basic:
 \h			- For Help
-\sc			- To list schemas
-\st			- To list hosts for instance
-\ta {SCHEMA_NAME}	- To list tables for a schema
-\vs {SCHEMA_NAME}	- To list views for a schema
+\sc, \ds		- To list schemas
+\ta, \dt {SCHEMA_NAME}	- To list tables for a schema
+\vs, \dv {SCHEMA_NAME}	- To list views for a schema
 \in			- To list instances
 
 History:
@@ -98,6 +97,7 @@ History:
 
 Current Status:
 \al			- To list active alerts
+\st			- To list hosts for instance
 \con			- To list connections
 \serv			- To list services
 \tt {OPTIONAL_LIMIT}	- To list the largest column tables
