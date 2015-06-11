@@ -49,10 +49,9 @@ CommandHandler.prototype.runInternalCommand = function(command, callback) {
                     "-----------------------------------------------------",
                     "Basic:",
                     "\\h\t\t\t- For Help",
-                    "\\sc\t\t\t- To list schemas",
-                    "\\st\t\t\t- To list hosts for instance",
-                    "\\ta {SCHEMA_NAME}\t- To list tables for a schema",
-                    "\\vs {SCHEMA_NAME}\t- To list views for a schema",
+                    "\\sc, \\ds\t\t- To list schemas",
+                    "\\ta, \\dt {SCHEMA_NAME}\t- To list tables for a schema",
+                    "\\vs, \\dv {SCHEMA_NAME}\t- To list views for a schema",
                     "\\in\t\t\t- To list instances",
                     "",
                     "History:",
@@ -69,6 +68,7 @@ CommandHandler.prototype.runInternalCommand = function(command, callback) {
                     "",
                     "Current Status:",
                     "\\al\t\t\t- To list active alerts",
+                    "\\st\t\t\t- To list hosts for instance",
                     "\\con\t\t\t- To list connections",
                     "\\serv\t\t\t- To list services",
                     "\\tt {OPTIONAL_LIMIT}\t- To list the largest column tables",
@@ -101,6 +101,7 @@ CommandHandler.prototype.runInternalCommand = function(command, callback) {
             break;
 
         case "sc":
+        case "ds":
             this.conn.exec("conn", "SELECT * FROM SYS.SCHEMAS", function(err, data) {
                 callback([err == null ? 0 : 1, err == null ? data : err, err == null ? (cParts[cParts.length - 1].toLowerCase().slice(-2) == "g" ? "group" : "table") : "json"]);
             })
@@ -122,6 +123,7 @@ CommandHandler.prototype.runInternalCommand = function(command, callback) {
             break;
 
         case "ta":
+        case "dt":
 
             if(cParts.length < 2 || cParts[1].length == 0 || cParts[1].toLowerCase() == "\\g"){
                 callback([1, "Invalid input! Try: \\h for help", "message"]);
@@ -135,6 +137,7 @@ CommandHandler.prototype.runInternalCommand = function(command, callback) {
             break;
 
         case "vs":
+        case "dv":
 
             if(cParts.length < 2 || cParts[1].length == 0 || cParts[1].toLowerCase() == "\\g"){
                 callback([1, "Invalid input! Try: \\h for help", "message"]);
