@@ -10,7 +10,7 @@
   <li>Run <code>git clone git@github.com:Centiq/CenSQL.git</code></li>
   <li>cd CenSQL</li>
   <li>
-    Use application like so: <code>./app.js --user USERNAME --port PORT --host HOSTNAME/IP --pass PASSWORD</code>
+    Use application like so: <code>./app.js --user USERNAME --port 3{INSTANCE_ID}15 --host HOSTNAME/IP --pass PASSWORD</code>
     <br>
     Example: <code>./app.js --user SYSTEM --port 30015 --host 127.0.0.1 --pass myPassword123</code>
   </li>
