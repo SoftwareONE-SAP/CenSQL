@@ -8,7 +8,7 @@ var argv = require('optimist').argv;
 
 var CenSql = function(){
 
-	this.screen = new ScreenManager({
+	this.screen = new ScreenManager(argv.command, {
 		handleCommand: function(command, callback){
 			return this.commandHandler.onCommand(command, callback);
 		}.bind(this)
@@ -17,10 +17,13 @@ var CenSql = function(){
 	this.hdb = new HDB();
 
 	this.hdb.connect(argv.host, argv.user, argv.pass, argv.port, "conn", function(err, data){
-        this.screen.ready();
+
+		if(!argv.command){
+	        this.screen.ready();
+		}
 
         setTimeout(function(){
-			this.commandHandler = new CommandHandler(this.screen, this.hdb);
+			this.commandHandler = new CommandHandler(this.screen, this.hdb, argv.command);
         }.bind(this), 1);
 
     }.bind(this))

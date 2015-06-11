@@ -2,13 +2,21 @@ var debug = require("debug")("censql:ScreenManager");
 var readline = require('readline');
 var charm = require('charm')(process.stdout)
 
-var ScreenManager = function(commandHandler) {
+var ScreenManager = function(isBatch, commandHandler) {
+    this.isBatch = isBatch;
     this.commandHandler = commandHandler;
     this.init.call(this);
 }
 
 ScreenManager.prototype.init = function() {
-    this.printHeader();
+
+    if(!this.isBatch){
+        this.printHeader();
+    }
+
+    this.settings = {
+        plotHeight: 10
+    }
 
     this.setupInput();
 }
@@ -116,8 +124,13 @@ ScreenManager.prototype.printCommandOutput = function(command, output) {
             break;
     }
 
-    charm.foreground("cyan");
-    charm.write("> ");
+    if(!this.isBatch){
+        charm.foreground("cyan");
+        charm.write("> ");
+    }else{
+        charm.foreground("white");
+    }
+
     charm.display("reset");
 }
 
@@ -223,9 +236,8 @@ ScreenManager.prototype.drawLineGraph = function(data, title){
              */
 
             var plot = []
-            var plotHeight = 10;
 
-            for(var k = 0 ; k < plotHeight + 1; k++){
+            for(var k = 0 ; k < this.settings.plotHeight + 1; k++){
                 plot.push([]);
             }
 
@@ -256,14 +268,14 @@ ScreenManager.prototype.drawLineGraph = function(data, title){
 
                 if(data[i][k][keys[3]] !== sections[s]) continue;
 
-                var val = parseInt(((data[i][k][keys[4]] - minValue) / (maxValue - minValue)) * plotHeight);
+                var val = parseInt(((data[i][k][keys[4]] - minValue) / (maxValue - minValue)) * this.settings.plotHeight);
 
-                for(var j = 0 ; j < plotHeight + 1; j++){
+                for(var j = 0 ; j < this.settings.plotHeight + 1; j++){
                     
                     var point = "·"
 
 
-                    if(j == plotHeight - val){
+                    if(j == this.settings.plotHeight - val){
                         point = "■"
                     }
 
@@ -276,25 +288,25 @@ ScreenManager.prototype.drawLineGraph = function(data, title){
              * Display plot
              */
 
-            var widthRatio = Math.floor(process.stdout.columns / plot[0].length);
+            var widthRatio = Math.floor((process.stdout.columns - 3) / plot[0].length);
 
             if(widthRatio < 1){
                 widthRatio = 1;
             }
 
-            charm.write("┌" + maxValue)
+            charm.write("╔" + maxValue)
 
             for (var k = 0; k < (plot[0].length * widthRatio) - ("" + maxValue).length; k++) {
-                charm.write("─");
+                charm.write("═");
             };
 
-            charm.write("\n");
+            charm.write("╗\n");
 
             for (var k = 0; k < plot.length; k++) {
 
                 plot[k].reverse()
 
-                charm.write("|");
+                charm.write("║");
 
                 for (var o = 0; o < plot[k].length; o++) {
                     for(var w = 0 ; w < widthRatio; w++){
@@ -311,16 +323,16 @@ ScreenManager.prototype.drawLineGraph = function(data, title){
                     }
                 };
 
-                charm.write("\n");
+                charm.write("║\n");
             };
 
-            charm.write("└" + minValue);
+            charm.write("╚" + minValue);
 
             for (var k = 0; k < (plot[0].length * widthRatio) - ("" + minValue).length; k++) {
-                charm.write("─");
+                charm.write("═");
             };
 
-            charm.write("\n");
+            charm.write("╝\n");
 
             var description = title + " - " + sections[s];
 

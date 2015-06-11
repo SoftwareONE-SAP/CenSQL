@@ -1,13 +1,16 @@
 var debug = require("debug")("censql:CommandHandler");
 
 
-var CommandHandler = function(screen, conn) {
+var CommandHandler = function(screen, conn, command) {
     this.screen = screen;
     this.conn = conn;
-    this.init.call(this);
-}
 
-CommandHandler.prototype.init = function(callback) {
+    if(command){
+        this.onCommand(command, function(output){
+            this.screen.printCommandOutput("\n", output);
+            process.exit(0)
+        }.bind(this));
+    }
 
 }
 
@@ -44,6 +47,7 @@ CommandHandler.prototype.runInternalCommand = function(command, callback) {
                 0, [
                     "CenSQL v1.0.0 Help",
                     "-----------------------------------------------------",
+                    "Basic:",
                     "\\h\t\t\t- For Help",
                     "\\sc\t\t\t- To list schemas",
                     "\\st\t\t\t- To list hosts for instance",
@@ -72,9 +76,27 @@ CommandHandler.prototype.runInternalCommand = function(command, callback) {
                     "\\smem\t\t\t- Show bar chart of shared memeory",
                     "\\hmem\t\t\t- Show bar chart of heap memory usage per service",
                     "\\tmem\t\t\t- Show bar chart of total memory usage per service",
+                    "\\scpu\t\t\t- Show bar chart of cpu usage per service",
+                    "",
+                    "Settings:",
+                    "\\sgh\t\t\t-Set the height to draw graphs"
                 ].join("\n"),
                 "message"
             ]);
+            return;
+            break;
+
+        case "sgh":
+            
+            if(!cParts[1].match(/^\d+$/)){
+                callback([1, "Syntax: \\sgh {HEIGHT}", "message"]);
+                return;
+                break;
+            }
+
+            this.screen.settings.plotHeight = parseInt(cParts[1])
+
+            callback([0, "Graph height set to: " + this.screen.settings.plotHeight, "message"]);
             return;
             break;
 
@@ -127,7 +149,7 @@ CommandHandler.prototype.runInternalCommand = function(command, callback) {
 
         case "st":
             this.conn.exec("conn", 
-                "SELECT HOST,HOST_ACTIVE,HOST_STATUS FROM SYS.M_LANDSCAPE_HOST_CONFIGURATION", function(err, data) {
+                "SELECT HOST,HOST_ACTIVE,HOST_STATUS FROM SYS.M_LANDSCAPE_HOST_CONFIGURATION ORDER BY HOST", function(err, data) {
                 callback([err == null ? 0 : 1, err == null ? data : err, err == null ? (cParts[cParts.length - 1].toLowerCase().slice(-2) == "g" ? "group" : "table") : "json"]);
             })
             return;
@@ -218,11 +240,11 @@ CommandHandler.prototype.runInternalCommand = function(command, callback) {
 
         case "csm":
 
-            this.conn.exec("conn", "SELECT MONTH(SNAPSHOT_ID), DAYOFMONTH(SNAPSHOT_ID), HOUR(SNAPSHOT_ID), HOST, SUM(MEMORY_SIZE_IN_TOTAL), MIN(SNAPSHOT_ID)\
+            this.conn.exec("conn", "SELECT MONTH(SNAPSHOT_ID), DAYOFMONTH(SNAPSHOT_ID), HOUR(SNAPSHOT_ID), 'Instance', SUM(MEMORY_SIZE_IN_TOTAL), MIN(SNAPSHOT_ID)\
                 FROM _SYS_STATISTICS.HOST_COLUMN_TABLES_PART_SIZE\
                 WHERE SNAPSHOT_ID > ADD_DAYS(CURRENT_TIMESTAMP, -3)\
-                GROUP BY MONTH(SNAPSHOT_ID), DAYOFMONTH(SNAPSHOT_ID), HOUR(SNAPSHOT_ID), HOST\
-                ORDER BY MONTH(SNAPSHOT_ID) DESC, DAYOFMONTH(SNAPSHOT_ID) DESC, HOUR(SNAPSHOT_ID) DESC, HOST DESC", function(err, data) {
+                GROUP BY MONTH(SNAPSHOT_ID), DAYOFMONTH(SNAPSHOT_ID), HOUR(SNAPSHOT_ID)\
+                ORDER BY MONTH(SNAPSHOT_ID) DESC, DAYOFMONTH(SNAPSHOT_ID) DESC, HOUR(SNAPSHOT_ID) DESC", function(err, data) {
                 callback([err == null ? 0 : 1, err == null ? data : err, err == null ? "line-graph" : "json", "CS memory total over the last 3 days"]);
             })
 
@@ -231,11 +253,11 @@ CommandHandler.prototype.runInternalCommand = function(command, callback) {
 
         case "csc":
 
-            this.conn.exec("conn", "SELECT MONTH(SNAPSHOT_ID), DAYOFMONTH(SNAPSHOT_ID), HOUR(SNAPSHOT_ID), HOST, SUM(RECORD_COUNT), MIN(SNAPSHOT_ID)\
+            this.conn.exec("conn", "SELECT MONTH(SNAPSHOT_ID), DAYOFMONTH(SNAPSHOT_ID), HOUR(SNAPSHOT_ID), 'Instance', SUM(RECORD_COUNT), MIN(SNAPSHOT_ID)\
                 FROM _SYS_STATISTICS.HOST_COLUMN_TABLES_PART_SIZE\
                 WHERE SNAPSHOT_ID > ADD_DAYS(CURRENT_TIMESTAMP, -3)\
-                GROUP BY MONTH(SNAPSHOT_ID), DAYOFMONTH(SNAPSHOT_ID), HOUR(SNAPSHOT_ID), HOST\
-                ORDER BY MONTH(SNAPSHOT_ID) DESC, DAYOFMONTH(SNAPSHOT_ID) DESC, HOUR(SNAPSHOT_ID) DESC, HOST DESC", function(err, data) {
+                GROUP BY MONTH(SNAPSHOT_ID), DAYOFMONTH(SNAPSHOT_ID), HOUR(SNAPSHOT_ID)\
+                ORDER BY MONTH(SNAPSHOT_ID) DESC, DAYOFMONTH(SNAPSHOT_ID) DESC, HOUR(SNAPSHOT_ID) DESC", function(err, data) {
                 callback([err == null ? 0 : 1, err == null ? data : err, err == null ? "line-graph" : "json", "CS record count over the last 3 days"]);
             })
 
@@ -244,11 +266,11 @@ CommandHandler.prototype.runInternalCommand = function(command, callback) {
 
         case "csd":
 
-            this.conn.exec("conn", "SELECT MONTH(SNAPSHOT_ID), DAYOFMONTH(SNAPSHOT_ID), HOUR(SNAPSHOT_ID), HOST, SUM(MEMORY_SIZE_IN_DELTA), MIN(SNAPSHOT_ID)\
+            this.conn.exec("conn", "SELECT MONTH(SNAPSHOT_ID), DAYOFMONTH(SNAPSHOT_ID), HOUR(SNAPSHOT_ID), 'Instance', SUM(MEMORY_SIZE_IN_DELTA), MIN(SNAPSHOT_ID)\
                 FROM _SYS_STATISTICS.HOST_COLUMN_TABLES_PART_SIZE\
                 WHERE SNAPSHOT_ID > ADD_DAYS(CURRENT_TIMESTAMP, -3)\
-                GROUP BY MONTH(SNAPSHOT_ID), DAYOFMONTH(SNAPSHOT_ID), HOUR(SNAPSHOT_ID), HOST\
-                ORDER BY MONTH(SNAPSHOT_ID) DESC, DAYOFMONTH(SNAPSHOT_ID) DESC, HOUR(SNAPSHOT_ID) DESC, HOST DESC", function(err, data) {
+                GROUP BY MONTH(SNAPSHOT_ID), DAYOFMONTH(SNAPSHOT_ID), HOUR(SNAPSHOT_ID)\
+                ORDER BY MONTH(SNAPSHOT_ID) DESC, DAYOFMONTH(SNAPSHOT_ID) DESC, HOUR(SNAPSHOT_ID) DESC", function(err, data) {
                 callback([err == null ? 0 : 1, err == null ? data : err, err == null ? "line-graph" : "json", "CS in memory delta over the last 3 days"]);
             })
 
@@ -257,11 +279,11 @@ CommandHandler.prototype.runInternalCommand = function(command, callback) {
 
         case "csr":
 
-            this.conn.exec("conn", "SELECT MONTH(SNAPSHOT_ID), DAYOFMONTH(SNAPSHOT_ID), HOUR(SNAPSHOT_ID), HOST, SUM(READ_COUNT), MIN(SNAPSHOT_ID)\
+            this.conn.exec("conn", "SELECT MONTH(SNAPSHOT_ID), DAYOFMONTH(SNAPSHOT_ID), HOUR(SNAPSHOT_ID), 'Instance', SUM(READ_COUNT), MIN(SNAPSHOT_ID)\
                 FROM _SYS_STATISTICS.HOST_COLUMN_TABLES_PART_SIZE\
                 WHERE SNAPSHOT_ID > ADD_DAYS(CURRENT_TIMESTAMP, -3)\
-                GROUP BY MONTH(SNAPSHOT_ID), DAYOFMONTH(SNAPSHOT_ID), HOUR(SNAPSHOT_ID), HOST\
-                ORDER BY MONTH(SNAPSHOT_ID) DESC, DAYOFMONTH(SNAPSHOT_ID) DESC, HOUR(SNAPSHOT_ID) DESC, HOST DESC", function(err, data) {
+                GROUP BY MONTH(SNAPSHOT_ID), DAYOFMONTH(SNAPSHOT_ID), HOUR(SNAPSHOT_ID)\
+                ORDER BY MONTH(SNAPSHOT_ID) DESC, DAYOFMONTH(SNAPSHOT_ID) DESC, HOUR(SNAPSHOT_ID) DESC", function(err, data) {
                 callback([err == null ? 0 : 1, err == null ? data : err, err == null ? "line-graph" : "json", "CS read count over the last 3 days"]);
             })
 
@@ -270,11 +292,11 @@ CommandHandler.prototype.runInternalCommand = function(command, callback) {
 
         case "csw":
 
-            this.conn.exec("conn", "SELECT MONTH(SNAPSHOT_ID), DAYOFMONTH(SNAPSHOT_ID), HOUR(SNAPSHOT_ID), HOST, SUM(WRITE_COUNT), MIN(SNAPSHOT_ID)\
+            this.conn.exec("conn", "SELECT MONTH(SNAPSHOT_ID), DAYOFMONTH(SNAPSHOT_ID), HOUR(SNAPSHOT_ID), 'Instance', SUM(WRITE_COUNT), MIN(SNAPSHOT_ID)\
                 FROM _SYS_STATISTICS.HOST_COLUMN_TABLES_PART_SIZE\
                 WHERE SNAPSHOT_ID > ADD_DAYS(CURRENT_TIMESTAMP, -3)\
-                GROUP BY MONTH(SNAPSHOT_ID), DAYOFMONTH(SNAPSHOT_ID), HOUR(SNAPSHOT_ID), HOST\
-                ORDER BY MONTH(SNAPSHOT_ID) DESC, DAYOFMONTH(SNAPSHOT_ID) DESC, HOUR(SNAPSHOT_ID) DESC, HOST DESC", function(err, data) {
+                GROUP BY MONTH(SNAPSHOT_ID), DAYOFMONTH(SNAPSHOT_ID), HOUR(SNAPSHOT_ID)\
+                ORDER BY MONTH(SNAPSHOT_ID) DESC, DAYOFMONTH(SNAPSHOT_ID) DESC, HOUR(SNAPSHOT_ID) DESC", function(err, data) {
                 callback([err == null ? 0 : 1, err == null ? data : err, err == null ? "line-graph" : "json", "CS read count over the last 3 days"]);
             })
 
@@ -296,22 +318,29 @@ CommandHandler.prototype.runInternalCommand = function(command, callback) {
             break;
 
         case "smem":
-            this.conn.exec("conn", "SELECT CONCAT(CONCAT(HOST, ' - ') , PORT) AS HOST, NAME, VALUE FROM M_MEMORY WHERE NAME IN ('SHARED_MEMORY_USED_SIZE', 'SHARED_MEMORY_FREE_SIZE')", function(err, data) {
+            this.conn.exec("conn", "SELECT CONCAT(CONCAT(HOST, ' - ') , PORT) AS HOST, NAME, VALUE FROM SYS.M_MEMORY WHERE NAME IN ('SHARED_MEMORY_USED_SIZE', 'SHARED_MEMORY_FREE_SIZE')", function(err, data) {
                 callback([err == null ? 0 : 1, err == null ? data : err, err == null ? "key-value-bar-chart" : "json", "Shared Memory Usage"]);
             })
             return;
             break;
 
         case "hmem":
-            this.conn.exec("conn", "SELECT CONCAT(CONCAT(HOST, ' - ') , SERVICE_NAME), HEAP_MEMORY_USED_SIZE, HEAP_MEMORY_ALLOCATED_SIZE - HEAP_MEMORY_USED_SIZE FROM M_SERVICE_MEMORY", function(err, data) {
+            this.conn.exec("conn", "SELECT CONCAT(CONCAT(HOST, ' - ') , SERVICE_NAME), HEAP_MEMORY_USED_SIZE, HEAP_MEMORY_ALLOCATED_SIZE - HEAP_MEMORY_USED_SIZE FROM SYS.M_SERVICE_MEMORY", function(err, data) {
                 callback([err == null ? 0 : 1, err == null ? data : err, err == null ? "bar-chart" : "json", "Heap Memory Usage"]);
             })
             return;
             break;
 
         case "tmem":
-            this.conn.exec("conn", "SELECT CONCAT(CONCAT(HOST, ' - ') , SERVICE_NAME), TOTAL_MEMORY_USED_SIZE, EFFECTIVE_ALLOCATION_LIMIT - TOTAL_MEMORY_USED_SIZE FROM M_SERVICE_MEMORY", function(err, data) {
+            this.conn.exec("conn", "SELECT CONCAT(CONCAT(HOST, ' - ') , SERVICE_NAME), TOTAL_MEMORY_USED_SIZE, EFFECTIVE_ALLOCATION_LIMIT - TOTAL_MEMORY_USED_SIZE FROM SYS.M_SERVICE_MEMORY", function(err, data) {
                 callback([err == null ? 0 : 1, err == null ? data : err, err == null ? "bar-chart" : "json", "Total Memory Usage"]);
+            })
+            return;
+            break;
+
+        case "scpu":
+            this.conn.exec("conn", "SELECT CONCAT(CONCAT(HOST, ' - ') , SERVICE_NAME), TOTAL_CPU AS WORKING, 100 - TOTAL_CPU AS IDLE FROM SYS.M_SERVICE_STATISTICS WHERE TOTAL_CPU <> -1", function(err, data) {
+                callback([err == null ? 0 : 1, err == null ? data : err, err == null ? "bar-chart" : "json", "CPU Usage"]);
             })
             return;
             break;
