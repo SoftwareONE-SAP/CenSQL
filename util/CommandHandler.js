@@ -50,6 +50,7 @@ CommandHandler.prototype.runInternalCommand = function(command, callback) {
                     "Basic:",
                     "\\h\t\t\t- For Help",
                     "\\sc, \\ds\t\t- To list schemas",
+                    "\\us, \\du\t\t- To list users",
                     "\\ta, \\dt {SCHEMA_NAME}\t- To list tables for a schema",
                     "\\vs, \\dv {SCHEMA_NAME}\t- To list views for a schema",
                     "\\in\t\t\t- To list instances",
@@ -103,6 +104,14 @@ CommandHandler.prototype.runInternalCommand = function(command, callback) {
         case "sc":
         case "ds":
             this.conn.exec("conn", "SELECT * FROM SYS.SCHEMAS", function(err, data) {
+                callback([err == null ? 0 : 1, err == null ? data : err, err == null ? (cParts[cParts.length - 1].toLowerCase().slice(-2) == "g" ? "group" : "table") : "json"]);
+            })
+            return;
+            break;
+
+        case "us":
+        case "du":
+            this.conn.exec("conn", "SELECT USER_ID, USER_NAME, USER_MODE, LAST_SUCCESSFUL_CONNECT, USER_DEACTIVATED FROM SYS.USERS", function(err, data) {
                 callback([err == null ? 0 : 1, err == null ? data : err, err == null ? (cParts[cParts.length - 1].toLowerCase().slice(-2) == "g" ? "group" : "table") : "json"]);
             })
             return;
