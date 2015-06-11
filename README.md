@@ -11,8 +11,10 @@
   <li>cd CenSQL</li>
   <li>
     Use application like so: <code>./app.js --user USERNAME --port 3{INSTANCE_ID}15 --host HOSTNAME/IP --pass PASSWORD</code>
-    <br>
+    <br><br>
     Example: <code>./app.js --user SYSTEM --port 30015 --host 127.0.0.1 --pass myPassword123</code>
+    <br><br>
+    Optionally, supply the sql to run without entering the interactive mode witht he <code>--command</code> option
   </li>
 
 </ol>
