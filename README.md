@@ -3,6 +3,18 @@
 
 <h5>A better CLI client for SAP HANA</h5>
 
+<p>
+CenSQL (Pronounced "<i>Sen-Sea-Quel</i>") is an unofficial replacement for the hdbsql CLI provided by SAP. It was created because using hdbsql is difficult and clunky due to issues with the interface.
+</p>
+
+<p>
+As well as having a smoother user interface, CenSQL also provides a lot more extra functionality which is not present in hdbsql, such as short-hands for sql queries useful for any DB admin or developer for example <code>\al</code> for viewing open alerts on the instance you are connected to.
+</p>
+
+<p>
+Finally, CenSQL has support for bar charts and line graphs inside of the CLI interface for showing a 'at-a-glanse' view of the status and history of the instance, for example <code>\cpu</code> for showing the CPU usage for each host on the instance and <code>\smem</code> for showing the current shared memory.
+</p>
+
 <h3>Installation</h3>
 <ol>
   
@@ -66,10 +78,9 @@ CenSQL v1.0.0 Help
 -----------------------------------------------------
 Basic:
 \h			- For Help
-\sc			- To list schemas
-\st			- To list hosts for instance
-\ta {SCHEMA_NAME}	- To list tables for a schema
-\vs {SCHEMA_NAME}	- To list views for a schema
+\sc, \ds		- To list schemas
+\ta, \dt {SCHEMA_NAME}	- To list tables for a schema
+\vs, \dv {SCHEMA_NAME}	- To list views for a schema
 \in			- To list instances
 
 History:
@@ -86,6 +97,7 @@ History:
 
 Current Status:
 \al			- To list active alerts
+\st			- To list hosts for instance
 \con			- To list connections
 \serv			- To list services
 \tt {OPTIONAL_LIMIT}	- To list the largest column tables
