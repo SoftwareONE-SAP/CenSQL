@@ -15,6 +15,8 @@ As well as having a smoother user interface, CenSQL also provides a lot more ext
 Finally, CenSQL has support for bar charts and line graphs inside of the CLI interface for showing a 'at-a-glanse' view of the status and history of the instance, for example <code>\cpu</code> for showing the CPU usage for each host on the instance and <code>\smem</code> for showing the current shared memory.
 </p>
 
+<hr>
+
 <h3>Installation</h3>
 <ol>
   
@@ -31,9 +33,11 @@ Finally, CenSQL has support for bar charts and line graphs inside of the CLI int
 
 </ol>
 
+<hr>
+
 <h3>Example Output</h3>
 
-<h5>Basic usage</h5>
+<h5>Basic SQL usage</h5>
 ```
   > SELECT HOST, SCHEMA_NAME, TABLE_NAME FROM SYS.M_CS_TABLES LIMIT 5
   
@@ -70,6 +74,9 @@ No: 4 -------------------
  SCHEMA_NAME: TEST_ANARCHY_6FWJAKF2EGYBKGA2
  TABLE_NAME: ANARCHY_038VUW1QBSPDBPSV
 ```
+
+<hr>
+
 <h5>Help Section</h5>
 ```
 > \h
@@ -110,8 +117,11 @@ Current Status:
 Settings:
 \sgh			-Set the height to draw graphs
 ```
-<h4>View Status</h4>
+
+<h3>View Status</h3>
+
 <h5>View host status:</h5>
+
 ```
 > \st
 
@@ -213,7 +223,8 @@ CPU Usage - dev-kvmhana03 - compileserver
 - WORKING
 - IDLE
 ```
-<h4>Show History</h4>
+
+<h3>View History</h3>
 <h5>Show Memory Usage For Column Storage</h5>
 ```
  \csm
@@ -284,3 +295,6 @@ CPU Usage - dev-kvmhana03 - compileserver
 ╚293052172══════════════════════════════════════════════════════════════╝
            CS in memory delta over the last 3 days - Instance
 ```
+
+<hr>
+License: <a href="https://github.com/Centiq/CenSQL/blob/master/license.md">MIT</a>
