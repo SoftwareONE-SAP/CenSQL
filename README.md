@@ -7,7 +7,7 @@
 <ol>
   
   <li>Install NodeJS v0.10.30 or higher (If not already installed)</li>
-  <li>git clone ...</li>
+  <li>Run <code>git clone git@github.com:Centiq/CenSQL.git</code></li>
   <li>cd CenSQL</li>
   <li>
     Use application like so: <code>./app.js --user USERNAME --port PORT --host HOSTNAME/IP --pass PASSWORD</code>
