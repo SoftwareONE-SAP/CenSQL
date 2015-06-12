@@ -16,6 +16,9 @@ var CommandHandler = function(screen, conn, command) {
 
 CommandHandler.prototype.onCommand = function(command, callback) {
 
+    /**
+     * Is the command an internal command? (Does it start with a '\')
+     */
     if (command.charAt(0) == "\\") {
         this.runInternalCommand(command.substring(1), callback);
         return;
@@ -25,6 +28,10 @@ CommandHandler.prototype.onCommand = function(command, callback) {
      * If we have got this far, it is not an internal command and should instead be ran on HANA
      */
 
+    /**
+     * Should the data be shown in a group view?
+     * @type {Boolean}
+     */
     var isGroupOption = false;
 
     if(command.toLowerCase().slice(-2) == "\\g"){
@@ -32,6 +39,9 @@ CommandHandler.prototype.onCommand = function(command, callback) {
         command = command.substring(0, command.length - 2);
     }
 
+    /**
+     * Run the command as a string of SQL and send it to HANA
+     */
     this.conn.exec("conn", command, function(err, data) {
         callback([err == null ? 0 : 1, err == null ? data : err, err == null ? (isGroupOption ? "group" : "table") : "json"]);
     })
@@ -39,7 +49,17 @@ CommandHandler.prototype.onCommand = function(command, callback) {
 
 CommandHandler.prototype.runInternalCommand = function(command, callback) {
 
+    /**
+     * The parts of the command
+     * @type {String[]}
+     */
     var cParts = command.split(/\\| /);
+
+    /**
+     * Should the data be shown in the group view
+     * @type {Boolean}
+     */
+    var isGroupView = cParts[cParts.length - 1].toLowerCase().slice(-2) == "g";
 
     switch (cParts[0]) {
         case "h":
@@ -56,6 +76,7 @@ CommandHandler.prototype.runInternalCommand = function(command, callback) {
                     "\\in\t\t\t- To list instances",
                     "",
                     "History:",
+                    "\\ul {OPTIONAL_LIMIT}\t- To list recent unloads",
                     "\\mem\t\t\t- Graph physical memory over the last 3 days",
                     "\\imem\t\t\t- Graph instance used memory over the last 3 days",
                     "\\cpu\t\t\t- Graph cpu over the last 3 days",
@@ -104,7 +125,7 @@ CommandHandler.prototype.runInternalCommand = function(command, callback) {
         case "sc":
         case "ds":
             this.conn.exec("conn", "SELECT * FROM SYS.SCHEMAS", function(err, data) {
-                callback([err == null ? 0 : 1, err == null ? data : err, err == null ? (cParts[cParts.length - 1].toLowerCase().slice(-2) == "g" ? "group" : "table") : "json"]);
+                callback([err == null ? 0 : 1, err == null ? data : err, err == null ? (isGroupView ? "group" : "table") : "json"]);
             })
             return;
             break;
@@ -112,21 +133,21 @@ CommandHandler.prototype.runInternalCommand = function(command, callback) {
         case "us":
         case "du":
             this.conn.exec("conn", "SELECT USER_ID, USER_NAME, USER_MODE, LAST_SUCCESSFUL_CONNECT, USER_DEACTIVATED FROM SYS.USERS", function(err, data) {
-                callback([err == null ? 0 : 1, err == null ? data : err, err == null ? (cParts[cParts.length - 1].toLowerCase().slice(-2) == "g" ? "group" : "table") : "json"]);
+                callback([err == null ? 0 : 1, err == null ? data : err, err == null ? (isGroupView ? "group" : "table") : "json"]);
             })
             return;
             break;
 
         case "serv":
             this.conn.exec("conn", "SELECT * FROM SYS.M_SERVICES", function(err, data) {
-                callback([err == null ? 0 : 1, err == null ? data : err, err == null ? (cParts[cParts.length - 1].toLowerCase().slice(-2) == "g" ? "group" : "table") : "json"]);
+                callback([err == null ? 0 : 1, err == null ? data : err, err == null ? (isGroupView ? "group" : "table") : "json"]);
             })
             return;
             break;
 
         case "in":
             this.conn.exec("conn", "SELECT * FROM SYS.M_DATABASES", function(err, data) {
-                callback([err == null ? 0 : 1, err == null ? data : err, err == null ? (cParts[cParts.length - 1].toLowerCase().slice(-2) == "g" ? "group" : "table") : "json"]);
+                callback([err == null ? 0 : 1, err == null ? data : err, err == null ? (isGroupView ? "group" : "table") : "json"]);
             })
             return;
             break;
@@ -140,7 +161,7 @@ CommandHandler.prototype.runInternalCommand = function(command, callback) {
             }
 
             this.conn.exec("conn", "SELECT * FROM SYS.TABLES WHERE SCHEMA_NAME LIKE '" + cParts[1] + "'", function(err, data) {
-                callback([err == null ? 0 : 1, err == null ? data : err, err == null ? (cParts[cParts.length - 1].toLowerCase().slice(-2) == "g" ? "group" : "table") : "json"]);
+                callback([err == null ? 0 : 1, err == null ? data : err, err == null ? (isGroupView ? "group" : "table") : "json"]);
             })
             return;
             break;
@@ -154,7 +175,7 @@ CommandHandler.prototype.runInternalCommand = function(command, callback) {
             }
 
             this.conn.exec("conn", "SELECT VIEW_NAME, VIEW_OID, IS_READ_ONLY, COMMENTS FROM SYS.VIEWS WHERE SCHEMA_NAME LIKE '" + cParts[1] + "'", function(err, data) {
-                callback([err == null ? 0 : 1, err == null ? data : err, err == null ? (cParts[cParts.length - 1].toLowerCase().slice(-2) == "g" ? "group" : "table") : "json"]);
+                callback([err == null ? 0 : 1, err == null ? data : err, err == null ? (isGroupView ? "group" : "table") : "json"]);
             })
             return;
             break;
@@ -162,7 +183,7 @@ CommandHandler.prototype.runInternalCommand = function(command, callback) {
         case "st":
             this.conn.exec("conn", 
                 "SELECT HOST,HOST_ACTIVE,HOST_STATUS FROM SYS.M_LANDSCAPE_HOST_CONFIGURATION ORDER BY HOST", function(err, data) {
-                callback([err == null ? 0 : 1, err == null ? data : err, err == null ? (cParts[cParts.length - 1].toLowerCase().slice(-2) == "g" ? "group" : "table") : "json"]);
+                callback([err == null ? 0 : 1, err == null ? data : err, err == null ? (isGroupView ? "group" : "table") : "json"]);
             })
             return;
             break;
@@ -170,17 +191,28 @@ CommandHandler.prototype.runInternalCommand = function(command, callback) {
         case "ba":
 
             this.conn.exec("conn", "SELECT BACKUP_ID, UTC_START_TIME, STATE_NAME FROM sys.m_backup_catalog\
-                 WHERE ENTRY_TYPE_NAME = 'complete data backup'\
-                 ORDER BY entry_id DESC\
-                 LIMIT " + parseInt(cParts[1] && cParts[1].toLowerCase() != "\\g" ? cParts[1] : 10), function(err, data) {
-                callback([err == null ? 0 : 1, err == null ? data : err, err == null ? (cParts[cParts.length - 1].toLowerCase().slice(-2) == "g" ? "group" : "table") : "json"]);
+                WHERE ENTRY_TYPE_NAME = 'complete data backup'\
+                ORDER BY entry_id DESC\
+                LIMIT " + parseInt(cParts[1] && cParts[1].toLowerCase() != "\\g" ? cParts[1] : 10), function(err, data) {
+                callback([err == null ? 0 : 1, err == null ? data : err, err == null ? (isGroupView ? "group" : "table") : "json"]);
             })
             return;
             break;
 
         case "al":
             this.conn.exec("conn", "SELECT ALERT_TIMESTAMP, ALERT_RATING, ALERT_NAME, ALERT_DETAILS, INDEX FROM _SYS_STATISTICS.STATISTICS_CURRENT_ALERTS", function(err, data) {
-                callback([err == null ? 0 : 1, err == null ? data : err, err == null ? (cParts[cParts.length - 1].toLowerCase().slice(-2) == "g" ? "group" : "table") : "json"]);
+                callback([err == null ? 0 : 1, err == null ? data : err, err == null ? (isGroupView ? "group" : "table") : "json"]);
+            })
+            return;
+            break;
+
+        case "ul":
+            this.conn.exec("conn", "SELECT CONCAT(CONCAT(CONCAT(CONCAT(CONCAT(CONCAT(CONCAT(YEAR(UNLOAD_TIME), '-'), MONTH(UNLOAD_TIME)), '-'), DAYOFMONTH(UNLOAD_TIME)), ' '), HOUR(UNLOAD_TIME)), ':**:**') AS TIME, HOST, COUNT(*) AS \"COLUMNS IN HOUR\"\
+                FROM SYS.M_CS_UNLOADS\
+                GROUP BY YEAR(UNLOAD_TIME), MONTH(UNLOAD_TIME), DAYOFMONTH(UNLOAD_TIME), HOUR(UNLOAD_TIME), HOST\
+                ORDER BY MONTH(UNLOAD_TIME) DESC, DAYOFMONTH(UNLOAD_TIME) DESC, HOUR(UNLOAD_TIME) DESC, HOST DESC\
+                LIMIT " + parseInt(cParts[1] && cParts[1].toLowerCase() != "\\g" ? cParts[1] : 10), function(err, data) {
+                callback([err == null ? 0 : 1, err == null ? data : err, err == null ? (isGroupView ? "group" : "table") : "json"]);
             })
             return;
             break;
@@ -317,14 +349,14 @@ CommandHandler.prototype.runInternalCommand = function(command, callback) {
 
         case "tt":
             this.conn.exec("conn", "SELECT SCHEMA_NAME, TABLE_NAME, LOADED, MEMORY_SIZE_IN_TOTAL, ESTIMATED_MAX_MEMORY_SIZE_IN_TOTAL FROM SYS.M_CS_TABLES ORDER BY MEMORY_SIZE_IN_TOTAL DESC, MEMORY_SIZE_IN_DELTA DESC LIMIT " + parseInt(cParts[1] && cParts[1].toLowerCase() != "\\g" ? cParts[1] : 10), function(err, data) {
-                callback([err == null ? 0 : 1, err == null ? data : err, err == null ? (cParts[cParts.length - 1].toLowerCase().slice(-2) == "g" ? "group" : "table") : "json"]);
+                callback([err == null ? 0 : 1, err == null ? data : err, err == null ? (isGroupView ? "group" : "table") : "json"]);
             })
             return;
             break;
 
         case "con":
             this.conn.exec("conn", "SELECT HOST, USER_NAME, COUNT(*) AS AMOUNT FROM SYS.M_CONNECTIONS WHERE CONNECTION_STATUS = 'RUNNING' OR CONNECTION_STATUS = 'IDLE' GROUP BY HOST, USER_NAME", function(err, data) {
-                callback([err == null ? 0 : 1, err == null ? data : err, err == null ? (cParts[cParts.length - 1].toLowerCase().slice(-2) == "g" ? "group" : "table") : "json"]);
+                callback([err == null ? 0 : 1, err == null ? data : err, err == null ? (isGroupView ? "group" : "table") : "json"]);
             })
             return;
             break;

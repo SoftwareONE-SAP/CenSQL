@@ -8,6 +8,9 @@ var ScreenManager = function(isBatch, commandHandler) {
     this.init.call(this);
 }
 
+/**
+ * Initialize settings and prepare the screen manager
+ */
 ScreenManager.prototype.init = function() {
 
     if(!this.isBatch){
@@ -21,6 +24,9 @@ ScreenManager.prototype.init = function() {
     this.setupInput();
 }
 
+/**
+ * Add an input handler to the cli and pass it to the commandHandler
+ */
 ScreenManager.prototype.setupInput = function() {
     rl = readline.createInterface(process.stdin, process.stdout);
 
@@ -47,6 +53,9 @@ ScreenManager.prototype.setupInput = function() {
     });
 }
 
+/**
+ * Print a pretty header when the user enters interactive mode
+ */
 ScreenManager.prototype.printHeader = function() {
     // charm.erase("screen");
     // charm.position(0, 0)
@@ -67,9 +76,16 @@ ScreenManager.prototype.printHeader = function() {
 
 }
 
+/**
+ * The rest of the program is ready for user input, start listening on stdin
+ */
 ScreenManager.prototype.ready = function() {
 
     charm.erase("line");
+
+    /**
+     * Todo: allow for teminals more than 9999999 chars wide
+     */
     charm.left(9999999);
 
     charm.display("reset");
@@ -83,6 +99,7 @@ ScreenManager.prototype.ready = function() {
     charm.foreground("cyan");
     charm.write("> ");
     charm.display("reset");
+
     process.stdin.resume();
 }
 
@@ -90,6 +107,11 @@ ScreenManager.prototype.message = function(message) {
     charm.write(message + "\n");
 }
 
+/**
+ * Print the output to a command entered by the user
+ * @param  {String} command The command the user ran
+ * @param  {Array} output  the data and how to display it
+ */
 ScreenManager.prototype.printCommandOutput = function(command, output) {
 
     process.stdin.resume();
@@ -134,6 +156,10 @@ ScreenManager.prototype.printCommandOutput = function(command, output) {
     charm.display("reset");
 }
 
+/**
+ * Display an ascii table of data
+ * @param  {Array} data
+ */
 ScreenManager.prototype.drawTable = function(data) {
     for (var i = 0; i < data.length; i++) {
 
@@ -166,8 +192,16 @@ ScreenManager.prototype.drawTable = function(data) {
     };
 }
 
+/**
+ * Display the data in the grouped format
+ * @param  {Array} data
+ */
 ScreenManager.prototype.drawGroup = function(data) {
     for (var i = 0; i < data.length; i++) {
+
+        /**
+         * get keys
+         */
 
         var keys = [];
 
@@ -180,6 +214,10 @@ ScreenManager.prototype.drawGroup = function(data) {
         }
 
         keys.reverse()
+
+        /**
+         * Display data
+         */
 
         for (var k = 0; k < data[i].length; k++) {
 
