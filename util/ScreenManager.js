@@ -13,13 +13,19 @@ var ScreenManager = function(isBatch, commandHandler) {
  */
 ScreenManager.prototype.init = function() {
 
-    if(!this.isBatch){
+    if (!this.isBatch) {
         this.printHeader();
     }
 
     this.settings = {
         plotHeight: 10
     }
+
+    /**
+     * Has the suer tried to quit once?
+     * @type {Boolean}
+     */
+    this.wantsToQuit = false;
 
     this.setupInput();
 }
@@ -32,16 +38,39 @@ ScreenManager.prototype.setupInput = function() {
 
     rl.on('line', function(line) {
 
+        /**
+         * The user has ran a command, reset the quit request
+         * @type {Boolean}
+         */
+        this.wantsToQuit = false;
+
+        /**
+         * remove the user input since we will add it back again later with colour
+         */
         charm.up(1);
         charm.erase("line");
         charm.left(99999);
 
+        /**
+         * Stop taking user input until we have complted this request
+         */
         process.stdin.pause();
 
+        /**
+         * Send the suer command to the command handler
+         */
         this.commandHandler.handleCommand(line, function(output) {
+
+            /**
+             * Print the command to the screen however the command handler thinks is best
+             */
             this.printCommandOutput(line, output);
+
         }.bind(this));
 
+    /**
+     * On close, give the user a pretty message and then stop the entire program
+     */
     }.bind(this)).on('close', function() {
 
         charm.foreground("green");
@@ -51,14 +80,47 @@ ScreenManager.prototype.setupInput = function() {
         rl.close();
         process.exit(0);
     });
+
+    /**
+     * When the user ^Cs make sure they weren't just trying to clear the command
+     */
+    rl.on('SIGINT', function() {
+
+        /**
+         * If this si the second time in a row the user has tried to quit, lets actually quit
+         */
+        if(this.wantsToQuit){
+
+            charm.erase("line");
+            charm.left(99999);
+            charm.up(1);
+
+            /**
+             * Exit command promt
+             */
+            rl.close();
+
+            /**
+             * Exit program
+             */
+            process.exit(0);
+            return
+        }
+
+        charm.erase("line");
+        charm.left(99999);
+
+        this.printCommandOutput("\\q", [2, "Press ^C again to exit", "message"]);
+
+        this.wantsToQuit = true;
+
+    }.bind(this));
 }
 
 /**
  * Print a pretty header when the user enters interactive mode
  */
 ScreenManager.prototype.printHeader = function() {
-    // charm.erase("screen");
-    // charm.position(0, 0)
 
     charm.foreground("cyan");
     charm.display("underscore");
@@ -114,42 +176,96 @@ ScreenManager.prototype.message = function(message) {
  */
 ScreenManager.prototype.printCommandOutput = function(command, output) {
 
+    /**
+     * Re-enable the command line
+     */
     process.stdin.resume();
 
-    charm.foreground(output[0] == 0 ? "green" : "red");
-    charm.write("> " + command + "\n\n");
+    var color = "cyan"
+
+    /**
+     * The colour the output should be
+     */
+    if(output[0] == 0){
+        color = "green"
+    }else if(output[0] == 1){
+        color = "red"
+    }else if(output[0] == 2){
+        color = "yellow"
+    }
+
+    charm.foreground(color);
+
+    /**
+     * Dont print the command if it was a batch command
+     */
+    if (!this.isBatch) {
+        charm.write("> " + command + "\n\n");
+    }
 
     switch (output[2]) {
+
+        /**
+         * Plain text
+         */
         case "message":
             charm.write(output[1] + "\n\n");
             break;
+
+        /**
+         * a table
+         */
         case "table":
             this.drawTable(output[1]);
             break;
+
+        /**
+         * display each row in a key value chunk
+         */
         case "group":
             this.drawGroup(output[1]);
             break;
+
+        /**
+         * turn the output array into json
+         */
         case "json":
             charm.write(JSON.stringify(output[1]) + "\n\n")
             break;
+
+        /**
+         * display a line graph of the data
+         */
         case "line-graph":
             this.drawLineGraph(output[1], output[3]);
             break;
+
+        /**
+         * Display a bar chart for data in a key value store
+         */
         case "key-value-bar-chart":
             this.drawKeyValueBarChart(output[1], output[3]);
             break;
+
+        /**
+         * Display a bar chart of the data in a normal table structor
+         */
         case "bar-chart":
             this.drawBarChart(output[1], output[3]);
             break;
+
+        /**
+         * If the command handler did not supply a valid format, print it as plain text
+         */
         default:
             charm.write("NO DISPLAY TYPE: " + output[1] + "\n\n");
             break;
     }
 
-    if(!this.isBatch){
+    if (!this.isBatch) {
         charm.foreground("cyan");
         charm.write("> ");
-    }else{
+    } else {
         charm.foreground("white");
     }
 
@@ -233,7 +349,7 @@ ScreenManager.prototype.drawGroup = function(data) {
     };
 }
 
-ScreenManager.prototype.drawLineGraph = function(data, title){
+ScreenManager.prototype.drawLineGraph = function(data, title) {
 
     for (var i = 0; i < data.length; i++) {
 
@@ -259,14 +375,14 @@ ScreenManager.prototype.drawLineGraph = function(data, title){
 
         for (var k = 0; k < data[i].length; k++) {
 
-            if(sections.indexOf(data[i][k][keys[3]]) === -1){
+            if (sections.indexOf(data[i][k][keys[3]]) === -1) {
                 sections.push(data[i][k][keys[3]]);
             }
 
         }
 
         sections.sort();
-        
+
         for (var s = 0; s < sections.length; s++) {
 
             /**
@@ -275,25 +391,25 @@ ScreenManager.prototype.drawLineGraph = function(data, title){
 
             var plot = []
 
-            for(var k = 0 ; k < this.settings.plotHeight + 1; k++){
+            for (var k = 0; k < this.settings.plotHeight + 1; k++) {
                 plot.push([]);
             }
 
             /**
              * Get min an max values
              */
-            
+
             var maxValue = 0;
             var minValue = Number.MAX_VALUE;
-            
+
             for (var k = 0; k < data[i].length; k++) {
 
-                if(maxValue < data[i][k][keys[4]]) maxValue = data[i][k][keys[4]];
-                if(minValue > data[i][k][keys[4]]) minValue = data[i][k][keys[4]];
+                if (maxValue < data[i][k][keys[4]]) maxValue = data[i][k][keys[4]];
+                if (minValue > data[i][k][keys[4]]) minValue = data[i][k][keys[4]];
 
             }
 
-            if(maxValue == minValue){
+            if (maxValue == minValue) {
                 maxValue++;
                 minValue--;
             }
@@ -304,16 +420,16 @@ ScreenManager.prototype.drawLineGraph = function(data, title){
 
             for (var k = 0; k < data[i].length; k++) {
 
-                if(data[i][k][keys[3]] !== sections[s]) continue;
+                if (data[i][k][keys[3]] !== sections[s]) continue;
 
                 var val = parseInt(((data[i][k][keys[4]] - minValue) / (maxValue - minValue)) * this.settings.plotHeight);
 
-                for(var j = 0 ; j < this.settings.plotHeight + 1; j++){
-                    
+                for (var j = 0; j < this.settings.plotHeight + 1; j++) {
+
                     var point = "·"
 
 
-                    if(j == this.settings.plotHeight - val){
+                    if (j == this.settings.plotHeight - val) {
                         point = "■"
                     }
 
@@ -328,7 +444,7 @@ ScreenManager.prototype.drawLineGraph = function(data, title){
 
             var widthRatio = Math.floor((process.stdout.columns - 3) / plot[0].length);
 
-            if(widthRatio < 1){
+            if (widthRatio < 1) {
                 widthRatio = 1;
             }
 
@@ -347,11 +463,11 @@ ScreenManager.prototype.drawLineGraph = function(data, title){
                 charm.write("║");
 
                 for (var o = 0; o < plot[k].length; o++) {
-                    for(var w = 0 ; w < widthRatio; w++){
+                    for (var w = 0; w < widthRatio; w++) {
 
-                        if(plot[k][o] === "■"){
+                        if (plot[k][o] === "■") {
                             charm.foreground("cyan");
-                        }else{
+                        } else {
                             charm.foreground("magenta");
                         }
 
@@ -385,13 +501,13 @@ ScreenManager.prototype.drawLineGraph = function(data, title){
     }
 }
 
-ScreenManager.prototype.drawKeyValueBarChart = function(data, title){
+ScreenManager.prototype.drawKeyValueBarChart = function(data, title) {
 
     var barTypes = ["█", "░", "▒", "▓"]
 
     var parts = [];
 
-    var colors = [ 'cyan', 'green', 'red', 'yellow', 'blue', 'magenta' ];
+    var colors = ['cyan', 'green', 'red', 'yellow', 'blue', 'magenta'];
 
     for (var i = 0; i < data.length; i++) {
 
@@ -417,25 +533,25 @@ ScreenManager.prototype.drawKeyValueBarChart = function(data, title){
 
         for (var k = 0; k < data[i].length; k++) {
 
-            if(sections.indexOf(data[i][k][keys[0]]) === -1){
+            if (sections.indexOf(data[i][k][keys[0]]) === -1) {
                 sections.push(data[i][k][keys[0]]);
             }
 
         }
 
         sections.sort();
-        
+
         for (var s = 0; s < sections.length; s++) {
 
             var sum = 0;
 
             for (var k = 0; k < data[i].length; k++) {
 
-                if(data[i][k][keys[0]] !== sections[s]) continue;
+                if (data[i][k][keys[0]] !== sections[s]) continue;
 
                 sum += data[i][k][keys[2]]
 
-                if(parts.indexOf(data[i][k][keys[1]]) === -1){
+                if (parts.indexOf(data[i][k][keys[1]]) === -1) {
                     parts.push(data[i][k][keys[1]])
                 }
 
@@ -446,12 +562,12 @@ ScreenManager.prototype.drawKeyValueBarChart = function(data, title){
 
             for (var k = 0; k < data[i].length; k++) {
 
-                if(data[i][k][keys[0]] !== sections[s]) continue;
+                if (data[i][k][keys[0]] !== sections[s]) continue;
 
                 var width = parseInt(process.stdout.columns * data[i][k][keys[2]] / sum);
 
                 charm.foreground(colors[parts.indexOf(data[i][k][keys[1]])])
-                
+
                 charm.write(new Array(width).join(barTypes[parts.indexOf(data[i][k][keys[1]]) % 4]))
 
             }
@@ -460,7 +576,7 @@ ScreenManager.prototype.drawKeyValueBarChart = function(data, title){
 
         }
 
-        for(var k = 0 ; k < parts.length; k++){
+        for (var k = 0; k < parts.length; k++) {
 
             charm.foreground("white");
 
@@ -474,11 +590,11 @@ ScreenManager.prototype.drawKeyValueBarChart = function(data, title){
     }
 }
 
-ScreenManager.prototype.drawBarChart = function(data, title){
+ScreenManager.prototype.drawBarChart = function(data, title) {
 
     var barTypes = ["█", "░", "▒", "▓"]
 
-    var colors = [ 'green', 'cyan', 'red', 'yellow', 'blue', 'magenta' ];
+    var colors = ['green', 'cyan', 'red', 'yellow', 'blue', 'magenta'];
 
     for (var i = 0; i < data.length; i++) {
 
@@ -495,7 +611,7 @@ ScreenManager.prototype.drawBarChart = function(data, title){
             charm.write("No Results\n\n");
             continue;
         }
-        
+
         for (var k = 0; k < data[i].length; k++) {
 
             var sum = 0;
@@ -507,24 +623,24 @@ ScreenManager.prototype.drawBarChart = function(data, title){
             charm.foreground("white");
             charm.write(title + " - " + data[i][k][keys[0]] + "\n");
 
-            
+
 
             var width = parseInt(process.stdout.columns * data[i][k][keys[1]] / sum);
 
             charm.foreground(colors[1])
-            
+
             charm.write(new Array(width).join(barTypes[0]))
 
             width = parseInt(process.stdout.columns * data[i][k][keys[2]] / sum);
 
             charm.foreground(colors[0])
-            
+
             charm.write(new Array(width).join(barTypes[1]))
 
 
             charm.write("\n\n");
 
-            
+
 
         }
 
