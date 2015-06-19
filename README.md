@@ -8,11 +8,11 @@ CenSQL (Pronounced "<i>Sen-Sea-Quel</i>") is an unofficial replacement by Centiq
 </p>
 
 <p>
-As well as having a smoother user interface, CenSQL also provides a lot more extra functionality which is not present in hdbsql, such as short-hands for sql queries useful for any DB admin or developer for example <code>\al</code> for viewing open alerts on the instance you are connected to.
+As well as having a smoother user interface, CenSQL also provides a lot more functionality which is not present in hdbsql, such as shortcuts for sql queries useful for any DB admin or developer for example <code>\al</code> for viewing open alerts on the instance you are connected to.
 </p>
 
 <p>
-Finally, CenSQL has support for bar charts and line graphs inside of the CLI interface for showing a 'at-a-glanse' view of the status and history of the instance, for example <code>\cpu</code> for showing the CPU usage for each host on the instance and <code>\smem</code> for showing the current shared memory.
+Finally, CenSQL has support for bar charts and line graphs inside the CLI interface for showing a 'at-a-glanse' view of the status and history of the instance, for example <code>\cpu</code> for showing the CPU usage for each host for the instance and <code>\smem</code> for showing the current shared memory.
 </p>
 
 <hr>
@@ -28,7 +28,7 @@ Finally, CenSQL has support for bar charts and line graphs inside of the CLI int
     <br><br>
     Example: <code>./app.js --user SYSTEM --port 30015 --host 127.0.0.1 --pass myPassword123</code>
     <br><br>
-    Optionally, supply the sql to run without entering the interactive mode witht he <code>--command</code> option
+    Optionally, supply the sql to run without entering the interactive mode with the <code>--command</code> option
   </li>
 
 </ol>
