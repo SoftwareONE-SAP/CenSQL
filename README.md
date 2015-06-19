@@ -4,7 +4,7 @@
 <h5>A better CLI client for SAP HANA</h5>
 
 <p>
-CenSQL (Pronounced "<i>Sen-Sea-Quel</i>") is an unofficial replacement by Centiq Ltd for the hdbsql CLI. It was created because using hdbsql is difficult and clunky due to issues with the interface.
+CenSQL (Pronounced "<i>Sen-Sea-Quel</i>") is an unofficial replacement by Centiq Ltd for the hdbsql CLI. It was created to provided command history and shorthand commands useful for monitoring SAP HANA which aren't available in the hdbsql client.
 </p>
 
 <p>
