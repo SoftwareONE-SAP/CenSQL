@@ -1,6 +1,7 @@
 var debug = require("debug")("censql:ScreenManager");
-var readline = require('readline');
-var charm = require('charm')(process.stdout)
+var readline = require('readline-history');
+var charm = require('charm')(process.stdout);
+var path = require('path');
 
 var ScreenManager = function(isBatch, commandHandler) {
     this.isBatch = isBatch;
@@ -34,87 +35,97 @@ ScreenManager.prototype.init = function() {
  * Add an input handler to the cli and pass it to the commandHandler
  */
 ScreenManager.prototype.setupInput = function() {
-    rl = readline.createInterface(process.stdin, process.stdout);
+    readline.createInterface({
+        input: process.stdin,
+        output: process.stdout,
+        path: path.join(process.env.HOME, ".censql_hist"),
+        maxLength: 0x10,
+        next: function(rl){
+            this.rl = rl;
 
-    rl.on('line', function(line) {
-
-        /**
-         * The user has ran a command, reset the quit request
-         * @type {Boolean}
-         */
-        this.wantsToQuit = false;
-
-        /**
-         * remove the user input since we will add it back again later with colour
-         */
-        charm.up(1);
-        charm.erase("line");
-        charm.left(99999);
-
-        /**
-         * Stop taking user input until we have complted this request
-         */
-        process.stdin.pause();
-
-        /**
-         * Send the suer command to the command handler
-         */
-        this.commandHandler.handleCommand(line, function(output) {
+            this.rl.on('line', function(line) {
 
             /**
-             * Print the command to the screen however the command handler thinks is best
+             * The user has ran a command, reset the quit request
+             * @type {Boolean}
              */
-            this.printCommandOutput(line, output);
+            this.wantsToQuit = false;
 
-        }.bind(this));
-
-    /**
-     * On close, give the user a pretty message and then stop the entire program
-     */
-    }.bind(this)).on('close', function() {
-
-        charm.foreground("green");
-        charm.write('\nHave a great day!\n');
-        charm.foreground("white");
-
-        rl.close();
-        process.exit(0);
-    });
-
-    /**
-     * When the user ^Cs make sure they weren't just trying to clear the command
-     */
-    rl.on('SIGINT', function() {
-
-        /**
-         * If this si the second time in a row the user has tried to quit, lets actually quit
-         */
-        if(this.wantsToQuit){
-
+            /**
+             * remove the user input since we will add it back again later with colour
+             */
+            charm.up(1);
             charm.erase("line");
             charm.left(99999);
-            charm.up(1);
 
             /**
-             * Exit command promt
+             * Stop taking user input until we have complted this request
              */
-            rl.close();
+            process.stdin.pause();
 
             /**
-             * Exit program
+             * Send the suer command to the command handler
              */
-            process.exit(0);
-            return
-        }
+            this.commandHandler.handleCommand(line, function(output) {
 
-        charm.erase("line");
-        charm.left(99999);
+                /**
+                 * Print the command to the screen however the command handler thinks is best
+                 */
+                this.printCommandOutput(line, output);
 
-        this.printCommandOutput("\\q", [2, "Press ^C again to exit", "message"]);
+            }.bind(this));
 
-        this.wantsToQuit = true;
+            /**
+             * On close, give the user a pretty message and then stop the entire program
+             */
+            }.bind(this)).on('close', function() {
 
-    }.bind(this));
+                charm.foreground("green");
+                charm.write('\nHave a great day!\n');
+                charm.foreground("white");
+
+                this.rl.close();
+                process.exit(0);
+            }.bind(this));
+
+            /**
+             * When the user ^Cs make sure they weren't just trying to clear the command
+             */
+            this.rl.on('SIGINT', function() {
+
+                /**
+                 * If this si the second time in a row the user has tried to quit, lets actually quit
+                 */
+                if(this.wantsToQuit){
+
+                    charm.erase("line");
+                    charm.left(99999);
+                    charm.up(1);
+
+                    /**
+                     * Exit command promt
+                     */
+                    this.rl.close();
+
+                    /**
+                     * Exit program
+                     */
+                    process.exit(0);
+                    return
+                }
+
+                charm.erase("line");
+                charm.left(99999);
+
+                this.printCommandOutput("\\q", [2, "Press ^C again to exit", "message"]);
+
+                this.wantsToQuit = true;
+
+            }.bind(this));
+
+        }.bind(this)
+
+    });
 }
 
 /**

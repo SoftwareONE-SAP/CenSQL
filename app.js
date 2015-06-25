@@ -8,6 +8,14 @@ var argv = require('optimist').argv;
 
 var CenSql = function(){
 
+	if(!argv.host || !argv.user || !argv.pass || !argv.port){
+		console.log("Usage:\t censql --user <USER> --port 3<ID>15 --host <IP OR HOSTNAME> --pass <PASSWORD>");
+		console.log("\t censql --user <USER> --port 3<ID>15 --host <IP OR HOSTNAME> --pass <PASSWORD> --command '<SQL_STRING>'");
+		console.log("Example: censql --user SYSTEM --port 30015 --host 192.168.0.1 --pass Password123");
+		console.log("Example: censql --user SYSTEM --port 30015 --host 192.168.0.1 --pass Password123 --command 'SELECT * FROM SYS.M_SERVICES'");
+		return;
+	}
+
 	this.screen = new ScreenManager(argv.command, {
 		handleCommand: function(command, callback){
 			return this.commandHandler.onCommand(command, callback);
