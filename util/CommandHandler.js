@@ -7,7 +7,7 @@ var CommandHandler = function(screen, conn, command) {
 
     if(command){
         this.onCommand(command, function(output){
-            this.screen.printCommandOutput("\n", output);
+            this.screen.printCommandOutput(command, output);
             process.exit(0)
         }.bind(this));
     }
@@ -59,7 +59,7 @@ CommandHandler.prototype.runInternalCommand = function(command, callback) {
      * Should the data be shown in the group view
      * @type {Boolean}
      */
-    var isGroupView = cParts[cParts.length - 1].toLowerCase().slice(-2) == "g";
+    var isGroupView = cParts[cParts.length - 1].toLowerCase() == "g";
 
     switch (cParts[0]) {
         case "h":

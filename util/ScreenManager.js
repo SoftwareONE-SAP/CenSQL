@@ -45,35 +45,35 @@ ScreenManager.prototype.setupInput = function() {
 
             this.rl.on('line', function(line) {
 
-            /**
-             * The user has ran a command, reset the quit request
-             * @type {Boolean}
-             */
-            this.wantsToQuit = false;
-
-            /**
-             * remove the user input since we will add it back again later with colour
-             */
-            charm.up(1);
-            charm.erase("line");
-            charm.left(99999);
-
-            /**
-             * Stop taking user input until we have complted this request
-             */
-            process.stdin.pause();
-
-            /**
-             * Send the suer command to the command handler
-             */
-            this.commandHandler.handleCommand(line, function(output) {
+                /**
+                 * The user has ran a command, reset the quit request
+                 * @type {Boolean}
+                 */
+                this.wantsToQuit = false;
 
                 /**
-                 * Print the command to the screen however the command handler thinks is best
+                 * remove the user input since we will add it back again later with colour
                  */
-                this.printCommandOutput(line, output);
+                charm.up(1);
+                charm.erase("line");
+                charm.left(99999);
 
-            }.bind(this));
+                /**
+                 * Stop taking user input until we have complted this request
+                 */
+                process.stdin.pause();
+
+                /**
+                 * Send the suer command to the command handler
+                 */
+                this.commandHandler.handleCommand(line, function(output) {
+
+                    /**
+                     * Print the command to the screen however the command handler thinks is best
+                     */
+                    this.printCommandOutput(line, output);
+
+                }.bind(this));
 
             /**
              * On close, give the user a pretty message and then stop the entire program
@@ -207,11 +207,13 @@ ScreenManager.prototype.printCommandOutput = function(command, output) {
 
     charm.foreground(color);
 
+    var commandParts = command.replace(/([^\\])\|/g, "$1$1|").split(/[^\\]\|/);
+
     /**
      * Dont print the command if it was a batch command
      */
     if (!this.isBatch) {
-        charm.write("> " + command + "\n\n");
+        charm.write("> " + commandParts[0] + "\n\n");
     }
 
     switch (output[2]) {
@@ -227,14 +229,14 @@ ScreenManager.prototype.printCommandOutput = function(command, output) {
          * a table
          */
         case "table":
-            this.drawTable(output[1]);
+            this.drawTable(output[1], commandParts);
             break;
 
         /**
          * display each row in a key value chunk
          */
         case "group":
-            this.drawGroup(output[1]);
+            this.drawGroup(output[1], commandParts);
             break;
 
         /**
@@ -287,7 +289,8 @@ ScreenManager.prototype.printCommandOutput = function(command, output) {
  * Display an ascii table of data
  * @param  {Array} data
  */
-ScreenManager.prototype.drawTable = function(data) {
+ScreenManager.prototype.drawTable = function(data, commandParts) {
+
     for (var i = 0; i < data.length; i++) {
 
         var keys = [];
@@ -311,8 +314,30 @@ ScreenManager.prototype.drawTable = function(data) {
                 rows.push(data[i][k][keys[j]])
             };
 
-            charm.write(rows.join(" | ") + "\n");
-            // charm.write(new Array(20).join("- ") + "\n");
+            var rowString = rows.join(" | ") + "\n";
+
+            var shouldShow = true;
+
+            for(var j = 1; j < commandParts.length; j++){
+                
+                var part = commandParts[j].trim();
+
+                /**
+                 * handle grep command
+                 */
+                if(part.split(" ")[0].toLowerCase() == "grep"){
+
+                    if(rowString.indexOf(part.substring(part.indexOf(' ')+1)) === -1){
+                        shouldShow = false;
+                    }
+                }
+
+            }
+
+            if(shouldShow){
+                charm.write(rowString);
+            }
+
         };
 
         charm.write("\n");
