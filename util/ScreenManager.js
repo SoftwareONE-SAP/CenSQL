@@ -213,7 +213,7 @@ ScreenManager.prototype.printCommandOutput = function(command, output) {
      * Dont print the command if it was a batch command
      */
     if (!this.isBatch) {
-        charm.write("> " + commandParts[0] + "\n\n");
+        charm.write("> " + command + "\n\n");
     }
 
     switch (output[2]) {
@@ -294,17 +294,36 @@ ScreenManager.prototype.processPipes = function(linesIn, commandParts){
     for(var j = 1; j < commandParts.length; j++){
             
         var part = commandParts[j].trim();
+        var parts = part.split(" ");
 
         /**
          * handle grep command
          */
-        if(part.split(" ")[0].toLowerCase() == "grep"){
+        if(parts[0].toLowerCase() == "grep"){
+
+            var isInverse = false;
+
+            if(parts[1].trim() == "-i"){
+                isInverse = true;
+            }
 
             var i = linesOut.length;
             while (i--) {
-                if(!!(linesOut[i].indexOf(part.substring(part.indexOf(' ')+1)) === -1)){
-                    linesOut.splice(i, 1);
+
+                if(isInverse){
+
+                    if(linesOut[i].indexOf(part.substring(part.indexOf('-i ') + 3)) !== -1){
+                        linesOut.splice(i, 1);
+                    }
+
+                }else{
+
+                    if(linesOut[i].indexOf(part.substring(part.indexOf(' ') + 1)) === -1){
+                        linesOut.splice(i, 1);
+                    }
+
                 }
+
             }   
 
             continue;
@@ -313,9 +332,9 @@ ScreenManager.prototype.processPipes = function(linesIn, commandParts){
         /**
          * handle head command
          */
-        if(part.split(" ")[0].toLowerCase() == "head"){
+        if(parts[0].toLowerCase() == "head"){
 
-            var limit = parseInt(part.split(" ")[1]);
+            var limit = parseInt(parts[1]);
 
             var i = linesOut.length;
             while (i--) {
@@ -330,15 +349,38 @@ ScreenManager.prototype.processPipes = function(linesIn, commandParts){
         /**
          * handle tail command
          */
-        if(part.split(" ")[0].toLowerCase() == "tail"){
+        if(parts[0].toLowerCase() == "tail"){
 
-            var limit = parseInt(part.split(" ")[1]);
+            var limit = parseInt(parts[1]);
 
             var i = linesOut.length;
             while (i--) {
                 if(linesOut.length - i > limit){
                     linesOut.splice(i, 1);
                 }
+            }  
+
+            continue;
+        }
+
+        /**
+         * handle cut command
+         */
+        if(parts[0].toLowerCase() == "cut"){
+
+            var dir = parts[1][0] == "-";
+
+            var amount = parseInt(parts[1].replace("-", ""));
+
+            var i = linesOut.length;
+            while (i--) {
+
+                if(dir){
+                    linesOut[i] = linesOut[i].slice(0, amount);
+                }else{
+                    linesOut[i] = linesOut[i].slice(amount - 1, linesOut[i].length);
+                }
+
             }  
 
             continue;
