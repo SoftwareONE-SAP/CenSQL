@@ -53,7 +53,7 @@ CommandHandler.prototype.runInternalCommand = function(command, callback) {
      * The parts of the command
      * @type {String[]}
      */
-    var cParts = command.split(/\\| /);
+    var cParts = command.split("|")[0].trim().split(/\\| /);
 
     /**
      * Should the data be shown in the group view

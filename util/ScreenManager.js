@@ -229,14 +229,16 @@ ScreenManager.prototype.printCommandOutput = function(command, output) {
          * a table
          */
         case "table":
-            this.drawTable(output[1], commandParts);
+            var lines = this.renderTable(output[1]);
+            this.renderLines(this.processPipes(lines, commandParts));
             break;
 
         /**
          * display each row in a key value chunk
          */
         case "group":
-            this.drawGroup(output[1], commandParts);
+            var lines = this.drawGroup(output[1], commandParts);
+            this.renderLines(this.processPipes(lines, commandParts));
             break;
 
         /**
@@ -285,11 +287,82 @@ ScreenManager.prototype.printCommandOutput = function(command, output) {
     charm.display("reset");
 }
 
+ScreenManager.prototype.processPipes = function(linesIn, commandParts){
+
+    var linesOut = linesIn.slice(0);
+
+    for(var j = 1; j < commandParts.length; j++){
+            
+        var part = commandParts[j].trim();
+
+        /**
+         * handle grep command
+         */
+        if(part.split(" ")[0].toLowerCase() == "grep"){
+
+            var i = linesOut.length;
+            while (i--) {
+                if(!!(linesOut[i].indexOf(part.substring(part.indexOf(' ')+1)) === -1)){
+                    linesOut.splice(i, 1);
+                }
+            }   
+
+            continue;
+        }
+
+        /**
+         * handle head command
+         */
+        if(part.split(" ")[0].toLowerCase() == "head"){
+
+            var limit = parseInt(part.split(" ")[1]);
+
+            var i = linesOut.length;
+            while (i--) {
+                if(i > limit - 1){
+                    linesOut.splice(i, 1);
+                }
+            }  
+
+            continue;
+        }
+
+        /**
+         * handle tail command
+         */
+        if(part.split(" ")[0].toLowerCase() == "tail"){
+
+            var limit = parseInt(part.split(" ")[1]);
+
+            var i = linesOut.length;
+            while (i--) {
+                if(linesOut.length - i > limit){
+                    linesOut.splice(i, 1);
+                }
+            }  
+
+            continue;
+        }
+
+    }
+
+    return linesOut;
+
+}
+
+ScreenManager.prototype.renderLines = function(lines){
+    for(var i = 0 ; i < lines.length; i++){
+        charm.write(lines[i] + "\n");
+    }
+}
+
 /**
  * Display an ascii table of data
  * @param  {Array} data
  */
-ScreenManager.prototype.drawTable = function(data, commandParts) {
+ScreenManager.prototype.renderTable = function(data) {
+
+    var renderedLines = [];
 
     for (var i = 0; i < data.length; i++) {
 
@@ -314,41 +387,25 @@ ScreenManager.prototype.drawTable = function(data, commandParts) {
                 rows.push(data[i][k][keys[j]])
             };
 
-            var rowString = rows.join(" | ") + "\n";
+            var rowString = rows.join(" | ");
 
-            var shouldShow = true;
-
-            for(var j = 1; j < commandParts.length; j++){
-                
-                var part = commandParts[j].trim();
-
-                /**
-                 * handle grep command
-                 */
-                if(part.split(" ")[0].toLowerCase() == "grep"){
-
-                    if(rowString.indexOf(part.substring(part.indexOf(' ')+1)) === -1){
-                        shouldShow = false;
-                    }
-                }
-
-            }
-
-            if(shouldShow){
-                charm.write(rowString);
-            }
+            renderedLines.push(rowString);
 
         };
 
-        charm.write("\n");
     };
+
+    return renderedLines;
 }
 
 /**
  * Display the data in the grouped format
  * @param  {Array} data
  */
-ScreenManager.prototype.drawGroup = function(data) {
+ScreenManager.prototype.drawGroup = function(data, commandParts) {
+
+    var renderedLines = [];
+
     for (var i = 0; i < data.length; i++) {
 
         /**
@@ -361,7 +418,7 @@ ScreenManager.prototype.drawGroup = function(data) {
 
             keys = Object.keys(data[i][0]);
         } else {
-            charm.write("No Results\n\n");
+            renderedLines.push("No Results\n");
             continue;
         }
 
@@ -373,16 +430,17 @@ ScreenManager.prototype.drawGroup = function(data) {
 
         for (var k = 0; k < data[i].length; k++) {
 
-            charm.write("No: " + k + " " + new Array(20).join("-") + "\n");
+            renderedLines.push("No: " + k + " " + new Array(20).join("-"));
 
             for (var j = keys.length - 1; j >= 0; j--) {
-                charm.write(" " + keys[j] + ": " + data[i][k][keys[j]] + "\n")
+                renderedLines.push(" " + keys[j] + ": " + data[i][k][keys[j]]);
             };
 
         };
 
-        charm.write("\n");
     };
+
+    return renderedLines;
 }
 
 ScreenManager.prototype.drawLineGraph = function(data, title) {
