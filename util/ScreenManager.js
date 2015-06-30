@@ -22,12 +22,6 @@ ScreenManager.prototype.init = function() {
         plotHeight: 10
     }
 
-    /**
-     * Has the suer tried to quit once?
-     * @type {Boolean}
-     */
-    this.wantsToQuit = false;
-
     this.loadPipeHandlers();
 
     this.setupInput();
@@ -63,12 +57,6 @@ ScreenManager.prototype.setupInput = function() {
             this.rl = rl;
 
             this.rl.on('line', function(line) {
-
-                /**
-                 * The user has ran a command, reset the quit request
-                 * @type {Boolean}
-                 */
-                this.wantsToQuit = false;
 
                 /**
                  * remove the user input since we will add it back again later with colour
@@ -112,33 +100,20 @@ ScreenManager.prototype.setupInput = function() {
              */
             this.rl.on('SIGINT', function() {
 
-                /**
-                 * If this si the second time in a row the user has tried to quit, lets actually quit
-                 */
-                if(this.wantsToQuit){
-
-                    charm.erase("line");
-                    charm.left(99999);
-                    charm.up(1);
-
-                    /**
-                     * Exit command promt
-                     */
-                    this.rl.close();
-
-                    /**
-                     * Exit program
-                     */
-                    process.exit(0);
-                    return
-                }
 
                 charm.erase("line");
                 charm.left(99999);
+                charm.up(1);
 
-                this.printCommandOutput("\\q", [2, "Press ^C again to exit", "message"]);
+                /**
+                 * Exit command promt
+                 */
+                this.rl.close();
 
-                this.wantsToQuit = true;
+                /**
+                 * Exit program
+                 */
+                process.exit(0);
 
             }.bind(this));
 
