@@ -28,7 +28,21 @@ ScreenManager.prototype.init = function() {
      */
     this.wantsToQuit = false;
 
+    this.loadPipeHandlers();
+
     this.setupInput();
+}
+
+ScreenManager.prototype.loadPipeHandlers = function(){
+    this.handlers = {};
+
+    require('fs').readdirSync(__dirname + '/../pipeCommands/').forEach(function(file) {
+        if (file.match(/\.js$/) !== null && file !== 'index.js') {
+            var name = file.replace('.js', '');
+            this.handlers[name] = require('../pipeCommands/' + file);
+        }
+    }.bind(this));
+
 }
 
 /**
@@ -237,7 +251,7 @@ ScreenManager.prototype.printCommandOutput = function(command, output) {
          * display each row in a key value chunk
          */
         case "group":
-            var lines = this.drawGroup(output[1], commandParts);
+            var lines = this.renderGroup(output[1], commandParts);
             this.renderLines(this.processPipes(lines, commandParts));
             break;
 
@@ -292,99 +306,10 @@ ScreenManager.prototype.processPipes = function(linesIn, commandParts){
     var linesOut = linesIn.slice(0);
 
     for(var j = 1; j < commandParts.length; j++){
-            
-        var part = commandParts[j].trim();
-        var parts = part.split(" ");
 
-        /**
-         * handle grep command
-         */
-        if(parts[0].toLowerCase() == "grep"){
+        var commandName = commandParts[j].trim().split(" ")[0].toLowerCase();
 
-            var isInverse = false;
-
-            if(parts[1].trim() == "-i"){
-                isInverse = true;
-            }
-
-            var i = linesOut.length;
-            while (i--) {
-
-                if(isInverse){
-
-                    if(linesOut[i].indexOf(part.substring(part.indexOf('-i ') + 3)) !== -1){
-                        linesOut.splice(i, 1);
-                    }
-
-                }else{
-
-                    if(linesOut[i].indexOf(part.substring(part.indexOf(' ') + 1)) === -1){
-                        linesOut.splice(i, 1);
-                    }
-
-                }
-
-            }   
-
-            continue;
-        }
-
-        /**
-         * handle head command
-         */
-        if(parts[0].toLowerCase() == "head"){
-
-            var limit = parseInt(parts[1]);
-
-            var i = linesOut.length;
-            while (i--) {
-                if(i > limit - 1){
-                    linesOut.splice(i, 1);
-                }
-            }  
-
-            continue;
-        }
-
-        /**
-         * handle tail command
-         */
-        if(parts[0].toLowerCase() == "tail"){
-
-            var limit = parseInt(parts[1]);
-
-            var i = linesOut.length;
-            while (i--) {
-                if(linesOut.length - i > limit){
-                    linesOut.splice(i, 1);
-                }
-            }  
-
-            continue;
-        }
-
-        /**
-         * handle cut command
-         */
-        if(parts[0].toLowerCase() == "cut"){
-
-            var dir = parts[1][0] == "-";
-
-            var amount = parseInt(parts[1].replace("-", ""));
-
-            var i = linesOut.length;
-            while (i--) {
-
-                if(dir){
-                    linesOut[i] = linesOut[i].slice(0, amount);
-                }else{
-                    linesOut[i] = linesOut[i].slice(amount - 1, linesOut[i].length);
-                }
-
-            }  
-
-            continue;
-        }
+        linesOut = this.handlers[commandName](linesOut, commandParts[j])
 
     }
 
@@ -414,10 +339,10 @@ ScreenManager.prototype.renderTable = function(data) {
 
             keys = Object.keys(data[i][0]);
 
-            charm.write(keys.join(" | "))
-            charm.write("\n" + new Array(20).join("- ") + "\n");
+            renderedLines.push(keys.join(" | "))
+            renderedLines.push(new Array(20).join("- "));
         } else {
-            charm.write("No Results\n");
+            renderedLines.push("No Results\n");
         }
 
         keys.reverse()
@@ -444,7 +369,7 @@ ScreenManager.prototype.renderTable = function(data) {
  * Display the data in the grouped format
  * @param  {Array} data
  */
-ScreenManager.prototype.drawGroup = function(data, commandParts) {
+ScreenManager.prototype.renderGroup = function(data, commandParts) {
 
     var renderedLines = [];
 
