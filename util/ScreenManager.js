@@ -38,7 +38,7 @@ ScreenManager.prototype.loadPipeHandlers = function(){
 
     require('fs').readdirSync(__dirname + '/../pipeCommands/').forEach(function(file) {
 
-        if (file.match(/\.js$/) !== null && file !== 'index.js') {
+        if (file.match(/\.js$/) !== null) {
 
             var name = file.replace('.js', '');
             
