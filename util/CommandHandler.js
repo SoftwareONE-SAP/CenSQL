@@ -5,6 +5,8 @@ var CommandHandler = function(screen, conn, command) {
     this.screen = screen;
     this.conn = conn;
 
+    this.loadCommandHandlers();
+
     if(command){
         this.onCommand(command, function(output){
             this.screen.printCommandOutput(command, output);
@@ -12,6 +14,23 @@ var CommandHandler = function(screen, conn, command) {
         }.bind(this));
     }
 
+}
+
+CommandHandler.prototype.loadCommandHandlers = function(){
+
+    this.handlers = {};
+
+    require('fs').readdirSync(__dirname + '/../baseCommands/').forEach(function(file) {
+
+        if (file.match(/\.js$/) !== null && file !== 'index.js') {
+
+            var name = file.replace('.js', '');
+
+            this.handlers[name] = new (require('../baseCommands/' + file))();
+
+        }
+
+    }.bind(this));
 }
 
 CommandHandler.prototype.onCommand = function(command, callback) {
@@ -55,344 +74,13 @@ CommandHandler.prototype.runInternalCommand = function(command, callback) {
      */
     var cParts = command.split("|")[0].trim().split(/\\| /);
 
-    /**
-     * Should the data be shown in the group view
-     * @type {Boolean}
-     */
-    var isGroupView = cParts[cParts.length - 1].toLowerCase() == "g";
-
-    switch (cParts[0]) {
-        case "h":
-            callback([
-                0, [
-                    "CenSQL v1.0.0 Help",
-                    "-----------------------------------------------------",
-                    "Basic:",
-                    "\\h\t\t\t- For Help",
-                    "\\sc, \\ds\t\t- To list schemas",
-                    "\\us, \\du\t\t- To list users",
-                    "\\ta, \\dt {SCHEMA_NAME}\t- To list tables for a schema",
-                    "\\vs, \\dv {SCHEMA_NAME}\t- To list views for a schema",
-                    "\\in\t\t\t- To list instances",
-                    "",
-                    "History:",
-                    "\\ul {OPTIONAL_LIMIT}\t- To list recent unloads",
-                    "\\mem\t\t\t- Graph physical memory over the last 3 days",
-                    "\\imem\t\t\t- Graph instance used memory over the last 3 days",
-                    "\\cpu\t\t\t- Graph cpu over the last 3 days",
-                    "\\swap\t\t\t- Graph swap over the last 3 days",
-                    "\\row\t\t\t- Graph the used fixed part size for row storage over the last 3 days",
-                    "\\csd\t\t\t- Graph CS in memory delta over the last 3 days",
-                    "\\csr\t\t\t- Graph CS read count over the last 3 days",
-                    "\\csw\t\t\t- Graph CS write count over the last 3 days",
-                    "\\csc\t\t\t- Graph CS record count over the last 3 days",
-                    "\\csm\t\t\t- Graph CS in memory size total (incl delta) over the last 3 days",
-                    "",
-                    "Current Status:",
-                    "\\al\t\t\t- To list active alerts",
-                    "\\st\t\t\t- To list hosts for instance",
-                    "\\con\t\t\t- To list connections",
-                    "\\serv\t\t\t- To list services",
-                    "\\tt {OPTIONAL_LIMIT}\t- To list the largest column tables",
-                    "\\ba {OPTIONAL_LIMIT}\t- To list recent backups",
-                    "\\smem\t\t\t- Show bar chart of shared memeory",
-                    "\\hmem\t\t\t- Show bar chart of heap memory usage per service",
-                    "\\tmem\t\t\t- Show bar chart of total memory usage per service",
-                    "\\scpu\t\t\t- Show bar chart of cpu usage per service",
-                    "",
-                    "Settings:",
-                    "\\sgh\t\t\t-Set the height to draw graphs"
-                ].join("\n"),
-                "message"
-            ]);
-            return;
-            break;
-
-        case "sgh":
-            
-            if(!cParts[1].match(/^\d+$/)){
-                callback([1, "Syntax: \\sgh {HEIGHT}", "message"]);
-                return;
-                break;
-            }
-
-            this.screen.settings.plotHeight = parseInt(cParts[1])
-
-            callback([0, "Graph height set to: " + this.screen.settings.plotHeight, "message"]);
-            return;
-            break;
-
-        case "sc":
-        case "ds":
-            this.conn.exec("conn", "SELECT * FROM SYS.SCHEMAS", function(err, data) {
-                callback([err == null ? 0 : 1, err == null ? data : err, err == null ? (isGroupView ? "group" : "table") : "json"]);
-            })
-            return;
-            break;
-
-        case "us":
-        case "du":
-            this.conn.exec("conn", "SELECT USER_ID, USER_NAME, USER_MODE, LAST_SUCCESSFUL_CONNECT, USER_DEACTIVATED FROM SYS.USERS", function(err, data) {
-                callback([err == null ? 0 : 1, err == null ? data : err, err == null ? (isGroupView ? "group" : "table") : "json"]);
-            })
-            return;
-            break;
-
-        case "serv":
-            this.conn.exec("conn", "SELECT * FROM SYS.M_SERVICES", function(err, data) {
-                callback([err == null ? 0 : 1, err == null ? data : err, err == null ? (isGroupView ? "group" : "table") : "json"]);
-            })
-            return;
-            break;
-
-        case "in":
-            this.conn.exec("conn", "SELECT * FROM SYS.M_DATABASES", function(err, data) {
-                callback([err == null ? 0 : 1, err == null ? data : err, err == null ? (isGroupView ? "group" : "table") : "json"]);
-            })
-            return;
-            break;
-
-        case "ta":
-        case "dt":
-
-            if(cParts.length < 2 || cParts[1].length == 0 || cParts[1].toLowerCase() == "\\g"){
-                callback([1, "Invalid input! Try: \\h for help", "message"]);
-                return;
-            }
-
-            this.conn.exec("conn", "SELECT * FROM SYS.TABLES WHERE SCHEMA_NAME LIKE '" + cParts[1] + "'", function(err, data) {
-                callback([err == null ? 0 : 1, err == null ? data : err, err == null ? (isGroupView ? "group" : "table") : "json"]);
-            })
-            return;
-            break;
-
-        case "vs":
-        case "dv":
-
-            if(cParts.length < 2 || cParts[1].length == 0 || cParts[1].toLowerCase() == "\\g"){
-                callback([1, "Invalid input! Try: \\h for help", "message"]);
-                return;
-            }
-
-            this.conn.exec("conn", "SELECT VIEW_NAME, VIEW_OID, IS_READ_ONLY, COMMENTS FROM SYS.VIEWS WHERE SCHEMA_NAME LIKE '" + cParts[1] + "'", function(err, data) {
-                callback([err == null ? 0 : 1, err == null ? data : err, err == null ? (isGroupView ? "group" : "table") : "json"]);
-            })
-            return;
-            break;
-
-        case "st":
-            this.conn.exec("conn", 
-                "SELECT HOST,HOST_ACTIVE,HOST_STATUS FROM SYS.M_LANDSCAPE_HOST_CONFIGURATION ORDER BY HOST", function(err, data) {
-                callback([err == null ? 0 : 1, err == null ? data : err, err == null ? (isGroupView ? "group" : "table") : "json"]);
-            })
-            return;
-            break;
-
-        case "ba":
-
-            this.conn.exec("conn", "SELECT BACKUP_ID, UTC_START_TIME, STATE_NAME FROM sys.m_backup_catalog\
-                WHERE ENTRY_TYPE_NAME = 'complete data backup'\
-                ORDER BY entry_id DESC\
-                LIMIT " + parseInt(cParts[1] && cParts[1].toLowerCase() != "\\g" ? cParts[1] : 10), function(err, data) {
-                callback([err == null ? 0 : 1, err == null ? data : err, err == null ? (isGroupView ? "group" : "table") : "json"]);
-            })
-            return;
-            break;
-
-        case "al":
-            this.conn.exec("conn", "SELECT ALERT_TIMESTAMP, ALERT_RATING, ALERT_NAME, ALERT_DETAILS, INDEX FROM _SYS_STATISTICS.STATISTICS_CURRENT_ALERTS", function(err, data) {
-                callback([err == null ? 0 : 1, err == null ? data : err, err == null ? (isGroupView ? "group" : "table") : "json"]);
-            })
-            return;
-            break;
-
-        case "ul":
-            this.conn.exec("conn", "SELECT CONCAT(CONCAT(CONCAT(CONCAT(CONCAT(CONCAT(CONCAT(YEAR(UNLOAD_TIME), '-'), MONTH(UNLOAD_TIME)), '-'), DAYOFMONTH(UNLOAD_TIME)), ' '), HOUR(UNLOAD_TIME)), ':**:**') AS TIME, HOST, COUNT(*) AS \"COLUMNS IN HOUR\"\
-                FROM SYS.M_CS_UNLOADS\
-                GROUP BY YEAR(UNLOAD_TIME), MONTH(UNLOAD_TIME), DAYOFMONTH(UNLOAD_TIME), HOUR(UNLOAD_TIME), HOST\
-                ORDER BY MONTH(UNLOAD_TIME) DESC, DAYOFMONTH(UNLOAD_TIME) DESC, HOUR(UNLOAD_TIME) DESC, HOST DESC\
-                LIMIT " + parseInt(cParts[1] && cParts[1].toLowerCase() != "\\g" ? cParts[1] : 10), function(err, data) {
-                callback([err == null ? 0 : 1, err == null ? data : err, err == null ? (isGroupView ? "group" : "table") : "json"]);
-            })
-            return;
-            break;
-
-        case "mem":
-
-            this.conn.exec("conn", "SELECT MONTH(SNAPSHOT_ID), DAYOFMONTH(SNAPSHOT_ID), HOUR(SNAPSHOT_ID), HOST, MAX(USED_PHYSICAL_MEMORY), MIN(SNAPSHOT_ID)\
-                FROM _SYS_STATISTICS.HOST_RESOURCE_UTILIZATION_STATISTICS\
-                WHERE SNAPSHOT_ID > ADD_DAYS(CURRENT_TIMESTAMP, -3)\
-                GROUP BY MONTH(SNAPSHOT_ID), DAYOFMONTH(SNAPSHOT_ID), HOUR(SNAPSHOT_ID), HOST\
-                ORDER BY MONTH(SNAPSHOT_ID) DESC, DAYOFMONTH(SNAPSHOT_ID) DESC, HOUR(SNAPSHOT_ID) DESC, HOST DESC", function(err, data) {
-                callback([err == null ? 0 : 1, err == null ? data : err, err == null ? "line-graph" : "json", "Memory usage over the last 3 days"]);
-            })
-
-            return;
-            break;
-
-        case "imem":
-
-            this.conn.exec("conn", "SELECT MONTH(SNAPSHOT_ID), DAYOFMONTH(SNAPSHOT_ID), HOUR(SNAPSHOT_ID), HOST, MAX(INSTANCE_TOTAL_MEMORY_USED_SIZE), MIN(SNAPSHOT_ID)\
-                FROM _SYS_STATISTICS.HOST_RESOURCE_UTILIZATION_STATISTICS\
-                WHERE SNAPSHOT_ID > ADD_DAYS(CURRENT_TIMESTAMP, -3)\
-                GROUP BY MONTH(SNAPSHOT_ID), DAYOFMONTH(SNAPSHOT_ID), HOUR(SNAPSHOT_ID), HOST\
-                ORDER BY MONTH(SNAPSHOT_ID) DESC, DAYOFMONTH(SNAPSHOT_ID) DESC, HOUR(SNAPSHOT_ID) DESC, HOST DESC", function(err, data) {
-                callback([err == null ? 0 : 1, err == null ? data : err, err == null ? "line-graph" : "json", "Memory usage over the last 3 days"]);
-            })
-
-            return;
-            break;
-
-        case "swap":
-
-            this.conn.exec("conn", "SELECT MONTH(SNAPSHOT_ID), DAYOFMONTH(SNAPSHOT_ID), HOUR(SNAPSHOT_ID), HOST, MAX(USED_SWAP_SPACE), MIN(SNAPSHOT_ID)\
-                FROM _SYS_STATISTICS.HOST_RESOURCE_UTILIZATION_STATISTICS\
-                WHERE SNAPSHOT_ID > ADD_DAYS(CURRENT_TIMESTAMP, -3)\
-                GROUP BY MONTH(SNAPSHOT_ID), DAYOFMONTH(SNAPSHOT_ID), HOUR(SNAPSHOT_ID), HOST\
-                ORDER BY MONTH(SNAPSHOT_ID) DESC, DAYOFMONTH(SNAPSHOT_ID) DESC, HOUR(SNAPSHOT_ID) DESC, HOST DESC", function(err, data) {
-                callback([err == null ? 0 : 1, err == null ? data : err, err == null ? "line-graph" : "json", "Swap usage over the last 3 days"]);
-            })
-
-            return;
-            break;
-
-        case "cpu":
-
-            this.conn.exec("conn", "SELECT MONTH(SNAPSHOT_ID), DAYOFMONTH(SNAPSHOT_ID), HOUR(SNAPSHOT_ID), HOST, MAX(TOTAL_CPU_USER_TIME_DELTA + TOTAL_CPU_SYSTEM_TIME_DELTA + TOTAL_CPU_WIO_TIME_DELTA), MIN(SNAPSHOT_ID)\
-                FROM _SYS_STATISTICS.HOST_RESOURCE_UTILIZATION_STATISTICS\
-                WHERE SNAPSHOT_ID > ADD_DAYS(CURRENT_TIMESTAMP, -3)\
-                GROUP BY MONTH(SNAPSHOT_ID), DAYOFMONTH(SNAPSHOT_ID), HOUR(SNAPSHOT_ID), HOST\
-                ORDER BY MONTH(SNAPSHOT_ID) DESC, DAYOFMONTH(SNAPSHOT_ID) DESC, HOUR(SNAPSHOT_ID) DESC, HOST DESC", function(err, data) {
-                callback([err == null ? 0 : 1, err == null ? data : err, err == null ? "line-graph" : "json", "CPU usage over the last 3 days"]);
-            })
-
-            return;
-            break;
-
-        case "row":
-
-            this.conn.exec("conn", "SELECT MONTH(SNAPSHOT_ID), DAYOFMONTH(SNAPSHOT_ID), HOUR(SNAPSHOT_ID), HOST, SUM(USED_FIXED_PART_SIZE), MIN(SNAPSHOT_ID)\
-                FROM _SYS_STATISTICS.GLOBAL_ROWSTORE_TABLES_SIZE\
-                WHERE SNAPSHOT_ID > ADD_DAYS(CURRENT_TIMESTAMP, -3)\
-                GROUP BY MONTH(SNAPSHOT_ID), DAYOFMONTH(SNAPSHOT_ID), HOUR(SNAPSHOT_ID), HOST\
-                ORDER BY MONTH(SNAPSHOT_ID) DESC, DAYOFMONTH(SNAPSHOT_ID) DESC, HOUR(SNAPSHOT_ID) DESC, HOST DESC", function(err, data) {
-                callback([err == null ? 0 : 1, err == null ? data : err, err == null ? "line-graph" : "json", "RS used fixed part size over the last 3 days"]);
-            })
-
-            return;
-            break;
-
-        case "csm":
-
-            this.conn.exec("conn", "SELECT MONTH(SNAPSHOT_ID), DAYOFMONTH(SNAPSHOT_ID), HOUR(SNAPSHOT_ID), 'Instance', SUM(MEMORY_SIZE_IN_TOTAL), MIN(SNAPSHOT_ID)\
-                FROM _SYS_STATISTICS.HOST_COLUMN_TABLES_PART_SIZE\
-                WHERE SNAPSHOT_ID > ADD_DAYS(CURRENT_TIMESTAMP, -3)\
-                GROUP BY MONTH(SNAPSHOT_ID), DAYOFMONTH(SNAPSHOT_ID), HOUR(SNAPSHOT_ID)\
-                ORDER BY MONTH(SNAPSHOT_ID) DESC, DAYOFMONTH(SNAPSHOT_ID) DESC, HOUR(SNAPSHOT_ID) DESC", function(err, data) {
-                callback([err == null ? 0 : 1, err == null ? data : err, err == null ? "line-graph" : "json", "CS memory total over the last 3 days"]);
-            })
-
-            return;
-            break;
-
-        case "csc":
-
-            this.conn.exec("conn", "SELECT MONTH(SNAPSHOT_ID), DAYOFMONTH(SNAPSHOT_ID), HOUR(SNAPSHOT_ID), 'Instance', SUM(RECORD_COUNT), MIN(SNAPSHOT_ID)\
-                FROM _SYS_STATISTICS.HOST_COLUMN_TABLES_PART_SIZE\
-                WHERE SNAPSHOT_ID > ADD_DAYS(CURRENT_TIMESTAMP, -3)\
-                GROUP BY MONTH(SNAPSHOT_ID), DAYOFMONTH(SNAPSHOT_ID), HOUR(SNAPSHOT_ID)\
-                ORDER BY MONTH(SNAPSHOT_ID) DESC, DAYOFMONTH(SNAPSHOT_ID) DESC, HOUR(SNAPSHOT_ID) DESC", function(err, data) {
-                callback([err == null ? 0 : 1, err == null ? data : err, err == null ? "line-graph" : "json", "CS record count over the last 3 days"]);
-            })
-
-            return;
-            break;
-
-        case "csd":
-
-            this.conn.exec("conn", "SELECT MONTH(SNAPSHOT_ID), DAYOFMONTH(SNAPSHOT_ID), HOUR(SNAPSHOT_ID), 'Instance', SUM(MEMORY_SIZE_IN_DELTA), MIN(SNAPSHOT_ID)\
-                FROM _SYS_STATISTICS.HOST_COLUMN_TABLES_PART_SIZE\
-                WHERE SNAPSHOT_ID > ADD_DAYS(CURRENT_TIMESTAMP, -3)\
-                GROUP BY MONTH(SNAPSHOT_ID), DAYOFMONTH(SNAPSHOT_ID), HOUR(SNAPSHOT_ID)\
-                ORDER BY MONTH(SNAPSHOT_ID) DESC, DAYOFMONTH(SNAPSHOT_ID) DESC, HOUR(SNAPSHOT_ID) DESC", function(err, data) {
-                callback([err == null ? 0 : 1, err == null ? data : err, err == null ? "line-graph" : "json", "CS in memory delta over the last 3 days"]);
-            })
-
-            return;
-            break;
-
-        case "csr":
-
-            this.conn.exec("conn", "SELECT MONTH(SNAPSHOT_ID), DAYOFMONTH(SNAPSHOT_ID), HOUR(SNAPSHOT_ID), 'Instance', SUM(READ_COUNT), MIN(SNAPSHOT_ID)\
-                FROM _SYS_STATISTICS.HOST_COLUMN_TABLES_PART_SIZE\
-                WHERE SNAPSHOT_ID > ADD_DAYS(CURRENT_TIMESTAMP, -3)\
-                GROUP BY MONTH(SNAPSHOT_ID), DAYOFMONTH(SNAPSHOT_ID), HOUR(SNAPSHOT_ID)\
-                ORDER BY MONTH(SNAPSHOT_ID) DESC, DAYOFMONTH(SNAPSHOT_ID) DESC, HOUR(SNAPSHOT_ID) DESC", function(err, data) {
-                callback([err == null ? 0 : 1, err == null ? data : err, err == null ? "line-graph" : "json", "CS read count over the last 3 days"]);
-            })
-
-            return;
-            break;
-
-        case "csw":
-
-            this.conn.exec("conn", "SELECT MONTH(SNAPSHOT_ID), DAYOFMONTH(SNAPSHOT_ID), HOUR(SNAPSHOT_ID), 'Instance', SUM(WRITE_COUNT), MIN(SNAPSHOT_ID)\
-                FROM _SYS_STATISTICS.HOST_COLUMN_TABLES_PART_SIZE\
-                WHERE SNAPSHOT_ID > ADD_DAYS(CURRENT_TIMESTAMP, -3)\
-                GROUP BY MONTH(SNAPSHOT_ID), DAYOFMONTH(SNAPSHOT_ID), HOUR(SNAPSHOT_ID)\
-                ORDER BY MONTH(SNAPSHOT_ID) DESC, DAYOFMONTH(SNAPSHOT_ID) DESC, HOUR(SNAPSHOT_ID) DESC", function(err, data) {
-                callback([err == null ? 0 : 1, err == null ? data : err, err == null ? "line-graph" : "json", "CS read count over the last 3 days"]);
-            })
-
-            return;
-            break;
-
-        case "tt":
-            this.conn.exec("conn", "SELECT SCHEMA_NAME, TABLE_NAME, LOADED, MEMORY_SIZE_IN_TOTAL, ESTIMATED_MAX_MEMORY_SIZE_IN_TOTAL FROM SYS.M_CS_TABLES ORDER BY MEMORY_SIZE_IN_TOTAL DESC, MEMORY_SIZE_IN_DELTA DESC LIMIT " + parseInt(cParts[1] && cParts[1].toLowerCase() != "\\g" ? cParts[1] : 10), function(err, data) {
-                callback([err == null ? 0 : 1, err == null ? data : err, err == null ? (isGroupView ? "group" : "table") : "json"]);
-            })
-            return;
-            break;
-
-        case "con":
-            this.conn.exec("conn", "SELECT HOST, USER_NAME, COUNT(*) AS AMOUNT FROM SYS.M_CONNECTIONS WHERE CONNECTION_STATUS = 'RUNNING' OR CONNECTION_STATUS = 'IDLE' GROUP BY HOST, USER_NAME", function(err, data) {
-                callback([err == null ? 0 : 1, err == null ? data : err, err == null ? (isGroupView ? "group" : "table") : "json"]);
-            })
-            return;
-            break;
-
-        case "smem":
-            this.conn.exec("conn", "SELECT CONCAT(CONCAT(HOST, ' - ') , PORT) AS HOST, NAME, VALUE FROM SYS.M_MEMORY WHERE NAME IN ('SHARED_MEMORY_USED_SIZE', 'SHARED_MEMORY_FREE_SIZE')", function(err, data) {
-                callback([err == null ? 0 : 1, err == null ? data : err, err == null ? "key-value-bar-chart" : "json", "Shared Memory Usage"]);
-            })
-            return;
-            break;
-
-        case "hmem":
-            this.conn.exec("conn", "SELECT CONCAT(CONCAT(HOST, ' - ') , SERVICE_NAME), HEAP_MEMORY_USED_SIZE, HEAP_MEMORY_ALLOCATED_SIZE - HEAP_MEMORY_USED_SIZE FROM SYS.M_SERVICE_MEMORY", function(err, data) {
-                callback([err == null ? 0 : 1, err == null ? data : err, err == null ? "bar-chart" : "json", "Heap Memory Usage"]);
-            })
-            return;
-            break;
-
-        case "tmem":
-            this.conn.exec("conn", "SELECT CONCAT(CONCAT(HOST, ' - ') , SERVICE_NAME), TOTAL_MEMORY_USED_SIZE, EFFECTIVE_ALLOCATION_LIMIT - TOTAL_MEMORY_USED_SIZE FROM SYS.M_SERVICE_MEMORY", function(err, data) {
-                callback([err == null ? 0 : 1, err == null ? data : err, err == null ? "bar-chart" : "json", "Total Memory Usage"]);
-            })
-            return;
-            break;
-
-        case "scpu":
-            this.conn.exec("conn", "SELECT CONCAT(CONCAT(HOST, ' - ') , SERVICE_NAME), TOTAL_CPU AS WORKING, 100 - TOTAL_CPU AS IDLE FROM SYS.M_SERVICE_STATISTICS WHERE TOTAL_CPU <> -1", function(err, data) {
-                callback([err == null ? 0 : 1, err == null ? data : err, err == null ? "bar-chart" : "json", "CPU Usage"]);
-            })
-            return;
-            break;
-
-        
+    if(!this.handlers[cParts[0]]){
+        callback([1, "Invalid command! Try \\h", "message", "message"]);
+        return;
     }
 
-    callback([1, "Invalid command! Try \\h", "message", "message"]);
+    this.handlers[cParts[0]].run(command, cParts, this.conn, this.screen, callback);
+
 }
 
 module.exports = CommandHandler;

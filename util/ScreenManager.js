@@ -37,10 +37,15 @@ ScreenManager.prototype.loadPipeHandlers = function(){
     this.handlers = {};
 
     require('fs').readdirSync(__dirname + '/../pipeCommands/').forEach(function(file) {
+
         if (file.match(/\.js$/) !== null && file !== 'index.js') {
+
             var name = file.replace('.js', '');
+            
             this.handlers[name] = require('../pipeCommands/' + file);
+
         }
+
     }.bind(this));
 
 }
@@ -308,6 +313,11 @@ ScreenManager.prototype.processPipes = function(linesIn, commandParts){
     for(var j = 1; j < commandParts.length; j++){
 
         var commandName = commandParts[j].trim().split(" ")[0].toLowerCase();
+
+        if(!this.handlers[commandName]){
+            linesOut = ["Unknown command: " + commandName + ". try \\h for help"];
+            continue;
+        }
 
         linesOut = this.handlers[commandName](linesOut, commandParts[j])
 
