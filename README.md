@@ -1,6 +1,8 @@
 
 <h1>CenSQL</h1>
 
+<img src="http://i.imgur.com/pEkKthe.gif"></img>
+
 <h5>A better CLI client for SAP HANA</h5>
 
 <p>
