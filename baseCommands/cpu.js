@@ -6,8 +6,6 @@ var CpuUsageCommandHandler = function(){
 
 CpuUsageCommandHandler.prototype.run = function(command, cParts, conn, screen, callback){
 
-	var isGroupView = cParts[cParts.length - 1].toLowerCase() == "g"
-
 	conn.exec("conn", "SELECT MONTH(SNAPSHOT_ID), DAYOFMONTH(SNAPSHOT_ID), HOUR(SNAPSHOT_ID), HOST, MAX(TOTAL_CPU_USER_TIME_DELTA + TOTAL_CPU_SYSTEM_TIME_DELTA + TOTAL_CPU_WIO_TIME_DELTA), MIN(SNAPSHOT_ID)\
         FROM _SYS_STATISTICS.HOST_RESOURCE_UTILIZATION_STATISTICS\
         WHERE SNAPSHOT_ID > ADD_DAYS(CURRENT_TIMESTAMP, -3)\

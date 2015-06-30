@@ -6,8 +6,6 @@ var CsRecordCountCommandHandler = function(){
 
 CsRecordCountCommandHandler.prototype.run = function(command, cParts, conn, screen, callback){
 
-	var isGroupView = cParts[cParts.length - 1].toLowerCase() == "g"
-
 	conn.exec("conn", "SELECT MONTH(SNAPSHOT_ID), DAYOFMONTH(SNAPSHOT_ID), HOUR(SNAPSHOT_ID), 'Instance', SUM(RECORD_COUNT), MIN(SNAPSHOT_ID)\
         FROM _SYS_STATISTICS.HOST_COLUMN_TABLES_PART_SIZE\
         WHERE SNAPSHOT_ID > ADD_DAYS(CURRENT_TIMESTAMP, -3)\
