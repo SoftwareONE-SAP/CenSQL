@@ -22,6 +22,7 @@ ScreenManager.prototype.init = function() {
         plotHeight: 10
     }
 
+    this.loadDataFormatters();
     this.loadPipeHandlers();
 
     this.setupInput();
@@ -37,6 +38,23 @@ ScreenManager.prototype.loadPipeHandlers = function(){
             var name = file.replace('.js', '');
             
             this.handlers[name] = require('../pipeCommands/' + file);
+
+        }
+
+    }.bind(this));
+
+}
+
+ScreenManager.prototype.loadDataFormatters = function(){
+    this.formatters = {};
+
+    require('fs').readdirSync(__dirname + '/../dataFormatters/').forEach(function(file) {
+
+        if (file.match(/\.js$/) !== null) {
+
+            var name = file.replace('.js', '');
+            
+            this.formatters[name] = require('../dataFormatters/' + file);
 
         }
 
@@ -186,21 +204,6 @@ ScreenManager.prototype.printCommandOutput = function(command, output) {
      */
     process.stdin.resume();
 
-    var color = "cyan"
-
-    /**
-     * The colour the output should be
-     */
-    if(output[0] == 0){
-        color = "green"
-    }else if(output[0] == 1){
-        color = "red"
-    }else if(output[0] == 2){
-        color = "yellow"
-    }
-
-    charm.foreground(color);
-
     var commandParts = command.replace(/([^\\])\|/g, "$1$1|").split(/[^\\]\|/);
 
     /**
@@ -210,68 +213,16 @@ ScreenManager.prototype.printCommandOutput = function(command, output) {
         charm.write("> " + command + "\n\n");
     }
 
-    switch (output[2]) {
+    /**
+     * Pass the data to the chosen formatter
+     */
+    var lines = this.formatters[output[2]](output[1], output[3], this.settings);
+    var pipedLines = this.processPipes(lines, commandParts);
+    this.renderLines(pipedLines);
 
-        /**
-         * Plain text
-         */
-        case "message":
-            charm.write(output[1] + "\n\n");
-            break;
-
-        /**
-         * a table
-         */
-        case "table":
-            var lines = this.renderTable(output[1]);
-            this.renderLines(this.processPipes(lines, commandParts));
-            break;
-
-        /**
-         * display each row in a key value chunk
-         */
-        case "group":
-            var lines = this.renderGroup(output[1], commandParts);
-            this.renderLines(this.processPipes(lines, commandParts));
-            break;
-
-        /**
-         * turn the output array into json
-         */
-        case "json":
-            var lines = JSON.stringify(output[1]);
-            this.renderLines(this.processPipes(lines, commandParts));
-            break;
-
-        /**
-         * display a line graph of the data
-         */
-        case "line-graph":
-            this.drawLineGraph(output[1], output[3]);
-            break;
-
-        /**
-         * Display a bar chart for data in a key value store
-         */
-        case "key-value-bar-chart":
-            this.drawKeyValueBarChart(output[1], output[3]);
-            break;
-
-        /**
-         * Display a bar chart of the data in a normal table structor
-         */
-        case "bar-chart":
-            this.drawBarChart(output[1], output[3]);
-            break;
-
-        /**
-         * If the command handler did not supply a valid format, print it as plain text
-         */
-        default:
-            charm.write("NO DISPLAY TYPE: " + output[1] + "\n\n");
-            break;
-    }
-
+    /**
+     * Dont display a prompt for batch requests
+     */
     if (!this.isBatch) {
         charm.foreground("cyan");
         charm.write("> ");
@@ -306,406 +257,6 @@ ScreenManager.prototype.processPipes = function(linesIn, commandParts){
 ScreenManager.prototype.renderLines = function(lines){
     for(var i = 0 ; i < lines.length; i++){
         charm.write(lines[i] + "\n");
-    }
-}
-
-/**
- * Display an ascii table of data
- * @param  {Array} data
- */
-ScreenManager.prototype.renderTable = function(data) {
-
-    var renderedLines = [];
-
-    for (var i = 0; i < data.length; i++) {
-
-        var keys = [];
-
-        if (data[i].length > 0) {
-
-            keys = Object.keys(data[i][0]);
-
-            renderedLines.push(keys.join(" | "))
-            renderedLines.push(new Array(20).join("- "));
-        } else {
-            renderedLines.push("No Results\n");
-        }
-
-        keys.reverse()
-
-        for (var k = 0; k < data[i].length; k++) {
-            var rows = [];
-
-            for (var j = keys.length - 1; j >= 0; j--) {
-                rows.push(data[i][k][keys[j]])
-            };
-
-            var rowString = rows.join(" | ");
-
-            renderedLines.push(rowString);
-
-        };
-
-    };
-
-    return renderedLines;
-}
-
-/**
- * Display the data in the grouped format
- * @param  {Array} data
- */
-ScreenManager.prototype.renderGroup = function(data, commandParts) {
-
-    var renderedLines = [];
-
-    for (var i = 0; i < data.length; i++) {
-
-        /**
-         * get keys
-         */
-
-        var keys = [];
-
-        if (data[i].length > 0) {
-
-            keys = Object.keys(data[i][0]);
-        } else {
-            renderedLines.push("No Results\n");
-            continue;
-        }
-
-        keys.reverse()
-
-        /**
-         * Display data
-         */
-
-        for (var k = 0; k < data[i].length; k++) {
-
-            renderedLines.push("No: " + k + " " + new Array(20).join("-"));
-
-            for (var j = keys.length - 1; j >= 0; j--) {
-                renderedLines.push(" " + keys[j] + ": " + data[i][k][keys[j]]);
-            };
-
-        };
-
-    };
-
-    return renderedLines;
-}
-
-ScreenManager.prototype.drawLineGraph = function(data, title) {
-
-    for (var i = 0; i < data.length; i++) {
-
-        /**
-         * get keys
-         */
-
-        var keys = [];
-
-        if (data[i].length > 0) {
-
-            keys = Object.keys(data[i][0]);
-        } else {
-            charm.write("No Results\n\n");
-            continue;
-        }
-
-        /**
-         * Get sections
-         */
-
-        var sections = [];
-
-        for (var k = 0; k < data[i].length; k++) {
-
-            if (sections.indexOf(data[i][k][keys[3]]) === -1) {
-                sections.push(data[i][k][keys[3]]);
-            }
-
-        }
-
-        sections.sort();
-
-        for (var s = 0; s < sections.length; s++) {
-
-            /**
-             * Start making plot
-             */
-
-            var plot = []
-
-            for (var k = 0; k < this.settings.plotHeight + 1; k++) {
-                plot.push([]);
-            }
-
-            /**
-             * Get min an max values
-             */
-
-            var maxValue = 0;
-            var minValue = Number.MAX_VALUE;
-
-            for (var k = 0; k < data[i].length; k++) {
-
-                if (maxValue < data[i][k][keys[4]]) maxValue = data[i][k][keys[4]];
-                if (minValue > data[i][k][keys[4]]) minValue = data[i][k][keys[4]];
-
-            }
-
-            if (maxValue == minValue) {
-                maxValue++;
-                minValue--;
-            }
-
-            /**
-             * Start creating graph
-             */
-
-            for (var k = 0; k < data[i].length; k++) {
-
-                if (data[i][k][keys[3]] !== sections[s]) continue;
-
-                var val = parseInt(((data[i][k][keys[4]] - minValue) / (maxValue - minValue)) * this.settings.plotHeight);
-
-                for (var j = 0; j < this.settings.plotHeight + 1; j++) {
-
-                    var point = "·"
-
-
-                    if (j == this.settings.plotHeight - val) {
-                        point = "■"
-                    }
-
-                    plot[j].push(point);
-                }
-
-            }
-
-            /**
-             * Display plot
-             */
-
-            var widthRatio = Math.floor((process.stdout.columns - 3) / plot[0].length);
-
-            if (widthRatio < 1) {
-                widthRatio = 1;
-            }
-
-            charm.write("╔" + maxValue)
-
-            for (var k = 0; k < (plot[0].length * widthRatio) - ("" + maxValue).length; k++) {
-                charm.write("═");
-            };
-
-            charm.write("╗\n");
-
-            for (var k = 0; k < plot.length; k++) {
-
-                plot[k].reverse()
-
-                charm.write("║");
-
-                for (var o = 0; o < plot[k].length; o++) {
-                    for (var w = 0; w < widthRatio; w++) {
-
-                        if (plot[k][o] === "■") {
-                            charm.foreground("cyan");
-                        } else {
-                            charm.foreground("magenta");
-                        }
-
-                        charm.write(plot[k][o]);
-
-                        charm.foreground("green");
-                    }
-                };
-
-                charm.write("║\n");
-            };
-
-            charm.write("╚" + minValue);
-
-            for (var k = 0; k < (plot[0].length * widthRatio) - ("" + minValue).length; k++) {
-                charm.write("═");
-            };
-
-            charm.write("╝\n");
-
-            var description = title + " - " + sections[s];
-
-            var xPadding = 2 + parseInt(((plot[0].length * widthRatio) - description.length) / 2);
-
-            charm.write(new Array(xPadding).join(" ") + description);
-
-            charm.write("\n\n");
-
-        }
-
-    }
-}
-
-ScreenManager.prototype.drawKeyValueBarChart = function(data, title) {
-
-    var barTypes = ["█", "░", "▒", "▓"]
-
-    var parts = [];
-
-    var colors = ['cyan', 'green', 'red', 'yellow', 'blue', 'magenta'];
-
-    for (var i = 0; i < data.length; i++) {
-
-        /**
-         * get keys
-         */
-
-        var keys = [];
-
-        if (data[i].length > 0) {
-
-            keys = Object.keys(data[i][0]);
-        } else {
-            charm.write("No Results\n\n");
-            continue;
-        }
-
-        /**
-         * Get sections
-         */
-
-        var sections = [];
-
-        for (var k = 0; k < data[i].length; k++) {
-
-            if (sections.indexOf(data[i][k][keys[0]]) === -1) {
-                sections.push(data[i][k][keys[0]]);
-            }
-
-        }
-
-        sections.sort();
-
-        for (var s = 0; s < sections.length; s++) {
-
-            var sum = 0;
-
-            for (var k = 0; k < data[i].length; k++) {
-
-                if (data[i][k][keys[0]] !== sections[s]) continue;
-
-                sum += data[i][k][keys[2]]
-
-                if (parts.indexOf(data[i][k][keys[1]]) === -1) {
-                    parts.push(data[i][k][keys[1]])
-                }
-
-            }
-
-            charm.foreground("white");
-            charm.write(title + " - " + sections[s] + "\n");
-
-            for (var k = 0; k < data[i].length; k++) {
-
-                if (data[i][k][keys[0]] !== sections[s]) continue;
-
-                var width = parseInt(process.stdout.columns * data[i][k][keys[2]] / sum);
-
-                charm.foreground(colors[parts.indexOf(data[i][k][keys[1]])])
-
-                charm.write(new Array(width).join(barTypes[parts.indexOf(data[i][k][keys[1]]) % 4]))
-
-            }
-
-            charm.write("\n\n");
-
-        }
-
-        for (var k = 0; k < parts.length; k++) {
-
-            charm.foreground("white");
-
-            charm.write("- ");
-
-            charm.foreground(colors[k]);
-            charm.write(parts[k] + "\n")
-        }
-
-        charm.foreground("green");
-    }
-}
-
-ScreenManager.prototype.drawBarChart = function(data, title) {
-
-    var barTypes = ["█", "░", "▒", "▓"]
-
-    var colors = ['green', 'cyan', 'red', 'yellow', 'blue', 'magenta'];
-
-    for (var i = 0; i < data.length; i++) {
-
-        /**
-         * get keys
-         */
-
-        var keys = [];
-
-        if (data[i].length > 0) {
-
-            keys = Object.keys(data[i][0]);
-        } else {
-            charm.write("No Results\n\n");
-            continue;
-        }
-
-        for (var k = 0; k < data[i].length; k++) {
-
-            var sum = 0;
-
-            sum += data[i][k][keys[1]]
-            sum += data[i][k][keys[2]]
-
-
-            charm.foreground("white");
-            charm.write(title + " - " + data[i][k][keys[0]] + "\n");
-
-
-
-            var width = parseInt(process.stdout.columns * data[i][k][keys[1]] / sum);
-
-            charm.foreground(colors[1])
-
-            charm.write(new Array(width).join(barTypes[0]))
-
-            width = parseInt(process.stdout.columns * data[i][k][keys[2]] / sum);
-
-            charm.foreground(colors[0])
-
-            charm.write(new Array(width).join(barTypes[1]))
-
-
-            charm.write("\n\n");
-
-
-
-        }
-
-        charm.foreground("white");
-
-        charm.write("- ");
-
-        charm.foreground(colors[1]);
-        charm.write(keys[1] + "\n")
-
-        charm.foreground("white");
-
-        charm.write("- ");
-
-        charm.foreground(colors[0]);
-        charm.write(keys[2] + "\n")
-
-        charm.foreground("green");
     }
 }
 
