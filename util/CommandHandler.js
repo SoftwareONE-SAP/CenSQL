@@ -36,10 +36,17 @@ CommandHandler.prototype.loadCommandHandlers = function(){
 CommandHandler.prototype.onCommand = function(command, callback) {
 
     /**
+     * The parts of the command
+     * @type {String[]}
+     */
+    var sqlCommand = command.replace(/([^\\])\|/g, "$1$1|").split(/[^\\]\|/)[0].trim();
+    var cParts = sqlCommand.split(/\\| /);
+
+    /**
      * Is the command an internal command? (Does it start with a '\')
      */
     if (command.charAt(0) == "\\") {
-        this.runInternalCommand(command.substring(1), callback);
+        this.runInternalCommand(command.substring(1), cParts, callback);
         return;
     }
 
@@ -53,26 +60,24 @@ CommandHandler.prototype.onCommand = function(command, callback) {
      */
     var isGroupOption = false;
 
-    if(command.toLowerCase().slice(-2) == "\\g"){
+    if(sqlCommand.toLowerCase().slice(-2) == "\\g"){
         isGroupOption = true;
-        command = command.substring(0, command.length - 2);
+        sqlCommand = sqlCommand.substring(0, sqlCommand.length - 2);
     }
 
+    console.log(sqlCommand);
+
     /**
-     * Run the command as a string of SQL and send it to HANA
+     * Run the sqlCommand as a string of SQL and send it to HANA
      */
-    this.conn.exec("conn", command, function(err, data) {
-        callback([err == null ? 0 : 1, err == null ? data : err, err == null ? (isGroupOption ? "group" : "table") : "json"]);
+    this.conn.exec("conn", sqlCommand, function(err, data) {
+        callback([err == null ? 0 : 1, err == null ? data : {error: err, sql: sqlCommand}, err == null ? (isGroupOption ? "group" : "table") : "json"]);
     })
 }
 
-CommandHandler.prototype.runInternalCommand = function(command, callback) {
+CommandHandler.prototype.runInternalCommand = function(command, cParts, callback) {
 
-    /**
-     * The parts of the command
-     * @type {String[]}
-     */
-    var cParts = command.split("|")[0].trim().split(/\\| /);
+    cParts.splice(0, 1);
 
     if(!this.handlers[cParts[0]]){
         callback([1, "Invalid command! Try \\h", "message", "message"]);
