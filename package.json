@@ -13,10 +13,9 @@
     "charm": "^1.0.0",
     "colors": "^1.1.2",
     "debug": "^2.2.0",
-    "file": "^0.2.2",
     "hdb": "^0.4.4",
     "optimist": "^0.6.1",
-    "readline": "0.0.7",
-    "readline-history": "^1.2.0"
+    "readline-history": "^1.2.0",
+    "shelljs": "^0.5.1"
   }
 }

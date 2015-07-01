@@ -69,6 +69,11 @@ ScreenManager.prototype.setupInput = function() {
 
     if(!process.stdout.isTTY){
 
+        /**
+         * Spoof the width of the temrinal
+         */
+        process.stdout.columns = 80;
+
         process.stdout.on('error', function( err ) {
             if (err.code == "EPIPE") {
                 process.exit(0);
@@ -112,10 +117,12 @@ ScreenManager.prototype.setupInput = function() {
 
                 }.bind(this));
 
+            }.bind(this));
+
             /**
              * On close, give the user a pretty message and then stop the entire program
              */
-            }.bind(this)).on('close', function() {
+            this.rl.on('close', function() {
 
                 charm.foreground("green");
                 charm.write('\nHave a great day!\n');
@@ -198,10 +205,6 @@ ScreenManager.prototype.ready = function() {
     charm.display("reset");
 
     process.stdin.resume();
-}
-
-ScreenManager.prototype.message = function(message) {
-    charm.write(message + "\n");
 }
 
 /**
