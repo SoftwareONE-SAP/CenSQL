@@ -16,6 +16,9 @@ var CommandHandler = function(screen, conn, command) {
 
 }
 
+/**
+ * Require the baseCommands from the baseCommands folder and save them by their file name
+ */
 CommandHandler.prototype.loadCommandHandlers = function(){
 
     this.handlers = {};
@@ -75,10 +78,16 @@ CommandHandler.prototype.onCommand = function(command, callback) {
     })
 }
 
+/**
+ * Run a non SQL command from the 'baseCommands' folder
+ */
 CommandHandler.prototype.runInternalCommand = function(command, cParts, callback) {
 
     cParts.splice(0, 1);
 
+    /**
+     * Does baseCommand exist?
+     */
     if(!this.handlers[cParts[0]]){
         callback([1, "Invalid command! Try \\h", "message", "message"]);
         return;

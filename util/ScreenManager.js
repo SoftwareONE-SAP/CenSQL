@@ -239,7 +239,8 @@ ScreenManager.prototype.printCommandOutput = function(command, output) {
          * turn the output array into json
          */
         case "json":
-            charm.write(JSON.stringify(output[1]) + "\n\n")
+            var lines = JSON.stringify(output[1]);
+            this.renderLines(this.processPipes(lines, commandParts));
             break;
 
         /**

@@ -1,5 +1,5 @@
 
-module.exports = function(linesIn, command){
+module.exports = function(linesIn, command) {
     var linesOut = linesIn.slice(0);
 
     var part = command.trim();
@@ -7,28 +7,35 @@ module.exports = function(linesIn, command){
 
     var isInverse = false;
 
-    if(parts[1] && parts[1].trim() == "-i"){
+    if (parts[1] && parts[1].trim() == "-i") {
         isInverse = true;
     }
 
     var i = linesOut.length;
-    while (i--) {
 
-        if(isInverse){
+    try {
 
-            if(linesOut[i].indexOf(part.substring(part.indexOf('-i ') + 3)) !== -1){
-                linesOut.splice(i, 1);
-            }
+        while (i--) {
 
-        }else{
+            if (isInverse) {
 
-            if(linesOut[i].indexOf(part.substring(part.indexOf(' ') + 1)) === -1){
-                linesOut.splice(i, 1);
+                if (linesOut[i].match(part.substring(part.indexOf('-i ') + 3))) {
+                    linesOut.splice(i, 1);
+                }
+
+            } else {
+
+                if (!linesOut[i].match(part.substring(part.indexOf(' ') + 1))) {
+                    linesOut.splice(i, 1);
+                }
+
             }
 
         }
 
-    }   
+    } catch (e) {
+    	linesOut = [e]
+    }
 
 
     return linesOut;
