@@ -1,7 +1,6 @@
 
 var UserViewCommandHandler = function(){
 	this.description = "";
-	this.helpText = "";
 }
 
 UserViewCommandHandler.prototype.run = function(command, cParts, conn, screen, callback){

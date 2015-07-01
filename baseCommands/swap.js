@@ -1,7 +1,6 @@
 
 var SwapUsageCommandHandler = function(){
 	this.description = "";
-	this.helpText = "";
 }
 
 SwapUsageCommandHandler.prototype.run = function(command, cParts, conn, screen, callback){

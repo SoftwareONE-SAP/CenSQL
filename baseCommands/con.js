@@ -1,7 +1,6 @@
 
 var ConnectionsCommandHandler = function(){
 	this.description = "";
-	this.helpText = "";
 }
 
 ConnectionsCommandHandler.prototype.run = function(command, cParts, conn, screen, callback){

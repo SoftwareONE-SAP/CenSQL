@@ -1,7 +1,6 @@
 
 var HeapMemoryCommandHandler = function(){
 	this.description = "";
-	this.helpText = "";
 }
 
 HeapMemoryCommandHandler.prototype.run = function(command, cParts, conn, screen, callback){

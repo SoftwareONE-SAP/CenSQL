@@ -1,7 +1,6 @@
 
 var ServiceCpuCommandHandler = function(){
 	this.description = "";
-	this.helpText = "";
 }
 
 ServiceCpuCommandHandler.prototype.run = function(command, cParts, conn, screen, callback){

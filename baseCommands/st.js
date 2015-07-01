@@ -1,7 +1,6 @@
 
 var StatusCommandHandler = function(){
 	this.description = "";
-	this.helpText = "";
 }
 
 StatusCommandHandler.prototype.run = function(command, cParts, conn, screen, callback){

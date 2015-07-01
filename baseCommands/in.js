@@ -1,7 +1,6 @@
 
 var InstancesCommandHandler = function(){
 	this.description = "";
-	this.helpText = "";
 }
 
 InstancesCommandHandler.prototype.run = function(command, cParts, conn, screen, callback){

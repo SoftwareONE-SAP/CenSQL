@@ -1,7 +1,6 @@
 
 var CsReadCountCommandHandler = function(){
 	this.description = "";
-	this.helpText = "";
 }
 
 CsReadCountCommandHandler.prototype.run = function(command, cParts, conn, screen, callback){

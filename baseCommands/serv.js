@@ -1,7 +1,6 @@
 
 var ServicesCommandHandler = function(){
 	this.description = "";
-	this.helpText = "";
 }
 
 ServicesCommandHandler.prototype.run = function(command, cParts, conn, screen, callback){

@@ -1,7 +1,6 @@
 
 var UnloadsCommandHandler = function(){
 	this.description = "";
-	this.helpText = "";
 }
 
 UnloadsCommandHandler.prototype.run = function(command, cParts, conn, screen, callback){

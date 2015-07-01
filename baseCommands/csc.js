@@ -1,7 +1,6 @@
 
 var CsRecordCountCommandHandler = function(){
 	this.description = "";
-	this.helpText = "";
 }
 
 CsRecordCountCommandHandler.prototype.run = function(command, cParts, conn, screen, callback){

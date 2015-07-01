@@ -1,7 +1,6 @@
 
 var MemUsageCommandHandler = function(){
 	this.description = "";
-	this.helpText = "";
 }
 
 MemUsageCommandHandler.prototype.run = function(command, cParts, conn, screen, callback){

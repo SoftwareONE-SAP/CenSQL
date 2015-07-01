@@ -1,7 +1,6 @@
 
 var TopTablesCommandHandler = function(){
 	this.description = "";
-	this.helpText = "";
 }
 
 TopTablesCommandHandler.prototype.run = function(command, cParts, conn, screen, callback){

@@ -1,7 +1,6 @@
 
 var CsMemDeltaCommandHandler = function(){
 	this.description = "";
-	this.helpText = "";
 }
 
 CsMemDeltaCommandHandler.prototype.run = function(command, cParts, conn, screen, callback){

@@ -1,7 +1,6 @@
 
 var TableViewCommandHandler = function(){
 	this.description = "";
-	this.helpText = "";
 }
 
 TableViewCommandHandler.prototype.run = function(command, cParts, conn, screen, callback){

@@ -1,7 +1,6 @@
 
 var CsMemoryCommandHandler = function(){
 	this.description = "";
-	this.helpText = "";
 }
 
 CsMemoryCommandHandler.prototype.run = function(command, cParts, conn, screen, callback){

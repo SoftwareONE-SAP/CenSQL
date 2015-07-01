@@ -1,7 +1,6 @@
 
 var CpuUsageCommandHandler = function(){
 	this.description = "";
-	this.helpText = "";
 }
 
 CpuUsageCommandHandler.prototype.run = function(command, cParts, conn, screen, callback){

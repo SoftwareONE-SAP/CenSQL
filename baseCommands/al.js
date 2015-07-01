@@ -1,7 +1,6 @@
 
 var AlertsCommandHandler = function(){
 	this.description = "";
-	this.helpText = "";
 }
 
 AlertsCommandHandler.prototype.run = function(command, cParts, conn, screen, callback){

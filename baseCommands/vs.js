@@ -1,7 +1,6 @@
 
 var ViewsViewCommandHandler = function(){
 	this.description = "";
-	this.helpText = "";
 }
 
 ViewsViewCommandHandler.prototype.run = function(command, cParts, conn, screen, callback){

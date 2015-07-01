@@ -1,7 +1,6 @@
 
 var SchemaViewCommandHandler = function(){
 	this.description = "";
-	this.helpText = "";
 }
 
 SchemaViewCommandHandler.prototype.run = function(command, cParts, conn, screen, callback){

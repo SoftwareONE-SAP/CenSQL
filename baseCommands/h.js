@@ -1,6 +1,6 @@
+
 var HelpCommandHandler = function() {
     this.description = "";
-    this.helpText = "";
 }
 
 HelpCommandHandler.prototype.run = function(command, cParts, conn, screen, callback) {
