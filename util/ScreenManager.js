@@ -66,6 +66,18 @@ ScreenManager.prototype.loadDataFormatters = function(){
  * Add an input handler to the cli and pass it to the commandHandler
  */
 ScreenManager.prototype.setupInput = function() {
+
+    if(!process.stdout.isTTY){
+
+        process.stdout.on('error', function( err ) {
+            if (err.code == "EPIPE") {
+                process.exit(0);
+            }
+        })
+
+        return;
+    }
+
     readline.createInterface({
         input: process.stdin,
         output: process.stdout,
@@ -89,7 +101,7 @@ ScreenManager.prototype.setupInput = function() {
                 process.stdin.pause();
 
                 /**
-                 * Send the suer command to the command handler
+                 * Send the user command to the command handler
                  */
                 this.commandHandler.handleCommand(line, function(output) {
 
