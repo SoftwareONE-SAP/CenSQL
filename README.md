@@ -17,8 +17,6 @@ As well as having a smoother user interface, CenSQL also provides a lot more fun
 Finally, CenSQL has support for bar charts and line graphs inside the CLI interface for showing a 'at-a-glanse' view of the status and history of the instance, for example <code>\cpu</code> for showing the CPU usage for each host for the instance and <code>\smem</code> for showing the current shared memory.
 </p>
 
-<hr>
-
 <h3>Installation</h3>
 <ol>
   
@@ -27,17 +25,25 @@ Finally, CenSQL has support for bar charts and line graphs inside the CLI interf
   <li><code>git clone git@github.com:Centiq/CenSQL.git</code></li>
   <li><code>cd CenSQL</code></li>
   <li><code>./install.sh</code></li>
-  <li>
-    Use application like so: <code>censql --user USERNAME --port 3{INSTANCE_ID}15 --host HOSTNAME/IP --pass PASSWORD</code>
-    <br><br>
-    Example: <code>censql --user SYSTEM --port 30015 --host 127.0.0.1 --pass myPassword123</code>
-    <br><br>
-    Optionally, supply the sql to run without entering the interactive mode with the <code>--command</code> option
-  </li>
-
 </ol>
 
-<hr>
+<h3>Usage</h3>
+<pre>
+Usage:	 censql --user {USER} --port 3<ID>15 --host {IP OR HOSTNAME} --pass <PASSWORD>
+	     censql --user {USER} --port 3<ID>15 --host {IP OR HOSTNAME} --pass <PASSWORD> --command '{SQL_STRING}'
+Example: censql --user SYSTEM --port 30015 --host 192.168.0.1 --pass Password123
+Example: censql --user SYSTEM --port 30015 --host 192.168.0.1 --pass Password123 --command 'SELECT * FROM SYS.M_SERVICES'
+
+CenSQL Help
+--user		The username for the user to connect as
+--pass		The password for the user connecting with
+--host		The host to connect to
+--port		The port to connect to the host with (Layout: '3<ID>15', Instance 99 would be 39915)
+--command	Optionally run a command/sql without entering the interective terminal
+
+--nocolour	disable colour output
+--nocolor	alias of --no-colour
+</pre>
 
 <h3>Example Output</h3>
 
