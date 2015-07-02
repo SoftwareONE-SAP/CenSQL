@@ -59,6 +59,11 @@ var CenSql = function(){
 	 */
 	this.hdb.connect(argv.host, argv.user, argv.pass, argv.port, "conn", function(err, data){
 
+		if(err){
+			this.screen.error(err.message);
+			process.exit(1);
+		}
+
 		/**
 		 * If the user specified the command, we do not want to open an interactive session
 		 */

@@ -1,6 +1,7 @@
 var debug = require("debug")("censql:ScreenManager");
 var readline = require('readline-history');
 var charm = require('charm')(process.stdout);
+var colors = require("colors");
 var path = require('path');
 var stripColorCodes = require('stripcolorcodes');
 
@@ -175,7 +176,7 @@ ScreenManager.prototype.printHeader = function() {
 
     if(this.settings.colour) charm.foreground("yellow");
 
-    charm.write("Connecting to HANA...");
+    charm.write("Connecting to HANA...\n");
 
     process.stdin.pause();
 
@@ -186,6 +187,7 @@ ScreenManager.prototype.printHeader = function() {
  */
 ScreenManager.prototype.ready = function() {
 
+    charm.up(1);
     charm.erase("line");
 
     /**
@@ -220,6 +222,9 @@ ScreenManager.prototype.printCommandOutput = function(command, output) {
      */
     process.stdin.resume();
 
+    /**
+     * Split command part by unescaped pipes
+     */
     var commandParts = command.replace(/([^\\])\|/g, "$1$1|").split(/[^\\]\|/);
 
     /**
@@ -249,6 +254,9 @@ ScreenManager.prototype.printCommandOutput = function(command, output) {
     if(this.settings.colour) charm.display("reset");
 }
 
+/**
+ * Send the data through all the piped commands they added
+ */
 ScreenManager.prototype.processPipes = function(linesIn, commandParts){
 
     var linesOut = linesIn.slice(0);
@@ -270,6 +278,9 @@ ScreenManager.prototype.processPipes = function(linesIn, commandParts){
 
 }
 
+/**
+ * Draw the data line by line, removing colour if the user requested no colour
+ */
 ScreenManager.prototype.renderLines = function(lines){
 
     for(var i = 0 ; i < lines.length; i++){
@@ -282,6 +293,10 @@ ScreenManager.prototype.renderLines = function(lines){
         charm.write(line + "\n");
 
     }
+}
+
+ScreenManager.prototype.error = function(message){
+    this.renderLines([colors.red(message)]);
 }
 
 module.exports = ScreenManager;
