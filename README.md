@@ -23,12 +23,14 @@ Finally, CenSQL has support for bar charts and line graphs inside the CLI interf
 <ol>
   
   <li>Install NodeJS v0.10.30 or higher (If not already installed)</li>
-  <li>Run <code>git clone git@github.com:Centiq/CenSQL.git</code></li>
-  <li>cd CenSQL</li>
+  <li><code>cd /opt</code></li>
+  <li><code>git clone git@github.com:Centiq/CenSQL.git</code></li>
+  <li><code>cd CenSQL</code></li>
+  <li><code>./install.sh</code></li>
   <li>
-    Use application like so: <code>./app.js --user USERNAME --port 3{INSTANCE_ID}15 --host HOSTNAME/IP --pass PASSWORD</code>
+    Use application like so: <code>censql --user USERNAME --port 3{INSTANCE_ID}15 --host HOSTNAME/IP --pass PASSWORD</code>
     <br><br>
-    Example: <code>./app.js --user SYSTEM --port 30015 --host 127.0.0.1 --pass myPassword123</code>
+    Example: <code>censql --user SYSTEM --port 30015 --host 127.0.0.1 --pass myPassword123</code>
     <br><br>
     Optionally, supply the sql to run without entering the interactive mode with the <code>--command</code> option
   </li>
