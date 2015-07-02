@@ -82,7 +82,66 @@ No: 1 -------------------
 
 HOST | HOST_ACTIVE | HOST_STATUS
 - - - - - - - - - - - - - - - - - - - 
-dev-kvmhana03 | YES | OK
+hananode01 | YES | OK
+</pre>
+
+<h4>Post Commands</h4>
+<p>Output from any query or command may be piped to a post command which will transform the output in some way. eg:</p>
+<pre>
+> \serv | grep indexserver
+
+hananode01 | 30103 | indexserver | 4771 | master | YES | 30115 | MASTER
+</pre>
+
+<h4>Help Command</h4>
+<pre>
+> \help
+
+CenSQL v1.0.0 Help
+-----------------------------------------------------
+Commands:
+	Basic:
+	\h			- For Help
+	\sc, \ds		- To list schemas
+	\us, \du		- To list users
+	\ta, \dt {SCHEMA_NAME}	- To list tables for a schema
+	\vs, \dv {SCHEMA_NAME}	- To list views for a schema
+	\in			- To list instances
+	
+	History:
+	\ul {OPTIONAL_LIMIT}	- To list recent unloads
+	\mem			- Graph physical memory over the last 3 days
+	\imem			- Graph instance used memory over the last 3 days
+	\cpu			- Graph cpu over the last 3 days
+	\swap			- Graph swap over the last 3 days
+	\row			- Graph the used fixed part size for row storage over the last 3 days
+	\csd			- Graph CS in memory delta over the last 3 days
+	\csr			- Graph CS read count over the last 3 days
+	\csw			- Graph CS write count over the last 3 days
+	\csc			- Graph CS record count over the last 3 days
+	\csm			- Graph CS in memory size total (incl delta) over the last 3 days
+	
+	Current Status:
+	\al			- To list active alerts
+	\st			- To list hosts for instance
+	\con			- To list connections
+	\serv			- To list services
+	\tt {OPTIONAL_LIMIT}	- To list the largest column tables
+	\ba {OPTIONAL_LIMIT}	- To list recent backups
+	\smem			- Show bar chart of shared memeory
+	\hmem			- Show bar chart of heap memory usage per service
+	\tmem			- Show bar chart of total memory usage per service
+	\scpu			- Show bar chart of cpu usage per service
+
+	Settings:
+	\sgh			- Set the height to draw graphs
+
+Post Commands:
+	grep [-i] {FILTER_STRING/REGEX_STRING}	- filter the results and only show the ones that match
+	head {AMOUNT_OF_LINES}		- Only show the amount of line from the top of the output
+	tail {AMOUNT_OF_LINES}		- Only show the amount of line from the bottom of the output
+	cut {AMOUNT_AND_DIR}		- Cut off characters from one side of the file.
+					eg: 'cut 3-' would cut the first 2 characters off each line
 </pre>
 
 <hr>
