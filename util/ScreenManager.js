@@ -2,10 +2,15 @@ var debug = require("debug")("censql:ScreenManager");
 var readline = require('readline-history');
 var charm = require('charm')(process.stdout);
 var path = require('path');
+var stripColorCodes = require('stripcolorcodes');
 
-var ScreenManager = function(isBatch, commandHandler) {
+var ScreenManager = function(isBatch, settings, commandHandler) {
     this.isBatch = isBatch;
+
+    this.settings = settings;
+    
     this.commandHandler = commandHandler;
+
     this.init.call(this);
 }
 
@@ -16,10 +21,6 @@ ScreenManager.prototype.init = function() {
 
     if (!this.isBatch) {
         this.printHeader();
-    }
-
-    this.settings = {
-        plotHeight: 10
     }
 
     this.loadDataFormatters();
@@ -124,9 +125,9 @@ ScreenManager.prototype.setupInput = function() {
              */
             this.rl.on('close', function() {
 
-                charm.foreground("green");
+                if(this.settings.colour) charm.foreground("green");
                 charm.write('\nHave a great day!\n');
-                charm.foreground("white");
+                if(this.settings.colour) charm.foreground("white");
 
                 this.rl.close();
                 process.exit(0);
@@ -164,15 +165,15 @@ ScreenManager.prototype.setupInput = function() {
  */
 ScreenManager.prototype.printHeader = function() {
 
-    charm.foreground("cyan");
-    charm.display("underscore");
-    charm.display("bright");
+    if(this.settings.colour) charm.foreground("cyan");
+    if(this.settings.colour) charm.display("underscore");
+    if(this.settings.colour) charm.display("bright");
 
     charm.write("Welcome to CenSQL for SAP HANA!\n\n");
 
-    charm.display("reset");
+    if(this.settings.colour) charm.display("reset");
 
-    charm.foreground("yellow");
+    if(this.settings.colour) charm.foreground("yellow");
 
     charm.write("Connecting to HANA...");
 
@@ -192,17 +193,17 @@ ScreenManager.prototype.ready = function() {
      */
     charm.left(9999999);
 
-    charm.display("reset");
-    charm.display("bright");
-    charm.foreground("cyan");
+    if(this.settings.colour) charm.display("reset");
+    if(this.settings.colour) charm.display("bright");
+    if(this.settings.colour) charm.foreground("cyan");
 
     charm.write("For help type \\h\n-----------------------------------------------------\n\n");
 
-    charm.display("reset");
+    if(this.settings.colour) charm.display("reset");
 
-    charm.foreground("cyan");
+    if(this.settings.colour) charm.foreground("cyan");
     charm.write("> ");
-    charm.display("reset");
+    if(this.settings.colour) charm.display("reset");
 
     process.stdin.resume();
 }
@@ -232,20 +233,20 @@ ScreenManager.prototype.printCommandOutput = function(command, output) {
      * Pass the data to the chosen formatter
      */
     var lines = this.formatters[output[2]](output[1], output[3], this.settings);
-    var pipedLines = this.processPipes(lines, commandParts);
+    var pipedLines = this.processPipes(lines, commandParts, this.settings);
     this.renderLines(pipedLines);
 
     /**
      * Dont display a prompt for batch requests
      */
     if (!this.isBatch) {
-        charm.foreground("cyan");
+        if(this.settings.colour) charm.foreground("cyan");
         charm.write("> ");
     } else {
-        charm.foreground("white");
+        if(this.settings.colour) charm.foreground("white");
     }
 
-    charm.display("reset");
+    if(this.settings.colour) charm.display("reset");
 }
 
 ScreenManager.prototype.processPipes = function(linesIn, commandParts){
@@ -270,8 +271,16 @@ ScreenManager.prototype.processPipes = function(linesIn, commandParts){
 }
 
 ScreenManager.prototype.renderLines = function(lines){
+
     for(var i = 0 ; i < lines.length; i++){
-        charm.write(lines[i] + "\n");
+        var line = lines[i];
+
+        if(!this.settings.colour){
+            line = stripColorCodes(line);
+        }
+
+        charm.write(line + "\n");
+
     }
 }
 

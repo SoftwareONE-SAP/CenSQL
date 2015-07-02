@@ -16,6 +16,7 @@
     "hdb": "^0.4.4",
     "optimist": "^0.6.1",
     "readline-history": "^1.2.0",
-    "shelljs": "^0.5.1"
+    "shelljs": "^0.5.1",
+    "stripcolorcodes": "^0.1.0"
   }
 }
