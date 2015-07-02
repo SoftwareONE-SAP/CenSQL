@@ -18,8 +18,8 @@ Finally, CenSQL has support for bar charts and line graphs inside the CLI interf
 </p>
 
 <h3>Installation</h3>
+<p>Note: CenSQL has only been tested on Ubuntu 14.04 And Debian 8 (jessie). However it should work on any distro running NodeJS v0.10.30 or higher<p>
 <ol>
-  
   <li>Install NodeJS v0.10.30 or higher (If not already installed)</li>
   <li><code>cd /opt</code></li>
   <li><code>git clone git@github.com:Centiq/CenSQL.git</code></li>
