@@ -74,7 +74,7 @@ No: 1 -------------------
  SCHEMA_NAME: _SYS_STATISTICS
 </pre>
 
-<h4>CenSQL Commands</4>
+<h4>CenSQL Commands</h4>
 <p>Any CenSQL command is prefixed with a '\'. This stops the input from being sent directly to HANA and instead runs the CenSQL command.</p>
 
 <pre>
