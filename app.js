@@ -11,6 +11,11 @@ var async = require("async");
 
 var CenSql = function(){
 
+	/**
+	 * get a global object for storing flags in
+	 */
+	GLOBAL.censql = {};
+
 	async.series([
 
 		this.createFolderIfNeeded.bind(this),

@@ -1,20 +1,67 @@
+var async = require("async")
 
 var PingCommandHandler = function(){
 	this.description = "Ping the HANA instance by making a new connection";
 }
 
 PingCommandHandler.prototype.run = function(command, cParts, conn, screen, callback){
+	this.conn = conn;
 
+	var isForever = cParts[1] == "-f";
+
+	/**
+	 * Is the command being ran in in constant ping mode
+	 */
+	if(isForever){
+
+		/**
+		 * Allow the user to ^C out
+		 */
+		process.stdin.resume();
+		
+		async.whilst(function(){return !GLOBAL.SHOULD_EXIT}, function(next){
+
+			this.ping(function(diff){
+
+				console.log("Ping Time (ms): " + diff)
+
+				setTimeout(function(){
+					next();
+				}, 500);
+
+			}, 1000);
+
+		}.bind(this), function(err){
+			callback([0, null, null]);
+		})
+
+	/**
+	 * Run the command once
+	 */
+	}else{
+
+		this.ping(function(diff){
+
+			callback([0, "Ping Time (ms): " + diff, "message"]);
+
+		});
+
+	}
+
+}
+
+PingCommandHandler.prototype.ping = function(callback){
 	var startTime = new Date().getTime();
 
-	conn.cloneConnection("conn", "ping-conn", function(){
+	this.conn.cloneConnection("conn", "ping-conn", function(){
+
+		this.conn.close("ping-conn");
 
 		var diff = new Date().getTime() - startTime;
 
-		callback([0, "Ping Time (ms): " + diff, "message"]);
+		callback(diff);
 
-	});
-
+	}.bind(this));
 }
 
 module.exports = PingCommandHandler;

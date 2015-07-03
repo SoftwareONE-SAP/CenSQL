@@ -95,6 +95,8 @@ ScreenManager.prototype.setupInput = function() {
 
             this.rl.on('line', function(line) {
 
+                if(GLOBAL.censql.RUNNING_PROCESS) return;
+
                 /**
                  * remove the user input since we will add it back again later with colour
                  */
@@ -107,6 +109,15 @@ ScreenManager.prototype.setupInput = function() {
                  */
                 process.stdin.pause();
 
+                GLOBAL.censql.RUNNING_PROCESS = true;
+
+                /**
+                 * Dont print the command if it was a batch command
+                 */
+                if (!this.isBatch) {
+                    charm.write("> " + line + "\n\n");
+                }
+
                 /**
                  * Send the user command to the command handler
                  */
@@ -116,6 +127,9 @@ ScreenManager.prototype.setupInput = function() {
                      * Print the command to the screen however the command handler thinks is best
                      */
                     this.printCommandOutput(line, output);
+
+                    GLOBAL.censql.RUNNING_PROCESS = false;
+                    GLOBAL.SHOULD_EXIT = false;
 
                 }.bind(this));
 
@@ -127,7 +141,9 @@ ScreenManager.prototype.setupInput = function() {
             this.rl.on('close', function() {
 
                 if(this.settings.colour) charm.foreground("green");
+
                 charm.write('\nHave a great day!\n');
+
                 if(this.settings.colour) charm.foreground("white");
 
                 this.rl.close();
@@ -139,6 +155,10 @@ ScreenManager.prototype.setupInput = function() {
              */
             this.rl.on('SIGINT', function() {
 
+                if(GLOBAL.censql.RUNNING_PROCESS){
+                    GLOBAL.SHOULD_EXIT = true;
+                    return;
+                }
 
                 charm.erase("line");
                 charm.left(99999);
@@ -227,19 +247,16 @@ ScreenManager.prototype.printCommandOutput = function(command, output) {
      */
     var commandParts = command.replace(/([^\\])\|/g, "$1$1|").split(/[^\\]\|/);
 
-    /**
-     * Dont print the command if it was a batch command
-     */
-    if (!this.isBatch) {
-        charm.write("> " + command + "\n\n");
-    }
+    if(output[2] !== null){
 
-    /**
-     * Pass the data to the chosen formatter
-     */
-    var lines = this.formatters[output[2]](output[1], output[3], this.settings);
-    var pipedLines = this.processPipes(lines, commandParts, this.settings);
-    this.renderLines(pipedLines);
+        /**
+         * Pass the data to the chosen formatter
+         */
+        var lines = this.formatters[output[2]](output[1], output[3], this.settings);
+        var pipedLines = this.processPipes(lines, commandParts, this.settings);
+        this.renderLines(pipedLines);
+        
+    }
 
     /**
      * Dont display a prompt for batch requests

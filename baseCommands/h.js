@@ -50,10 +50,10 @@ HelpCommandHandler.prototype.run = function(command, cParts, conn, screen, callb
                 "",
                 "Post Commands:",
                 "\tgrep [-i] {FILTER_STRING/REGEX_STRING}\t- filter the results and only show the ones that match",
-                "\thead {AMOUNT_OF_LINES}\t\t- Only show the amount of line from the top of the output",
-                "\ttail {AMOUNT_OF_LINES}\t\t- Only show the amount of line from the bottom of the output",
-                "\tcut {AMOUNT_AND_DIR}\t\t- Cut off characters from one side of the file.",
-                "\t\t\t\t\teg: 'cut 3-' would cut the first 2 characters off each line"
+                "\thead {AMOUNT_OF_LINES}\t\t\t- Only show the amount of line from the top of the output",
+                "\ttail {AMOUNT_OF_LINES}\t\t\t- Only show the amount of line from the bottom of the output",
+                "\tcut {AMOUNT_AND_DIR}\t\t\t- Cut off characters from one side of the file.",
+                "\t\t\t\t\t\teg: 'cut 3-' would cut the first 2 characters off each line"
             ].join("\n"),
             "message"
         ]);
