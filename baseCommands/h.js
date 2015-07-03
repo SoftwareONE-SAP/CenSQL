@@ -43,6 +43,7 @@ HelpCommandHandler.prototype.run = function(command, cParts, conn, screen, callb
                 "\t\\hmem\t\t\t- Show bar chart of heap memory usage per service",
                 "\t\\tmem\t\t\t- Show bar chart of total memory usage per service",
                 "\t\\scpu\t\t\t- Show bar chart of cpu usage per service",
+                "\t\\rep\t\t\t- Show current replication status",
                 "",
                 "\tSettings:",
                 "\t\\sgh\t\t\t- Set the height to draw graphs",
