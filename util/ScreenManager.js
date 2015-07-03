@@ -119,6 +119,16 @@ ScreenManager.prototype.setupInput = function() {
                 }
 
                 /**
+                 * Hide user input whilst a command is running (simply pausing stdin still allows scrolling through history) 
+                 */
+                process.stdin._events._keypress_full = process.stdin._events.keypress;
+                process.stdin._events.keypress = function(ch , key){ 
+                    if(key && key.ctrl && key.name == 'c'){
+                        GLOBAL.SHOULD_EXIT = true;
+                    }
+                };
+
+                /**
                  * Send the user command to the command handler
                  */
                 this.commandHandler.handleCommand(line, function(output) {
@@ -128,8 +138,17 @@ ScreenManager.prototype.setupInput = function() {
                      */
                     this.printCommandOutput(line, output);
 
+                    /**
+                     * Reset running app state
+                     * @type {Boolean}
+                     */
                     GLOBAL.censql.RUNNING_PROCESS = false;
                     GLOBAL.SHOULD_EXIT = false;
+
+                    /**
+                     * Reset the keypress function for stdin
+                     */
+                    process.stdin._events.keypress = process.stdin._events._keypress_full;
 
                 }.bind(this));
 

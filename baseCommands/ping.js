@@ -18,7 +18,10 @@ PingCommandHandler.prototype.run = function(command, cParts, conn, screen, callb
 		 * Allow the user to ^C out
 		 */
 		process.stdin.resume();
-		
+
+		/**
+		 * Whilst the user does not want to quit, ping constantly
+		 */
 		async.whilst(function(){return !GLOBAL.SHOULD_EXIT}, function(next){
 
 			this.ping(function(diff){
