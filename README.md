@@ -21,30 +21,8 @@ Finally, CenSQL has support for bar charts and line graphs inside the CLI interf
 <p>Note: CenSQL has only been tested on Ubuntu 14.04 And Debian 8 (jessie). However it should work on any distro running NodeJS v0.10.30 or higher<p>
 <ol>
   <li>Install NodeJS v0.10.30 or higher (If not already installed)</li>
-  <li><code>cd /opt</code></li>
-  <li><code>git clone git@github.com:Centiq/CenSQL.git</code></li>
-  <li><code>cd CenSQL</code></li>
-  <li><code>npm install</code></li>
-  <li><code>sudo bash install.sh</code></li>
+  <li><code>sudo npm install -g censql</code></li>
 </ol>
-
-<h3>Program Usage</h3>
-<pre>
-Usage:	 censql --user {USER} --port 3<ID>15 --host {IP OR HOSTNAME} --pass <PASSWORD>
-	     censql --user {USER} --port 3<ID>15 --host {IP OR HOSTNAME} --pass <PASSWORD> --command '{SQL_STRING}'
-Example: censql --user SYSTEM --port 30015 --host 192.168.0.1 --pass Password123
-Example: censql --user SYSTEM --port 30015 --host 192.168.0.1 --pass Password123 --command 'SELECT * FROM SYS.M_SERVICES'
-
-CenSQL Help
---user		The username for the user to connect as
---pass		The password for the user connecting with
---host		The host to connect to
---port		The port to connect to the host with (Layout: '3<ID>15', Instance 99 would be 39915)
---command	Optionally run a command/sql without entering the interective terminal
-
---nocolour	disable colour output
---nocolor	alias of --no-colour
-</pre>
 
 <h3>Command Usage</h3>
 
@@ -52,7 +30,7 @@ CenSQL Help
 <p>Entering a SQL query is done by simply typing it in and pressing enter.</p>
 
 <pre>
-> SELECT HOST, UNLOAD_TIME, SCHEMA_NAME FROM SYS.M_CS_UNLOADS LIMIT 4
+> SELECT HOST, UNLOAD_TIME, SCHEMA_NAME FROM SYS.M_CS_UNLOADS LIMIT 2
 
 HOST | UNLOAD_TIME | SCHEMA_NAME
 - - - - - - - - - - - - - - - - - - - 
@@ -63,7 +41,7 @@ hananode01 | 2015-07-02T05:30:34.006 | _SYS_STATISTICS
 <p>Results will be returned in a table format unless the command is ended with '\G' in which case it will draw data in a grouped format<p>
 
 <pre>
-> SELECT HOST, UNLOAD_TIME, SCHEMA_NAME FROM SYS.M_CS_UNLOADS LIMIT 4\G
+> SELECT HOST, UNLOAD_TIME, SCHEMA_NAME FROM SYS.M_CS_UNLOADS LIMIT 2\G
 
 No: 0 -------------------
  HOST: hananode01
@@ -96,9 +74,9 @@ hananode01 | 30103 | indexserver | 4771 | master | YES | 30115 | MASTER
 
 <h4>Help Command</h4>
 <pre>
-> \help
+> \h
 
-CenSQL v1.0.0 Help
+CenSQL v1.0.4 Help
 -----------------------------------------------------
 Commands:
 	Basic:
@@ -108,6 +86,7 @@ Commands:
 	\ta, \dt {SCHEMA_NAME}	- To list tables for a schema
 	\vs, \dv {SCHEMA_NAME}	- To list views for a schema
 	\in			- To list instances
+	\ping [-f | --forever]		- Test how long it takes to connect to HANA.
 	
 	History:
 	\ul {OPTIONAL_LIMIT}	- To list recent unloads
@@ -133,16 +112,18 @@ Commands:
 	\hmem			- Show bar chart of heap memory usage per service
 	\tmem			- Show bar chart of total memory usage per service
 	\scpu			- Show bar chart of cpu usage per service
-
+	\rep			- Show current replication status
+	\stor			- Show the current storage usage
+	\disk			- Show info about the disks
+	
 	Settings:
 	\sgh			- Set the height to draw graphs
 
 Post Commands:
 	grep [-i] {FILTER_STRING/REGEX_STRING}	- filter the results and only show the ones that match
-	head {AMOUNT_OF_LINES}		- Only show the amount of line from the top of the output
-	tail {AMOUNT_OF_LINES}		- Only show the amount of line from the bottom of the output
-	cut {AMOUNT_AND_DIR}		- Cut off characters from one side of the file.
-					eg: 'cut 3-' would cut the first 2 characters off each line
+	head {AMOUNT_OF_LINES}			- Only show the amount of line from the top of the output
+	tail {AMOUNT_OF_LINES}			- Only show the amount of line from the bottom of the output
+	cut {AMOUNT_AND_DIR}			- Cut off characters from one side of the file.
 </pre>
 
 <hr>
