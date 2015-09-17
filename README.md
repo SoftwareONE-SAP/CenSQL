@@ -24,8 +24,8 @@ Finally, CenSQL has support for bar charts and line graphs inside the CLI interf
   <li><code>cd /opt</code></li>
   <li><code>git clone git@github.com:Centiq/CenSQL.git</code></li>
   <li><code>cd CenSQL</code></li>
-  <li><code>npm installL</code></li>
-  <li><code>./install.sh</code></li>
+  <li><code>npm install</code></li>
+  <li><code>sudo bash install.sh</code></li>
 </ol>
 
 <h3>Program Usage</h3>
