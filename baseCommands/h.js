@@ -1,3 +1,4 @@
+var path = require('path');
 
 var HelpCommandHandler = function() {
     this.description = "";
@@ -8,7 +9,7 @@ HelpCommandHandler.prototype.run = function(command, cParts, conn, screen, callb
     callback(
         [
             0, [
-                "CenSQL v1.0.0 Help",
+                "CenSQL v" + require(path.join(path.dirname(require.main.filename), 'package.json')).version + " Help",
                 "-----------------------------------------------------",
                 "Commands:",
                 "\tBasic:",
@@ -47,7 +48,7 @@ HelpCommandHandler.prototype.run = function(command, cParts, conn, screen, callb
                 "\t\\rep\t\t\t- Show current replication status",
                 "\t\\stor\t\t\t- Show the current storage usage",
                 "\t\\disk\t\t\t- Show info about the disks",
-                "",
+                "\t",
                 "\tSettings:",
                 "\t\\sgh\t\t\t- Set the height to draw graphs",
                 "",
