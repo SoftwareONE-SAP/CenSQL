@@ -1,6 +1,6 @@
 {
   "name": "censql",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "A CLI application for SAP HANA",
   "main": "./app.js",
   "scripts": {
@@ -20,5 +20,11 @@
     "readline-history": "^1.2.0",
     "shelljs": "^0.5.1",
     "stripcolorcodes": "^0.1.0"
+  },
+  "bin": {
+    "censql": "./app.js"
+  },
+  "engines": {
+    "node": ">= 0.10.30"
   }
 }
