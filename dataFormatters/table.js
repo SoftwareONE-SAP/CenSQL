@@ -7,7 +7,7 @@ module.exports = function(data) {
 
         var keys = [];
 
-        if (data[i].length > 0) {
+        if (data[i] && data[i].length > 0) {
 
             keys = Object.keys(data[i][0]);
 
@@ -15,6 +15,7 @@ module.exports = function(data) {
             renderedLines.push(new Array(20).join("- "));
         } else {
             renderedLines.push("No Results\n");
+            continue;
         }
 
         keys.reverse()

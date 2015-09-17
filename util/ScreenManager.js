@@ -89,7 +89,7 @@ ScreenManager.prototype.setupInput = function() {
         input: process.stdin,
         output: process.stdout,
         path: path.join(process.env.HOME, ".censql", "censql_hist"),
-        maxLength: 0x10,
+        maxLength: 0x100,
         next: function(rl){
             this.rl = rl;
 
