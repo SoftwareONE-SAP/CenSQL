@@ -32,7 +32,7 @@ PingCommandHandler.prototype.run = function(command, cParts, conn, screen, callb
 					next();
 				}, 500);
 
-			}, 1000);
+			});
 
 		}.bind(this), function(err){
 			callback([0, null, null]);
