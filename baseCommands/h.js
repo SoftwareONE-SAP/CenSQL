@@ -18,6 +18,7 @@ HelpCommandHandler.prototype.run = function(command, cParts, conn, screen, callb
                 "\t\\ta, \\dt {SCHEMA_NAME}\t- To list tables for a schema",
                 "\t\\vs, \\dv {SCHEMA_NAME}\t- To list views for a schema",
                 "\t\\in\t\t\t- To list instances",
+                "\t\\ping [-f | --forever]\t\t- Test how long it takes to connect to HANA.",
                 "\t",
                 "\tHistory:",
                 "\t\\ul {OPTIONAL_LIMIT}\t- To list recent unloads",

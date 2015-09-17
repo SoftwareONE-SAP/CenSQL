@@ -7,7 +7,8 @@ var PingCommandHandler = function(){
 PingCommandHandler.prototype.run = function(command, cParts, conn, screen, callback){
 	this.conn = conn;
 
-	var isForever = cParts[1] == "-f";
+	var isForever = cParts[1] == "-f" || cParts[1] == "--forever";
+	var delay = (cParts[2] && parseFloat(cParts[2]) > 0 ? parseFloat(cParts[2]) * 1000 : 500);
 
 	/**
 	 * Is the command being ran in in constant ping mode
@@ -30,7 +31,7 @@ PingCommandHandler.prototype.run = function(command, cParts, conn, screen, callb
 
 				setTimeout(function(){
 					next();
-				}, 500);
+				}, delay);
 
 			});
 
