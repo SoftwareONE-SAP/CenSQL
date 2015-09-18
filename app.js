@@ -1,6 +1,5 @@
 #!/usr/local/bin/node
 
-var debug = require("debug")("censql:main");
 var ScreenManager = require("./util/ScreenManager.js");
 var CommandHandler = require("./util/CommandHandler.js");
 var HDB = require("./lib/HdbHandler.js");
@@ -111,7 +110,7 @@ CenSql.prototype.showHelpTextIfNeeded = function(callback){
 }
 
 CenSql.prototype.createFolderIfNeeded = function(callback) {
-	var location = process.env.HOME + "/.censql"
+	var location = path.join(process.env.HOME, ".censql");
 	mkdirp.sync(location, 0777);
 
 	callback(null);
