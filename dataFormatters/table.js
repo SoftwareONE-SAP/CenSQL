@@ -35,5 +35,8 @@ module.exports = function(data) {
 
     };
 
+    // Add an empty line onto the end of the output
+    renderedLines.push("")
+
     return renderedLines;
 }

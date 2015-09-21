@@ -115,7 +115,7 @@ ScreenManager.prototype.setupInput = function() {
                  * Dont print the command if it was a batch command
                  */
                 if (!this.isBatch) {
-                    charm.write("> " + line + "\n\n");
+                    console.log("> " + line + "\n");
                 }
 
                 /**
@@ -159,11 +159,7 @@ ScreenManager.prototype.setupInput = function() {
              */
             this.rl.on('close', function() {
 
-                if(this.settings.colour) charm.foreground("green");
-
-                charm.write('\nHave a great day!\n');
-
-                if(this.settings.colour) charm.foreground("white");
+                this.print(colors.green('\nHave a great day!\n'));
 
                 this.rl.close();
                 process.exit(0);
@@ -205,17 +201,9 @@ ScreenManager.prototype.setupInput = function() {
  */
 ScreenManager.prototype.printHeader = function() {
 
-    if(this.settings.colour) charm.foreground("cyan");
-    if(this.settings.colour) charm.display("underscore");
-    if(this.settings.colour) charm.display("bright");
+    this.print(colors.cyan(colors.bold(colors.underline("Welcome to CenSQL for SAP HANA!\n\n\n"))));
 
-    charm.write("Welcome to CenSQL for SAP HANA!\n\n");
-
-    if(this.settings.colour) charm.display("reset");
-
-    if(this.settings.colour) charm.foreground("yellow");
-
-    charm.write("Connecting to HANA...\n");
+    this.print(colors.yellow("Connecting to HANA..."))
 
     process.stdin.pause();
 
@@ -234,17 +222,8 @@ ScreenManager.prototype.ready = function() {
      */
     charm.left(9999999);
 
-    if(this.settings.colour) charm.display("reset");
-    if(this.settings.colour) charm.display("bright");
-    if(this.settings.colour) charm.foreground("cyan");
-
-    charm.write("For help type \\h\n-----------------------------------------------------\n\n");
-
-    if(this.settings.colour) charm.display("reset");
-
-    if(this.settings.colour) charm.foreground("cyan");
-    charm.write("> ");
-    if(this.settings.colour) charm.display("reset");
+    this.print(colors.cyan(colors.bold("For help type \\h\n-----------------------------------------------------\n\n")));
+    this.print(colors.cyan("> "));
 
     process.stdin.resume();
 }
@@ -281,13 +260,8 @@ ScreenManager.prototype.printCommandOutput = function(command, output) {
      * Dont display a prompt for batch requests
      */
     if (!this.isBatch) {
-        if(this.settings.colour) charm.foreground("cyan");
-        charm.write("> ");
-    } else {
-        if(this.settings.colour) charm.foreground("white");
+        this.print(colors.cyan("> "));
     }
-
-    if(this.settings.colour) charm.display("reset");
 }
 
 /**
@@ -326,13 +300,21 @@ ScreenManager.prototype.renderLines = function(lines){
             line = stripColorCodes(line);
         }
 
-        charm.write(line + "\n");
+        console.log(line);
 
     }
 }
 
 ScreenManager.prototype.error = function(message){
-    this.renderLines([colors.red(message)]);
+    this.print(colors.red(message));
+}
+
+ScreenManager.prototype.print = function(message) {
+    if(!this.settings.colour){
+        process.stdout.write(stripColorCodes(message));
+    }else{
+        process.stdout.write(message);
+    }
 }
 
 module.exports = ScreenManager;
