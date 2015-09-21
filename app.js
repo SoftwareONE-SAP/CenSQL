@@ -7,6 +7,7 @@ var argv = require('optimist').argv;
 var mkdirp = require('mkdirp');
 var path = require('path');
 var async = require("async");
+var osHomedir = require('os-homedir');
 
 var CenSql = function(){
 
@@ -110,7 +111,7 @@ CenSql.prototype.showHelpTextIfNeeded = function(callback){
 }
 
 CenSql.prototype.createFolderIfNeeded = function(callback) {
-	var location = path.join(process.env.HOME || process.env.USERPROFILE , ".censql");
+	var location = path.join(osHomedir() , ".censql");
 	mkdirp.sync(location, 0777);
 
 	callback(null);

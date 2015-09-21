@@ -4,6 +4,7 @@ var charm = require('charm')(process.stdout);
 var colors = require("colors");
 var path = require('path');
 var stripColorCodes = require('stripcolorcodes');
+var osHomedir = require('os-homedir');
 
 var ScreenManager = function(isBatch, settings, commandHandler) {
     this.isBatch = isBatch;
@@ -33,7 +34,7 @@ ScreenManager.prototype.init = function() {
 ScreenManager.prototype.loadPipeHandlers = function(){
     this.handlers = {};
 
-    require('fs').readdirSync(__dirname + '/../pipeCommands/').forEach(function(file) {
+    require('fs').readdirSync(path.join(__dirname, '/../pipeCommands/')).forEach(function(file) {
 
         if (file.match(/\.js$/) !== null) {
 
@@ -88,7 +89,7 @@ ScreenManager.prototype.setupInput = function() {
     readline.createInterface({
         input: process.stdin,
         output: process.stdout,
-        path: path.join(process.env.HOME || process.env.USERPROFILE, ".censql", "censql_hist"),
+        path: path.join(osHomedir(), ".censql", "censql_hist"),
         maxLength: 0x100,
         next: function(rl){
             this.rl = rl;
