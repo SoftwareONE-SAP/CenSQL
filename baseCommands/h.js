@@ -1,4 +1,5 @@
-var path = require('path');
+var path = require("path");
+var colors = require("colors");
 
 var HelpCommandHandler = function() {
     this.description = "";
@@ -9,19 +10,19 @@ HelpCommandHandler.prototype.run = function(command, cParts, conn, screen, callb
     callback(
         [
             0, [
-                "CenSQL v" + require(path.join(path.dirname(require.main.filename), 'package.json')).version + " Help",
+                colors.bold(colors.green("CenSQL") + " v" + require(path.join(path.dirname(require.main.filename), 'package.json')).version + " Help"),
                 "-----------------------------------------------------",
-                "Commands:",
-                "\tBasic:",
-                "\t\\h\t\t\t- For Help",
-                "\t\\sc, \\ds\t\t- To list schemas",
-                "\t\\us, \\du\t\t- To list users",
-                "\t\\ta, \\dt {SCHEMA_NAME}\t- To list tables for a schema",
-                "\t\\vs, \\dv {SCHEMA_NAME}\t- To list views for a schema",
-                "\t\\in\t\t\t- To list instances",
-                "\t\\ping [-f | --forever]\t\t- Test how long it takes to connect to HANA.",
+                colors.bold("Commands:"),
+                colors.bold("\tBasic:"),
+                "\t\\h\t\t\t\t\t- For Help",
+                "\t\\sc, \\ds\t\t\t\t- To list schemas",
+                "\t\\us, \\du\t\t\t\t- To list users",
+                "\t\\ta, \\dt {SCHEMA_NAME}\t\t\t- To list tables for a schema",
+                "\t\\vs, \\dv {SCHEMA_NAME}\t\t\t- To list views for a schema",
+                "\t\\in\t\t\t\t\t- To list instances",
+                "\t\\ping [-f | --forever] {OPTIONAL_SLEEP}\t- Test how long it takes to connect to HANA.",
                 "\t",
-                "\tHistory:",
+                colors.bold("\tHistory:"),
                 "\t\\ul {OPTIONAL_LIMIT}\t- To list recent unloads",
                 "\t\\mem\t\t\t- Graph physical memory over the last 3 days",
                 "\t\\imem\t\t\t- Graph instance used memory over the last 3 days",
@@ -34,7 +35,7 @@ HelpCommandHandler.prototype.run = function(command, cParts, conn, screen, callb
                 "\t\\csc\t\t\t- Graph CS record count over the last 3 days",
                 "\t\\csm\t\t\t- Graph CS in memory size total (incl delta) over the last 3 days",
                 "\t",
-                "\tCurrent Status:",
+                colors.bold("\tCurrent Status:"),
                 "\t\\al\t\t\t- To list active alerts",
                 "\t\\st\t\t\t- To list hosts for instance",
                 "\t\\con\t\t\t- To list connections",
@@ -49,15 +50,15 @@ HelpCommandHandler.prototype.run = function(command, cParts, conn, screen, callb
                 "\t\\stor\t\t\t- Show the current storage usage",
                 "\t\\disk\t\t\t- Show info about the disks",
                 "\t",
-                "\tSettings:",
+                colors.bold("\tSettings:"),
                 "\t\\sgh\t\t\t- Set the height to draw graphs",
                 "",
-                "Post Commands:",
-                "\tgrep [-i] {FILTER_STRING/REGEX_STRING}\t- filter the results and only show the ones that match",
-                "\thead {AMOUNT_OF_LINES}\t\t\t- Only show the amount of line from the top of the output",
-                "\ttail {AMOUNT_OF_LINES}\t\t\t- Only show the amount of line from the bottom of the output",
-                "\tcut {AMOUNT_AND_DIR}\t\t\t- Cut off characters from one side of the file.",
-                "\t\t\t\t\t\teg: 'cut 3-' would cut the first 2 characters off each line"
+                colors.grey(colors.bold("Post Commands:")),
+                colors.grey("\tgrep [-i] {FILTER_STRING/REGEX_STRING}\t- filter the results and only show the ones that match"),
+                colors.grey("\thead {AMOUNT_OF_LINES}\t\t\t- Only show the amount of line from the top of the output"),
+                colors.grey("\ttail {AMOUNT_OF_LINES}\t\t\t- Only show the amount of line from the bottom of the output"),
+                colors.grey("\tcut {AMOUNT_AND_DIR}\t\t\t- Cut off characters from one side of the file."),
+                colors.grey("\t\t\t\t\t\teg: 'cut 3-' would cut the first 2 characters off each line")
             ].join("\n"),
             "message"
         ]);
