@@ -88,7 +88,7 @@ ScreenManager.prototype.setupInput = function() {
     readline.createInterface({
         input: process.stdin,
         output: process.stdout,
-        path: path.join(process.env.HOME, ".censql", "censql_hist"),
+        path: path.join(process.env.HOME || process.env.USERPROFILE, ".censql", "censql_hist"),
         maxLength: 0x100,
         next: function(rl){
             this.rl = rl;

@@ -110,7 +110,7 @@ CenSql.prototype.showHelpTextIfNeeded = function(callback){
 }
 
 CenSql.prototype.createFolderIfNeeded = function(callback) {
-	var location = path.join(process.env.HOME, ".censql");
+	var location = path.join(process.env.HOME || process.env.USERPROFILE , ".censql");
 	mkdirp.sync(location, 0777);
 
 	callback(null);
