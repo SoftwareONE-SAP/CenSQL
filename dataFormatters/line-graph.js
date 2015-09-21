@@ -1,8 +1,11 @@
 var colors = require("colors");
+var moment = require("moment");
 
-module.exports = function(data, title, settings) {
+module.exports = function(data, title, settings, graphWidth) {
 
     var lines = [];
+    var emptyPointChar = "·";
+    var filledPointChar = "■";
 
     for (var i = 0; i < data.length; i++) {
 
@@ -41,16 +44,6 @@ module.exports = function(data, title, settings) {
         for (var s = 0; s < sections.length; s++) {
 
             /**
-             * Start making plot
-             */
-
-            var plot = []
-
-            for (var k = 0; k < settings.plotHeight + 1; k++) {
-                plot.push([]);
-            }
-
-            /**
              * Get min an max values
              */
 
@@ -70,6 +63,43 @@ module.exports = function(data, title, settings) {
             }
 
             /**
+             * Get the time between the first and last point
+             */
+            
+            var maxTime = 0;
+            var minTime = Number.MAX_VALUE;
+
+            for (var k = 0; k < data[i].length; k++) {
+
+                var diff = moment(data[i][k][keys[5]]).format("x");
+
+                if(maxTime < diff) maxTime = diff;
+                if(minTime > diff) minTime = diff;
+
+            }
+
+            var totalTimeDiff = maxTime - minTime;
+
+            /**
+             * Create empty plot
+             */
+
+            var plot = []
+
+            /**
+             * Build an empty graph
+             */
+            for(var y = 0; y < settings.plotHeight + 1; y++){
+
+                plot[y] = [];
+
+                for (var x = 0; x < graphWidth + 1; x++) {
+
+                    plot[y][x] = emptyPointChar;
+                }
+            }
+
+            /**
              * Start creating graph
              */
 
@@ -79,17 +109,10 @@ module.exports = function(data, title, settings) {
 
                 var val = parseInt(((data[i][k][keys[4]] - minValue) / (maxValue - minValue)) * settings.plotHeight);
 
-                for (var j = 0; j < settings.plotHeight + 1; j++) {
+                var groundedTiem = moment(data[i][k][keys[5]]).format("x") - totalTimeDiff;
+                var percentInGraph = Math.floor(((maxTime - moment(data[i][k][keys[5]]).format("x")) / totalTimeDiff) * graphWidth)
 
-                    var point = "·"
-
-
-                    if (j == settings.plotHeight - val) {
-                        point = "■"
-                    }
-
-                    plot[j].push(point);
-                }
+                plot[val][percentInGraph] = filledPointChar;
 
             }
 
@@ -97,10 +120,11 @@ module.exports = function(data, title, settings) {
              * Display plot
              */
 
+            var widthRatio = Math.floor((process.stdout.columns - 3) / graphWidth);
+
             /**
              * Build the header line for the graph
              */
-            var widthRatio = Math.floor((process.stdout.columns - 3) / plot[0].length);
 
             if (widthRatio < 1) {
                 widthRatio = 1;
@@ -121,24 +145,22 @@ module.exports = function(data, title, settings) {
             /**
              * Build the data lines
              */
-            for (var k = 0; k < plot.length; k++) {
-
-                plot[k].reverse()
+            for (var y = 0; y < settings.plotHeight; y++) {
 
                 var line = colors.green("║");
 
-                for (var o = 0; o < plot[k].length; o++) {
+                for (var o = 0; o < plot[y].length; o++) {
                     for (var w = 0; w < widthRatio; w++) {
 
-                        if (plot[k][o] === "■") {
-                            plot[k][o] = colors.cyan(plot[k][o])
+                        if (plot[y][o] === "■") {
+                            plot[y][o] = colors.cyan(plot[y][o])
                         } else {
-                            plot[k][o] = colors.magenta(plot[k][o])
+                            plot[y][o] = colors.magenta(plot[y][o])
                         }
 
-                        line += plot[k][o];
+                        line += plot[y][o];
 
-                        plot[k][o] = colors.green(plot[k][o])
+                        plot[y][o] = colors.green(plot[y][o])
                     }
                 };
 

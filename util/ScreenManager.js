@@ -250,7 +250,7 @@ ScreenManager.prototype.printCommandOutput = function(command, output) {
         /**
          * Pass the data to the chosen formatter
          */
-        var lines = this.formatters[output[2]](output[1], output[3], this.settings);
+        var lines = this.formatters[output[2]](output[1], output[3], this.settings, output[4], output[5], output[6]);
         var pipedLines = this.processPipes(lines, commandParts, this.settings);
         this.renderLines(pipedLines);
         
