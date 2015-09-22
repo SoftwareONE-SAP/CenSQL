@@ -93,7 +93,7 @@ module.exports = function(data, title, settings, graphWidth) {
 
                 plot[y] = [];
 
-                for (var x = 0; x < graphWidth + 1; x++) {
+                for (var x = 0; x < graphWidth; x++) {
 
                     plot[y][x] = emptyPointChar;
                 }
@@ -107,10 +107,10 @@ module.exports = function(data, title, settings, graphWidth) {
 
                 if (data[i][k][keys[3]] !== sections[s]) continue;
 
-                var val = parseInt(((data[i][k][keys[4]] - minValue) / (maxValue - minValue)) * settings.plotHeight);
+                var val = Math.floor(((data[i][k][keys[4]] - minValue) / (maxValue - minValue)) * settings.plotHeight);
 
                 var groundedTiem = moment(data[i][k][keys[5]]).format("x") - totalTimeDiff;
-                var percentInGraph = Math.floor(((maxTime - moment(data[i][k][keys[5]]).format("x")) / totalTimeDiff) * graphWidth)
+                var percentInGraph = Math.floor(((maxTime - moment(data[i][k][keys[5]]).format("x")) / totalTimeDiff) * (graphWidth - 1))
 
                 plot[val][percentInGraph] = filledPointChar;
 
@@ -120,7 +120,7 @@ module.exports = function(data, title, settings, graphWidth) {
              * Display plot
              */
 
-            var widthRatio = Math.floor((process.stdout.columns - 3) / graphWidth);
+            var widthRatio = Math.floor((process.stdout.columns - 3) / (graphWidth - 1));
 
             /**
              * Build the header line for the graph
@@ -182,7 +182,7 @@ module.exports = function(data, title, settings, graphWidth) {
 
             var description = title + " - " + sections[s];
 
-            var xPadding = 2 + parseInt(((plot[0].length * widthRatio) - description.length) / 2);
+            var xPadding = 2 + Math.floor(((plot[0].length * widthRatio) - description.length) / 2);
 
             lines.push(new Array(xPadding).join(" ") + description);
 
