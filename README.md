@@ -73,6 +73,7 @@ hananode01 | 30103 | indexserver | 4771 | master | YES | 30115 | MASTER
 </pre>
 
 <h4>Help Command</h4>
+```
 CenSQL v1.1.3 Help
 -----------------------------------------------------
 Commands:
@@ -128,7 +129,6 @@ Post Commands: Chained onto the end of a query, for example: '\st\g | grep HOST'
 Formatting: Added onto the end of a query, for example: 'SELECT 1 FROM DUMMY\g'
 	\g - Group output into each piece of data to it's own row
 	\j - Display the data in JSON
+```
 
-
-<hr>
 License: <a href="https://github.com/Centiq/CenSQL/blob/master/license.md">MIT</a>
