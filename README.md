@@ -73,20 +73,17 @@ hananode01 | 30103 | indexserver | 4771 | master | YES | 30115 | MASTER
 </pre>
 
 <h4>Help Command</h4>
-<pre>
-> \h
-
-CenSQL v1.0.4 Help
+CenSQL v1.1.3 Help
 -----------------------------------------------------
 Commands:
 	Basic:
-	\h			- For Help
-	\sc, \ds		- To list schemas
-	\us, \du		- To list users
-	\ta, \dt {SCHEMA_NAME}	- To list tables for a schema
-	\vs, \dv {SCHEMA_NAME}	- To list views for a schema
-	\in			- To list instances
-	\ping [-f | --forever]		- Test how long it takes to connect to HANA.
+	\h					- For Help
+	\sc, \ds				- To list schemas
+	\us, \du				- To list users
+	\ta, \dt {SCHEMA_NAME}			- To list tables for a schema
+	\vs, \dv {SCHEMA_NAME}			- To list views for a schema
+	\in					- To list instances
+	\ping [-f | --forever] {OPTIONAL_SLEEP}	- Test how long it takes to connect to HANA.
 	
 	History:
 	\ul {OPTIONAL_LIMIT}	- To list recent unloads
@@ -116,15 +113,22 @@ Commands:
 	\stor			- Show the current storage usage
 	\disk			- Show info about the disks
 	
-	Settings:
-	\sgh			- Set the height to draw graphs
+	Settings: Settings are also saved to file (not in HANA)
+	\sgh - Set the height to draw graphs
+	\sbh - Set the height to draw bar charts
 
-Post Commands:
+Post Commands: Chained onto the end of a query, for example: '\st\g | grep HOST'
 	grep [-i] {FILTER_STRING/REGEX_STRING}	- filter the results and only show the ones that match
 	head {AMOUNT_OF_LINES}			- Only show the amount of line from the top of the output
 	tail {AMOUNT_OF_LINES}			- Only show the amount of line from the bottom of the output
-	cut {AMOUNT_AND_DIR}			- Cut off characters from one side of the file.
-</pre>
+	cut {AMOUNT_OF_CHARS}			- Cut off characters from one side of the file.
+						  eg: 'cut 3-' would cut the first 2 characters off each line
+						  and 'cut -3' would cut all characters after the first 3
+
+Formatting: Added onto the end of a query, for example: 'SELECT 1 FROM DUMMY\g'
+	\g - Group output into each piece of data to it's own row
+	\j - Display the data in JSON
+
 
 <hr>
 License: <a href="https://github.com/Centiq/CenSQL/blob/master/license.md">MIT</a>
