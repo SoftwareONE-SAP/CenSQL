@@ -78,7 +78,7 @@ module.exports = function(data, title, settings, graphWidth) {
 
             }
 
-            var totalTimeDiff = maxTime - minTime;
+            var totalTimeDiff = 3 * 24 * 60 * 60 * 1000;//maxTime - minTime;
 
             /**
              * Create empty plot
@@ -119,7 +119,6 @@ module.exports = function(data, title, settings, graphWidth) {
             /**
              * Display plot
              */
-
             var widthRatio = Math.floor((process.stdout.columns - 3) / (graphWidth - 1));
 
             /**
@@ -146,6 +145,8 @@ module.exports = function(data, title, settings, graphWidth) {
              * Build the data lines
              */
             for (var y = 0; y < settings.plotHeight; y++) {
+
+                plot[y].reverse();
 
                 var line = colors.green("║");
 
