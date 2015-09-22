@@ -1,6 +1,6 @@
 var colors = require("colors");
 
-module.exports = function(data, title, settings) {
+module.exports = function(command, data, title, settings) {
 
     var lines = [];
 

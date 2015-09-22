@@ -1,7 +1,7 @@
 var colors = require("colors");
 var moment = require("moment");
 
-module.exports = function(data, title, settings, graphWidth) {
+module.exports = function(command, data, title, settings, graphWidth) {
 
     var lines = [];
     var emptyPointChar = "·";

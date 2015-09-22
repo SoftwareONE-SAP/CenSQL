@@ -1,5 +1,5 @@
 
-module.exports = function(data) {
+module.exports = function(command, data) {
 
     var renderedLines = [];
 
