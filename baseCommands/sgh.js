@@ -16,7 +16,7 @@ SetGraphHeightCommandHandler.prototype.run = function(command, cParts, conn, scr
 		screen.settings.plotHeight = 0;
 	}
 
-	callback([0, "Graph height set to: " + screen.settings.plotHeight, "message"]);
+	callback([0, "Graph height set to: " + (screen.settings.plotHeight + 1), "message"]);
 }
 
 module.exports = SetGraphHeightCommandHandler;
