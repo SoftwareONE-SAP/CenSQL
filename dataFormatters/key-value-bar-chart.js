@@ -1,8 +1,8 @@
 var colors = require("colors");
 
-module.exports = function(data, title) {
+module.exports = function(data, title, settings) {
 
-	var lines = [];
+    var lines = [];
 
     var barTypes = ["█", "░", "▒", "▓"]
 
@@ -61,19 +61,21 @@ module.exports = function(data, title) {
 
             lines.push(colors.white(title + " - " + sections[s]))
 
-            var dataLine = "";
+            for (var q = 0 ; q < settings.barHeight; q++) {
+                var dataLine = "";
 
-            for (var k = 0; k < data[i].length; k++) {
+                for (var k = 0; k < data[i].length; k++) {
 
-                if (data[i][k][keys[0]] !== sections[s]) continue;
+                    if (data[i][k][keys[0]] !== sections[s]) continue;
 
-                var width = parseInt(process.stdout.columns * data[i][k][keys[2]] / sum);
+                    var width = parseInt(process.stdout.columns * data[i][k][keys[2]] / sum);
 
-                dataLine += colors[ccolours[parts.indexOf(data[i][k][keys[1]])]](new Array(width).join(barTypes[parts.indexOf(data[i][k][keys[1]]) % 4]));
+                    dataLine += colors[ccolours[parts.indexOf(data[i][k][keys[1]])]](new Array(width).join(barTypes[parts.indexOf(data[i][k][keys[1]]) % 4]));
 
+                }
+
+                lines.push(dataLine);
             }
-
-            lines.push(dataLine);
 
             lines.push("");
 
