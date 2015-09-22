@@ -1,6 +1,6 @@
 var colors = require("colors");
 
-module.exports = function(data, title) {
+module.exports = function(data, title, settings) {
 
     var lines = [];
 
@@ -32,19 +32,24 @@ module.exports = function(data, title) {
             sum += data[i][k][keys[1]]
             sum += data[i][k][keys[2]]
 
-            var dataLine = "";
-
             lines.push(colors.white(title + " - " + data[i][k][keys[0]]));
 
-            var width = parseInt(process.stdout.columns * data[i][k][keys[1]] / sum);
+            for (var s = 0; s < settings.barHeight; s++) {
+                // console.log(s)
 
-            dataLine += colors[ccolours[1]](new Array(width).join(barTypes[0]));
+                var dataLine = "";
 
-            width = parseInt(process.stdout.columns * data[i][k][keys[2]] / sum);
+                var width = parseInt(process.stdout.columns * data[i][k][keys[1]] / sum);
 
-            dataLine += colors[ccolours[0]](new Array(width).join(barTypes[1]));
+                dataLine += colors[ccolours[1]](new Array(width).join(barTypes[0]));
 
-            lines.push(dataLine);
+                width = parseInt(process.stdout.columns * data[i][k][keys[2]] / sum);
+
+                dataLine += colors[ccolours[0]](new Array(width).join(barTypes[1]));
+
+                lines.push(dataLine);
+
+            }
 
             lines.push("");
         }

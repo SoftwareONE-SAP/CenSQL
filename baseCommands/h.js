@@ -52,6 +52,7 @@ HelpCommandHandler.prototype.run = function(command, cParts, conn, screen, callb
                 "\t",
                 colors.bold("\tSettings:"),
                 "\t\\sgh\t\t\t- Set the height to draw graphs",
+                "\t\\sbh\t\t\t- Set the height to draw bar charts",
                 "",
                 colors.grey(colors.bold("Post Commands:")),
                 colors.grey("\tgrep [-i] {FILTER_STRING/REGEX_STRING}\t- filter the results and only show the ones that match"),

@@ -82,6 +82,7 @@ CenSql.prototype.getSettings = function() {
      * Set defaults
      */
     if (!settings.plotHeight) settings.plotHeight = 10;
+    if (!settings.barHeight) settings.barHeight = 1;
 
     /**
      * Save the defaults
