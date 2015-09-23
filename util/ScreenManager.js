@@ -1,5 +1,5 @@
 var debug = require("debug")("censql:ScreenManager");
-var readline = require('readline-history');
+var readline = require('historic-readline');
 var charm = require('charm')(process.stdout);
 var colors = require("colors");
 var path = require('path');
@@ -90,7 +90,7 @@ ScreenManager.prototype.setupInput = function() {
         input: process.stdin,
         output: process.stdout,
         path: path.join(osHomedir(), ".censql", "censql_hist"),
-        maxLength: 0x100,
+        maxLength: 100,
         next: function(rl){
             this.rl = rl;
 
