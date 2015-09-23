@@ -105,7 +105,7 @@ ScreenManager.prototype.setupInput = function() {
                 charm.left(99999);
 
                 /**
-                 * Stop taking user input until we have complted this request
+                 * Stop taking user input until we complete this request
                  */
                 process.stdin.pause();
 

@@ -17,6 +17,12 @@ var CenSql = function() {
      */
     GLOBAL.censql = {};
 
+    /**
+     * Dont accept user input until we're ready
+     * @type {Boolean}
+     */
+    GLOBAL.censql.RUNNING_PROCESS = true;
+
     async.series([
 
         this.createFolderIfNeeded.bind(this),
@@ -118,6 +124,12 @@ CenSql.prototype.connectToHdb = function() {
          */
         this.commandHandler = new CommandHandler(this.screen, this.hdb, argv.command);
 
+        /**
+         * Allow user inpput from now on
+         * @type {Boolean}
+         */
+        GLOBAL.censql.RUNNING_PROCESS = false;
+
     }.bind(this))
 }
 
@@ -140,7 +152,7 @@ CenSql.prototype.createScreen = function(settings, callback) {
         // Command Handler
         {
             handleCommand: function(command, callback) {
-                return this.commandHandler.onCommand(command, callback);
+                this.commandHandler.onCommand(command, callback);
             }.bind(this)
         }
     )
