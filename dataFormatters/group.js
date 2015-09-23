@@ -1,38 +1,32 @@
-
 module.exports = function(command, data) {
 
     var renderedLines = [];
 
-    for (var i = 0; i < data.length; i++) {
+    /**
+     * get keys
+     */
+    var keys = [];
 
-        /**
-         * get keys
-         */
+    if (data.length > 0) {
 
-        var keys = [];
+        keys = Object.keys(data[0]);
+    } else {
+        renderedLines.push("No Results\n");
+        return lines;
+    }
 
-        if (data[i].length > 0) {
+    keys.reverse()
 
-            keys = Object.keys(data[i][0]);
-        } else {
-            renderedLines.push("No Results\n");
-            continue;
-        }
+    /**
+     * Display data
+     */
 
-        keys.reverse()
+    for (var k = 0; k < data.length; k++) {
 
-        /**
-         * Display data
-         */
+        renderedLines.push("No: " + k + " " + new Array(20).join("-"));
 
-        for (var k = 0; k < data[i].length; k++) {
-
-            renderedLines.push("No: " + k + " " + new Array(20).join("-"));
-
-            for (var j = keys.length - 1; j >= 0; j--) {
-                renderedLines.push(" " + keys[j] + ": " + data[i][k][keys[j]]);
-            };
-
+        for (var j = keys.length - 1; j >= 0; j--) {
+            renderedLines.push(" " + keys[j] + ": " + data[k][keys[j]]);
         };
 
     };

@@ -1,42 +1,37 @@
-
 module.exports = function(command, data) {
 
-    var renderedLines = [];
+    var lines = [];
 
-    for (var i = 0; i < data.length; i++) {
+    var keys = [];
 
-        var keys = [];
+    if (data && data.length > 0) {
 
-        if (data[i] && data[i].length > 0) {
+        keys = Object.keys(data[0]);
 
-            keys = Object.keys(data[i][0]);
+        lines.push(keys.join(" | "))
+        lines.push(new Array(20).join("- "));
+    } else {
+        lines.push("No Results\n");
+        return lines;
+    }
 
-            renderedLines.push(keys.join(" | "))
-            renderedLines.push(new Array(20).join("- "));
-        } else {
-            renderedLines.push("No Results\n");
-            continue;
-        }
+    keys.reverse()
 
-        keys.reverse()
+    for (var k = 0; k < data.length; k++) {
+        var rows = [];
 
-        for (var k = 0; k < data[i].length; k++) {
-            var rows = [];
-
-            for (var j = keys.length - 1; j >= 0; j--) {
-                rows.push(data[i][k][keys[j]])
-            };
-
-            var rowString = rows.join(" | ");
-
-            renderedLines.push(rowString);
-
+        for (var j = keys.length - 1; j >= 0; j--) {
+            rows.push(data[k][keys[j]])
         };
+
+        var rowString = rows.join(" | ");
+
+        lines.push(rowString);
 
     };
 
     // Add an empty line onto the end of the output
-    renderedLines.push("")
+    lines.push("")
 
-    return renderedLines;
+    return lines;
 }

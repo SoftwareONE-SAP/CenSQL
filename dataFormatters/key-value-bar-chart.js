@@ -10,83 +10,77 @@ module.exports = function(command, data, title, settings) {
 
     var ccolours = ['cyan', 'green', 'red', 'yellow', 'blue', 'magenta'];
 
-    for (var i = 0; i < data.length; i++) {
+    /**
+     * get keys
+     */
+    var keys = [];
 
-        /**
-         * get keys
-         */
+    if (data.length > 0) {
 
-        var keys = [];
+        keys = Object.keys(data[0]);
+    } else {
+        lines.push("No Results");
+        lines.push("");
+        return lines;
+    }
 
-        if (data[i].length > 0) {
+    /**
+     * Get sections
+     */
 
-            keys = Object.keys(data[i][0]);
-        } else {
-            lines.push("No Results");
-            lines.push("");
-            continue;
+    var sections = [];
+
+    for (var k = 0; k < data.length; k++) {
+
+        if (sections.indexOf(data[k][keys[0]]) === -1) {
+            sections.push(data[k][keys[0]]);
         }
 
-        /**
-         * Get sections
-         */
+    }
 
-        var sections = [];
+    sections.sort();
 
-        for (var k = 0; k < data[i].length; k++) {
+    for (var s = 0; s < sections.length; s++) {
 
-            if (sections.indexOf(data[i][k][keys[0]]) === -1) {
-                sections.push(data[i][k][keys[0]]);
+        var sum = 0;
+
+        for (var k = 0; k < data.length; k++) {
+
+            if (data[k][keys[0]] !== sections[s]) continue;
+
+            sum += data[k][keys[2]]
+
+            if (parts.indexOf(data[k][keys[1]]) === -1) {
+                parts.push(data[k][keys[1]])
             }
 
         }
 
-        sections.sort();
+        lines.push(colors.white(title + " - " + sections[s]))
 
-        for (var s = 0; s < sections.length; s++) {
+        for (var q = 0; q < settings.barHeight; q++) {
+            var dataLine = "";
 
-            var sum = 0;
+            for (var k = 0; k < data.length; k++) {
 
-            for (var k = 0; k < data[i].length; k++) {
+                if (data[k][keys[0]] !== sections[s]) continue;
 
-                if (data[i][k][keys[0]] !== sections[s]) continue;
+                var width = parseInt(process.stdout.columns * data[k][keys[2]] / sum);
 
-                sum += data[i][k][keys[2]]
-
-                if (parts.indexOf(data[i][k][keys[1]]) === -1) {
-                    parts.push(data[i][k][keys[1]])
-                }
+                dataLine += colors[ccolours[parts.indexOf(data[k][keys[1]])]](new Array(width).join(barTypes[parts.indexOf(data[k][keys[1]]) % 4]));
 
             }
 
-            lines.push(colors.white(title + " - " + sections[s]))
-
-            for (var q = 0 ; q < settings.barHeight; q++) {
-                var dataLine = "";
-
-                for (var k = 0; k < data[i].length; k++) {
-
-                    if (data[i][k][keys[0]] !== sections[s]) continue;
-
-                    var width = parseInt(process.stdout.columns * data[i][k][keys[2]] / sum);
-
-                    dataLine += colors[ccolours[parts.indexOf(data[i][k][keys[1]])]](new Array(width).join(barTypes[parts.indexOf(data[i][k][keys[1]]) % 4]));
-
-                }
-
-                lines.push(dataLine);
-            }
-
-            lines.push("");
-
+            lines.push(dataLine);
         }
 
-        for (var k = 0; k < parts.length; k++) {
+        lines.push("");
 
-            lines.push("- " + colors[ccolours[k]](parts[k]))
-        }
+    }
 
+    for (var k = 0; k < parts.length; k++) {
 
+        lines.push("- " + colors[ccolours[k]](parts[k]))
     }
 
     return lines;

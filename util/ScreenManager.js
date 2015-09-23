@@ -248,7 +248,6 @@ ScreenManager.prototype.printCommandOutput = function(command, output) {
     for (var i = 0; i < output.length; i++) {
         if (output[i][2] !== null) {
 
-
             /**
              * Pass the data to the chosen formatter
              */

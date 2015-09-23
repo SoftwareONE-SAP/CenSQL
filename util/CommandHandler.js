@@ -56,7 +56,7 @@ CommandHandler.prototype.onCommand = function(enteredCommand, allCallback) {
             return s.split('').reverse().join('');
         });
     }
-    
+
     /**
      * Run all commands in the command given
      */
@@ -83,8 +83,8 @@ CommandHandler.prototype.onCommand = function(enteredCommand, allCallback) {
         /**
          * Run the sqlCommand as a string of SQL and send it to HANA
          */
-        this.conn.exec("conn", sqlCommand, function(err, data) {
-            callback(null, [err == null ? 0 : 1, err == null ? data : {
+        this.conn.exec("conn", sqlCommand, function(err, hanaData) {
+            callback(null, [err == null ? 0 : 1, err == null ? hanaData : {
                     error: err,
                     sql: sqlCommand
                 },
