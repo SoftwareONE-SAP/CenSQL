@@ -1,5 +1,4 @@
-var debug = require("debug")("censql:CommandHandler");
-
+var async = require("async");
 
 var CommandHandler = function(screen, conn, command) {
     this.screen = screen;
@@ -7,8 +6,8 @@ var CommandHandler = function(screen, conn, command) {
 
     this.loadCommandHandlers();
 
-    if(command){
-        this.onCommand(command, function(output){
+    if (command) {
+        this.onCommand(command, function(output) {
             this.screen.printCommandOutput(command, output);
             process.exit(0)
         }.bind(this));
@@ -19,7 +18,7 @@ var CommandHandler = function(screen, conn, command) {
 /**
  * Require the baseCommands from the baseCommands folder and save them by their file name
  */
-CommandHandler.prototype.loadCommandHandlers = function(){
+CommandHandler.prototype.loadCommandHandlers = function() {
 
     this.handlers = {};
 
@@ -29,52 +28,72 @@ CommandHandler.prototype.loadCommandHandlers = function(){
 
             var name = file.replace('.js', '');
 
-            this.handlers[name] = new (require('../baseCommands/' + file))();
+            this.handlers[name] = new(require('../baseCommands/' + file))();
 
         }
 
     }.bind(this));
 }
 
-CommandHandler.prototype.onCommand = function(command, callback) {
+CommandHandler.prototype.onCommand = function(enteredCommand, allCallback) {
 
-    /**
-     * The parts of the command
-     * @type {String[]}
-     */
-    var sqlCommand = command.replace(/([^\\])\|/g, "$1$1|").split(/[^\\]\|/)[0].trim();
-    var cParts = sqlCommand.split(/\\| /);
+    // inspired from here: http://stackoverflow.com/a/12920211/3110929
+    function splitStringBySemicolon(s) {
 
-    /**
-     * Is the command an internal command? (Does it start with a '\')
-     */
-    if (command.charAt(0) == "\\") {
-        this.runInternalCommand(command.substring(1), cParts, callback);
-        return;
+        /**
+         * Reverse the string
+         */
+        var rev = s.split('').reverse().join('');
+
+        /**
+         * Only split on non escape semicolons.
+         */
+        return rev.split(/;(?=[^\\])/g).reverse().map(function(s) {
+
+            /**
+             * Put string back into order and return string chunk
+             */
+            return s.split('').reverse().join('');
+        });
     }
-
+    
     /**
-     * If we have got this far, it is not an internal command and should instead be ran on HANA
+     * Run all commands in the command given
      */
+    async.mapSeries(splitStringBySemicolon(enteredCommand), function(command, callback) {
+        /**
+         * The parts of the command
+         * @type {String[]}
+         */
+        var sqlCommand = command.replace(/([^\\])\|/g, "$1$1|").split(/[^\\]\|/)[0].trim();
+        var cParts = sqlCommand.split(/\\| /);
 
-    /**
-     * Should the data be shown in a group view?
-     * @type {Boolean}
-     */
-    var isGroupOption = false;
+        /**
+         * Is the command an internal command? (Does it start with a '\')
+         */
+        if (command.charAt(0) == "\\") {
+            this.runInternalCommand(command.substring(1), cParts, callback);
+            return;
+        }
 
-    if(sqlCommand.toLowerCase().slice(-2) == "\\g"){
-        isGroupOption = true;
-        sqlCommand = sqlCommand.substring(0, sqlCommand.length - 2);
-    }
+        /**
+         * If we have got this far, it is not an internal command and should instead be ran on HANA
+         */
 
-    console.log(sqlCommand);
+        /**
+         * Run the sqlCommand as a string of SQL and send it to HANA
+         */
+        this.conn.exec("conn", sqlCommand, function(err, data) {
+            callback(null, [err == null ? 0 : 1, err == null ? data : {
+                    error: err,
+                    sql: sqlCommand
+                },
+                err == null ? "default" : "json"
+            ]);
+        })
 
-    /**
-     * Run the sqlCommand as a string of SQL and send it to HANA
-     */
-    this.conn.exec("conn", sqlCommand, function(err, data) {
-        callback([err == null ? 0 : 1, err == null ? data : {error: err, sql: sqlCommand}, err == null ? (isGroupOption ? "group" : "table") : "json"]);
+    }.bind(this), function(err, data){
+        allCallback(data, enteredCommand);
     })
 }
 
@@ -88,12 +107,14 @@ CommandHandler.prototype.runInternalCommand = function(command, cParts, callback
     /**
      * Does baseCommand exist?
      */
-    if(!this.handlers[cParts[0]]){
+    if (!this.handlers[cParts[0]]) {
         callback([1, "Invalid command! Try \\h", "message", "message"]);
         return;
     }
 
-    this.handlers[cParts[0]].run(command, cParts, this.conn, this.screen, callback);
+    this.handlers[cParts[0]].run(command, cParts, this.conn, this.screen, function(data){
+        callback(null, data)
+    });
 
 }
 

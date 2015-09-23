@@ -1,4 +1,3 @@
-var debug = require("debug")("censql:ScreenManager");
 var readline = require('historic-readline');
 var charm = require('charm')(process.stdout);
 var colors = require("colors");
@@ -10,7 +9,7 @@ var ScreenManager = function(isBatch, settings, commandHandler) {
     this.isBatch = isBatch;
 
     this.settings = settings;
-    
+
     this.commandHandler = commandHandler;
 
     this.init.call(this);
@@ -31,7 +30,7 @@ ScreenManager.prototype.init = function() {
     this.setupInput();
 }
 
-ScreenManager.prototype.loadPipeHandlers = function(){
+ScreenManager.prototype.loadPipeHandlers = function() {
     this.handlers = {};
 
     require('fs').readdirSync(path.join(__dirname, '/../pipeCommands/')).forEach(function(file) {
@@ -39,7 +38,7 @@ ScreenManager.prototype.loadPipeHandlers = function(){
         if (file.match(/\.js$/) !== null) {
 
             var name = file.replace('.js', '');
-            
+
             this.handlers[name] = require('../pipeCommands/' + file);
 
         }
@@ -48,7 +47,7 @@ ScreenManager.prototype.loadPipeHandlers = function(){
 
 }
 
-ScreenManager.prototype.loadDataFormatters = function(){
+ScreenManager.prototype.loadDataFormatters = function() {
     this.formatters = {};
 
     require('fs').readdirSync(__dirname + '/../dataFormatters/').forEach(function(file) {
@@ -56,7 +55,7 @@ ScreenManager.prototype.loadDataFormatters = function(){
         if (file.match(/\.js$/) !== null) {
 
             var name = file.replace('.js', '');
-            
+
             this.formatters[name] = require('../dataFormatters/' + file);
 
         }
@@ -70,14 +69,14 @@ ScreenManager.prototype.loadDataFormatters = function(){
  */
 ScreenManager.prototype.setupInput = function() {
 
-    if(!process.stdout.isTTY){
+    if (!process.stdout.isTTY) {
 
         /**
          * Spoof the width of the temrinal
          */
         process.stdout.columns = 80;
 
-        process.stdout.on('error', function( err ) {
+        process.stdout.on('error', function(err) {
             if (err.code == "EPIPE") {
                 process.exit(0);
             }
@@ -91,12 +90,12 @@ ScreenManager.prototype.setupInput = function() {
         output: process.stdout,
         path: path.join(osHomedir(), ".censql", "censql_hist"),
         maxLength: 100,
-        next: function(rl){
+        next: function(rl) {
             this.rl = rl;
 
             this.rl.on('line', function(line) {
 
-                if(GLOBAL.censql.RUNNING_PROCESS) return;
+                if (GLOBAL.censql.RUNNING_PROCESS) return;
 
                 /**
                  * remove the user input since we will add it back again later with colour
@@ -120,11 +119,11 @@ ScreenManager.prototype.setupInput = function() {
                 }
 
                 /**
-                 * Hide user input whilst a command is running (simply pausing stdin still allows scrolling through history) 
+                 * Hide user input whilst a command is running (simply pausing stdin still allows scrolling through history)
                  */
                 process.stdin._events._keypress_full = process.stdin._events.keypress;
-                process.stdin._events.keypress = function(ch , key){ 
-                    if(key && key.ctrl && key.name == 'c'){
+                process.stdin._events.keypress = function(ch, key) {
+                    if (key && key.ctrl && key.name == 'c') {
                         GLOBAL.SHOULD_EXIT = true;
                     }
                 };
@@ -171,7 +170,7 @@ ScreenManager.prototype.setupInput = function() {
              */
             this.rl.on('SIGINT', function() {
 
-                if(GLOBAL.censql.RUNNING_PROCESS){
+                if (GLOBAL.censql.RUNNING_PROCESS) {
                     GLOBAL.SHOULD_EXIT = true;
                     return;
                 }
@@ -246,16 +245,19 @@ ScreenManager.prototype.printCommandOutput = function(command, output) {
      */
     var commandParts = command.replace(/([^\\])\|/g, "$1$1|").split(/[^\\]\|/);
 
-    if(output[2] !== null){
+    for (var i = 0; i < output.length; i++) {
+        if (output[i][2] !== null) {
 
-        /**
-         * Pass the data to the chosen formatter
-         */
-        var lines = this.formatters[output[2]](commandParts[0], output[1], output[3], this.settings, output[4], output[5], output[6]);
-        var pipedLines = this.processPipes(lines, commandParts, this.settings);
-        this.renderLines(pipedLines);
-        
-    }
+
+            /**
+             * Pass the data to the chosen formatter
+             */
+            var lines = this.formatters[output[i][2]](commandParts[0], output[i][1], output[i][3], this.settings, output[i][4], output[i][5], output[i][6]);
+            var pipedLines = this.processPipes(lines, commandParts, this.settings);
+            this.renderLines(pipedLines);
+
+        }
+    };
 
     /**
      * Dont display a prompt for batch requests
@@ -268,15 +270,15 @@ ScreenManager.prototype.printCommandOutput = function(command, output) {
 /**
  * Send the data through all the piped commands they added
  */
-ScreenManager.prototype.processPipes = function(linesIn, commandParts){
+ScreenManager.prototype.processPipes = function(linesIn, commandParts) {
 
     var linesOut = linesIn.slice(0);
 
-    for(var j = 1; j < commandParts.length; j++){
+    for (var j = 1; j < commandParts.length; j++) {
 
         var commandName = commandParts[j].trim().split(" ")[0].toLowerCase();
 
-        if(!this.handlers[commandName]){
+        if (!this.handlers[commandName]) {
             linesOut = ["Unknown command: " + commandName + ". try \\h for help"];
             continue;
         }
@@ -292,12 +294,12 @@ ScreenManager.prototype.processPipes = function(linesIn, commandParts){
 /**
  * Draw the data line by line, removing colour if the user requested no colour
  */
-ScreenManager.prototype.renderLines = function(lines){
+ScreenManager.prototype.renderLines = function(lines) {
 
-    for(var i = 0 ; i < lines.length; i++){
+    for (var i = 0; i < lines.length; i++) {
         var line = lines[i];
 
-        if(!this.settings.colour){
+        if (!this.settings.colour) {
             line = stripColorCodes(line);
         }
 
@@ -306,14 +308,14 @@ ScreenManager.prototype.renderLines = function(lines){
     }
 }
 
-ScreenManager.prototype.error = function(message){
+ScreenManager.prototype.error = function(message) {
     this.print(colors.red(message));
 }
 
 ScreenManager.prototype.print = function(message) {
-    if(!this.settings.colour){
+    if (!this.settings.colour) {
         process.stdout.write(stripColorCodes(message));
-    }else{
+    } else {
         process.stdout.write(message);
     }
 }
