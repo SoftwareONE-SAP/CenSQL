@@ -48,13 +48,21 @@ CommandHandler.prototype.onCommand = function(enteredCommand, allCallback) {
         /**
          * Only split on non escape semicolons.
          */
-        return rev.split(/;(?=[^\\])/g).reverse().map(function(s) {
+        var commands = rev.split(/;(?=[^\\])/g).reverse().map(function(s) {
 
             /**
              * Put string back into order and return string chunk
              */
             return s.split('').reverse().join('');
         });
+
+        for (var i = 0; i < commands.length; i++) {
+            if(commands[i].replace(/ /g, '').length == 0){
+                commands.splice(i, 1);
+            }
+        };
+
+        return commands;
     }
 
     /**
@@ -92,7 +100,7 @@ CommandHandler.prototype.onCommand = function(enteredCommand, allCallback) {
             ]);
         })
 
-    }.bind(this), function(err, data){
+    }.bind(this), function(err, data) {
         allCallback(data, enteredCommand);
     })
 }
@@ -112,7 +120,7 @@ CommandHandler.prototype.runInternalCommand = function(command, cParts, callback
         return;
     }
 
-    this.handlers[cParts[0]].run(command, cParts, this.conn, this.screen, function(data){
+    this.handlers[cParts[0]].run(command, cParts, this.conn, this.screen, function(data) {
         callback(null, data)
     });
 
