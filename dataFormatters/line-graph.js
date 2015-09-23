@@ -42,11 +42,11 @@ module.exports = function(command, data, title, settings, graphWidth) {
         /**
          * Get min an max values
          */
-
         var maxValue = 0;
         var minValue = Number.MAX_VALUE;
 
         for (var k = 0; k < data.length; k++) {
+            if (data[k][keys[3]] !== sections[s]) continue;
 
             if (maxValue < data[k][keys[4]]) maxValue = data[k][keys[4]];
             if (minValue > data[k][keys[4]]) minValue = data[k][keys[4]];
@@ -66,6 +66,7 @@ module.exports = function(command, data, title, settings, graphWidth) {
         var minTime = Number.MAX_VALUE;
 
         for (var k = 0; k < data.length; k++) {
+            if (data[k][keys[3]] !== sections[s]) continue;
 
             var diff = moment(data[k][keys[5]]).format("x");
 
@@ -102,10 +103,13 @@ module.exports = function(command, data, title, settings, graphWidth) {
 
             if (data[k][keys[3]] !== sections[s]) continue;
 
-            var val = Math.floor(((data[k][keys[4]] - minValue) / (maxValue - minValue)) * settings.plotHeight);
+            var val = parseInt(((data[k][keys[4]] - minValue) / (maxValue - minValue)) * settings.plotHeight);
 
-            var groundedTiem = moment(data[k][keys[5]]).format("x") - totalTimeDiff;
-            var percentInGraph = Math.floor(((maxTime - moment(data[k][keys[5]]).format("x")) / totalTimeDiff) * (graphWidth - 1))
+            if(val > settings.plotHeight){
+                console.log(val);
+            }
+
+            var percentInGraph = parseInt(((maxTime - moment(data[k][keys[5]]).format("x")) / totalTimeDiff) * (graphWidth + 1))
 
             plot[val][percentInGraph] = filledPointChar;
 
@@ -139,7 +143,7 @@ module.exports = function(command, data, title, settings, graphWidth) {
         /**
          * Build the data lines
          */
-        for (var y = 0; y < settings.plotHeight; y++) {
+        for (var y = 0; y < plot.length; y++) {
 
             plot[y].reverse();
 
@@ -178,7 +182,7 @@ module.exports = function(command, data, title, settings, graphWidth) {
 
         var description = title + " - " + sections[s];
 
-        var xPadding = 2 + Math.floor(((plot[0].length * widthRatio) - description.length) / 2);
+        var xPadding = 2 + Math.ceil(((plot[0].length * widthRatio) - description.length) / 2);
 
         lines.push(new Array(xPadding).join(" ") + description);
 
