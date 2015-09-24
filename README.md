@@ -133,4 +133,16 @@ Formatting: Added onto the end of a query, for example: 'SELECT 1 FROM DUMMY\g'
 	\j - Display the data in JSON
 ```
 
+<h4>Non Interactive</h4>
+```
+$ censql --user SYSTEM --port 34315 --host 192.168.182.240 --pass Passw0rd --command "\st"
+HOST | HOST_ACTIVE | HOST_STATUS
+- - - - - - - - - - - - - - - - - - - 
+dev-kvmhana01 | YES | OK
+dev-kvmhana02 | YES | OK
+
+$ censql --user MYUSER --port 30015 --host 192.168.182.5 --pass mypassword --command "\st\j"
+[{"HOST":"dev-hana01","HOST_ACTIVE":"YES","HOST_STATUS":"OK"},{"HOST":"dev-hana02","HOST_ACTIVE":"YES","HOST_STATUS":"OK"}]
+```
+
 License: <a href="https://github.com/Centiq/CenSQL/blob/master/license.md">MIT</a>
