@@ -54,7 +54,6 @@ No: 1 -------------------
 Any CenSQL command is prefixed with a '\'. This stops the input from being sent directly to HANA and instead runs the CenSQL command.
 
 ```
-
 > \st
 
 HOST | HOST_ACTIVE | HOST_STATUS
