@@ -1,9 +1,9 @@
 
-<h1>CenSQL</h1>
+# CenSQL
 
 <img src="http://i.imgur.com/pEkKthe.gif"></img>
 
-<h5>A better CLI client for SAP HANA</h5>
+##### A better CLI client for SAP HANA
 
 CenSQL (Pronounced "<i>Sen-Sea-Quel</i>") is an unofficial replacement by Centiq Ltd for the hdbsql CLI. It was created to provided command history and shorthand commands useful for monitoring SAP HANA which aren't available in the hdbsql client.
 
@@ -14,7 +14,7 @@ Finally, CenSQL has support for bar charts and line graphs inside the CLI interf
 
 <a href="http://scn.sap.com/community/developer-center/hana/blog/2015/09/18/announcing-censql-a-cli-client-for-sap-hana">See an SCN about CenSQL</a>
 
-###Installation
+### Installation
 Note: CenSQL has been tested on Ubuntu, Debian, SLES, SLES4SAP, Windows Server 2003 and Windows 7/8 Desktop. I most likely works perfectly on OSX but no testing is done on this platform.
 
 <ol>
@@ -22,9 +22,9 @@ Note: CenSQL has been tested on Ubuntu, Debian, SLES, SLES4SAP, Windows Server 2
   <li><code>sudo npm install -g censql</code></li>
 </ol>
 
-###Command Usage
+### Command Usage
 
-####Basic SQL
+#### Basic SQL
 Entering a SQL query is done by simply typing it in and pressing enter.
 
 ```
@@ -50,7 +50,7 @@ No: 1 -------------------
  SCHEMA_NAME: _SYS_STATISTICS
 ```
 
-####CenSQL Commands
+#### CenSQL Commands
 Any CenSQL command is prefixed with a '\'. This stops the input from being sent directly to HANA and instead runs the CenSQL command.
 
 ```
@@ -61,7 +61,7 @@ HOST | HOST_ACTIVE | HOST_STATUS
 hananode01 | YES | OK
 ```
 
-####Post Commands
+#### Post Commands
 Output from any query or command may be piped to a post command which will transform the output in some way. eg:
 ```
 > \serv | grep indexserver
@@ -69,7 +69,7 @@ Output from any query or command may be piped to a post command which will trans
 hananode01 | 30103 | indexserver | 4771 | master | YES | 30115 | MASTER
 ```
 
-####Help Command
+#### Help Command
 ```
 CenSQL v1.1.3 Help
 -----------------------------------------------------
@@ -129,7 +129,7 @@ Formatting: Added onto the end of a query, for example: 'SELECT 1 FROM DUMMY\g'
 	
 ```
 
-####Non Interactive
+#### Non Interactive
 ```
 $ censql --user SYSTEM --port 34315 --host 192.168.182.240 --pass Passw0rd --command "\st"
 HOST | HOST_ACTIVE | HOST_STATUS
