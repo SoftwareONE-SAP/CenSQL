@@ -66,7 +66,7 @@ module.exports = function(command, data, title, settings, graphWidth) {
         var minTime = Number.MAX_VALUE;
 
         for (var k = 0; k < data.length; k++) {
-            if (data[k][keys[3]] !== sections[s]) continue;
+            // if (data[k][keys[3]] !== sections[s]) continue;
 
             var diff = moment(data[k][keys[5]]).format("x");
 
