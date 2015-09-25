@@ -5,46 +5,41 @@
 
 <h5>A better CLI client for SAP HANA</h5>
 
-<p>
 CenSQL (Pronounced "<i>Sen-Sea-Quel</i>") is an unofficial replacement by Centiq Ltd for the hdbsql CLI. It was created to provided command history and shorthand commands useful for monitoring SAP HANA which aren't available in the hdbsql client.
-</p>
 
-<p>
 As well as having a smoother user interface, CenSQL also provides a lot more functionality which is not present in hdbsql, such as shortcuts for sql queries useful for any DB admin or developer for example <code>\al</code> for viewing open alerts on the instance you are connected to.
-</p>
 
-<p>
 Finally, CenSQL has support for bar charts and line graphs inside the CLI interface for showing a 'at-a-glanse' view of the status and history of the instance, for example <code>\cpu</code> for showing the CPU usage for each host for the instance and <code>\smem</code> for showing the current shared memory.
-</p>
+
 
 <a href="http://scn.sap.com/community/developer-center/hana/blog/2015/09/18/announcing-censql-a-cli-client-for-sap-hana">See an SCN about CenSQL</a>
 
-<h3>Installation</h3>
-<p>Note: CenSQL has only been tested on Ubuntu 14.04 And Debian 8 (jessie). However it should work on any distro running NodeJS v0.10.30 or higher<p>
+###Installation
+Note: CenSQL has been tested on Ubuntu, Debian, SLES, SLES4SAP, Windows Server 2003 and Windows 7/8 Desktop. I most likely works perfectly on OSX but no testing is done on this platform.
+
 <ol>
-  <li>Install NodeJS v0.10.30 or higher (If not already installed)</li>
+  <li>Install NodeJS <strong>v0.10.30</strong> or higher (If not already installed)</li>
   <li><code>sudo npm install -g censql</code></li>
 </ol>
 
-<h3>Command Usage</h3>
+###Command Usage
 
-<h4>Basic SQL</h4>
-<p>Entering a SQL query is done by simply typing it in and pressing enter.</p>
+####Basic SQL
+Entering a SQL query is done by simply typing it in and pressing enter.
 
-<pre>
+```
 > SELECT HOST, UNLOAD_TIME, SCHEMA_NAME FROM SYS.M_CS_UNLOADS LIMIT 2
 
 HOST | UNLOAD_TIME | SCHEMA_NAME
 - - - - - - - - - - - - - - - - - - - 
 hananode01 | 2015-07-02T05:30:34.017 | _SYS_STATISTICS
 hananode01 | 2015-07-02T05:30:34.006 | _SYS_STATISTICS
-</pre>
+```
 
-<p>Results will be returned in a table format unless the command is ended with '\G' in which case it will draw data in a grouped format<p>
+Results will be returned in a table format unless the command is ended with '\G' in which case it will draw data in a grouped format
 
-<pre>
+```
 > SELECT HOST, UNLOAD_TIME, SCHEMA_NAME FROM SYS.M_CS_UNLOADS LIMIT 2\G
-
 No: 0 -------------------
  HOST: hananode01
  UNLOAD_TIME: 2015-07-02T05:30:34.017
@@ -53,28 +48,28 @@ No: 1 -------------------
  HOST: hananode01
  UNLOAD_TIME: 2015-07-02T05:30:34.006
  SCHEMA_NAME: _SYS_STATISTICS
-</pre>
+```
 
-<h4>CenSQL Commands</h4>
-<p>Any CenSQL command is prefixed with a '\'. This stops the input from being sent directly to HANA and instead runs the CenSQL command.</p>
+####CenSQL Commands
+Any CenSQL command is prefixed with a '\'. This stops the input from being sent directly to HANA and instead runs the CenSQL command.
 
-<pre>
+```
 > \st
 
 HOST | HOST_ACTIVE | HOST_STATUS
 - - - - - - - - - - - - - - - - - - - 
 hananode01 | YES | OK
-</pre>
+```
 
-<h4>Post Commands</h4>
-<p>Output from any query or command may be piped to a post command which will transform the output in some way. eg:</p>
-<pre>
+####Post Commands
+Output from any query or command may be piped to a post command which will transform the output in some way. eg:
+```
 > \serv | grep indexserver
 
 hananode01 | 30103 | indexserver | 4771 | master | YES | 30115 | MASTER
-</pre>
+```
 
-<h4>Help Command</h4>
+####Help Command
 ```
 CenSQL v1.1.3 Help
 -----------------------------------------------------
@@ -131,6 +126,19 @@ Post Commands: Chained onto the end of a query, for example: '\st\g | grep HOST'
 Formatting: Added onto the end of a query, for example: 'SELECT 1 FROM DUMMY\g'
 	\g - Group output into each piece of data to it's own row
 	\j - Display the data in JSON
+	
+```
+
+####Non Interactive
+```
+$ censql --user SYSTEM --port 34315 --host 192.168.182.240 --pass Passw0rd --command "\st"
+HOST | HOST_ACTIVE | HOST_STATUS
+- - - - - - - - - - - - - - - - - - - 
+dev-kvmhana01 | YES | OK
+dev-kvmhana02 | YES | OK
+
+$ censql --user MYUSER --port 30015 --host 192.168.182.5 --pass mypassword --command "\st\j"
+[{"HOST":"dev-hana01","HOST_ACTIVE":"YES","HOST_STATUS":"OK"},{"HOST":"dev-hana02","HOST_ACTIVE":"YES","HOST_STATUS":"OK"}]
 ```
 
 License: <a href="https://github.com/Centiq/CenSQL/blob/master/license.md">MIT</a>
