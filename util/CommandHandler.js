@@ -116,7 +116,7 @@ CommandHandler.prototype.runInternalCommand = function(command, cParts, callback
      * Does baseCommand exist?
      */
     if (!this.handlers[cParts[0]]) {
-        callback([1, "Invalid command! Try \\h", "message", "message"]);
+        callback(null, [1, "Invalid command! Try \\h", "message", "message"]);
         return;
     }
 
