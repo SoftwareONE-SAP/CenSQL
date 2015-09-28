@@ -12,7 +12,7 @@ module.exports = function(command, data, title, settings){
 		}
 	}
 	
-	switch(formatterTag.toLowerCase()){
+	switch(formatterTag.toLowerCase().split(" ")[0]){
 		case "g":
 			return require("./group.js")(command, data);
 			break;
