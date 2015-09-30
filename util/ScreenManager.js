@@ -135,7 +135,7 @@ ScreenManager.prototype.setupInput = function() {
                 /**
                  * Send the user command to the command handler
                  */
-                this.commandHandler.handleCommand(line, function(err, output) {
+                this.commandHandler.handleCommand(line, function(output) {
 
                     /**
                      * Print the command to the screen however the command handler thinks is best
