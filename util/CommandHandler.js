@@ -37,44 +37,22 @@ CommandHandler.prototype.loadCommandHandlers = function() {
 
 CommandHandler.prototype.onCommand = function(enteredCommand, allCallback) {
 
-    // inspired from here: http://stackoverflow.com/a/12920211/3110929
-    function splitStringBySemicolon(s) {
-
-        /**
-         * Reverse the string
-         */
-        var rev = s.split('').reverse().join('');
-
-        /**
-         * Only split on non escape semicolons.
-         */
-        var commands = rev.split(/;(?=[^\\])/g).reverse().map(function(s) {
-
-            /**
-             * Put string back into order and return string chunk
-             */
-            return s.split('').reverse().join('');
-        });
-
-        for (var i = 0; i < commands.length; i++) {
-            if(commands[i].replace(/ /g, '').length == 0){
-                commands.splice(i, 1);
-            }
-        };
-
-        return commands;
-    }
-
     /**
      * Run all commands in the command given
      */
-    async.mapSeries(splitStringBySemicolon(enteredCommand), function(command, callback) {
+    async.mapSeries(this.splitStringBySemicolon(enteredCommand), function(command, callback) {
+
+        /**
+         * The initial command before any pipes
+         * @type {String}
+         */
+        var initialCommand = command.replace(/([^\\])\|/g, "$1$1|").split(/[^\\]\|/)[0].trim();
+
         /**
          * The parts of the command
          * @type {String[]}
          */
-        var sqlCommand = command.replace(/([^\\])\|/g, "$1$1|").split(/[^\\]\|/)[0].trim();
-        var cParts = sqlCommand.split(/\\| /);
+        var cParts = initialCommand.split(/\\| /);
 
         /**
          * Is the command an internal command? (Does it start with a '\')
@@ -89,12 +67,18 @@ CommandHandler.prototype.onCommand = function(enteredCommand, allCallback) {
          */
 
         /**
-         * Run the sqlCommand as a string of SQL and send it to HANA
+         * Remove formatters off the end to send to hana
          */
-        this.conn.exec("conn", sqlCommand, function(err, hanaData) {
-            callback(null, [err == null ? 0 : 1, err == null ? hanaData : {
+
+        var sql = this.stripFormatterIdentifiers(initialCommand);
+
+        /**
+         * Run the initialCommand as a string of SQL and send it to HANA
+         */
+        this.conn.exec("conn", sql, function(err, hanaData) {
+            callback(null, [initialCommand, err == null ? 0 : 1, err == null ? hanaData : {
                     error: err,
-                    sql: sqlCommand
+                    sql: initialCommand
                 },
                 err == null ? "default" : "json"
             ]);
@@ -121,9 +105,49 @@ CommandHandler.prototype.runInternalCommand = function(command, cParts, callback
     }
 
     this.handlers[cParts[0]].run(command, cParts, this.conn, this.screen, function(data) {
+        data.unshift(command);
         callback(null, data)
     });
 
+}
+
+// inspired from here: http://stackoverflow.com/a/12920211/3110929
+CommandHandler.prototype.splitStringBySemicolon = function(s) {
+
+    /**
+     * Reverse the string
+     */
+    var rev = s.split('').reverse().join('');
+
+    /**
+     * Only split on non escape semicolons.
+     */
+    var commands = rev.split(/;(?=[^\\])/g).reverse().map(function(s) {
+
+        /**
+         * Put string back into order and return string chunk
+         */
+        return s.split('').reverse().join('');
+    });
+
+    for (var i = 0; i < commands.length; i++) {
+        if (commands[i].replace(/ /g, '').length == 0) {
+            commands.splice(i, 1);
+        }
+    };
+
+    return commands;
+}
+
+CommandHandler.prototype.stripFormatterIdentifiers = function(string){
+    for (var i = 0; i < this.screen.formattersNames.length; i++) {
+
+        if(string.substr(string.length - this.screen.formattersNames[i].length, this.screen.formattersNames[i].length) == this.screen.formattersNames[i]){
+            return string.substr(0, string.length - this.screen.formattersNames[i].length - 1);
+        }
+    };
+
+    return string;
 }
 
 module.exports = CommandHandler;

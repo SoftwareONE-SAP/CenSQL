@@ -31,7 +31,8 @@ ScreenManager.prototype.init = function() {
 }
 
 ScreenManager.prototype.loadPipeHandlers = function() {
-    this.handlers = {};
+    this.pipeHandlers = {};
+    this.pipeHandlersNames = [];
 
     require('fs').readdirSync(path.join(__dirname, '/../pipeCommands/')).forEach(function(file) {
 
@@ -39,7 +40,8 @@ ScreenManager.prototype.loadPipeHandlers = function() {
 
             var name = file.replace('.js', '');
 
-            this.handlers[name] = require('../pipeCommands/' + file);
+            this.pipeHandlersNames.push(name);
+            this.pipeHandlers[name] = require('../pipeCommands/' + file);
 
         }
 
@@ -49,6 +51,7 @@ ScreenManager.prototype.loadPipeHandlers = function() {
 
 ScreenManager.prototype.loadDataFormatters = function() {
     this.formatters = {};
+    this.formattersNames = [];
 
     require('fs').readdirSync(__dirname + '/../dataFormatters/').forEach(function(file) {
 
@@ -56,6 +59,7 @@ ScreenManager.prototype.loadDataFormatters = function() {
 
             var name = file.replace('.js', '');
 
+            this.formattersNames.push(name);
             this.formatters[name] = require('../dataFormatters/' + file);
 
         }
@@ -131,7 +135,7 @@ ScreenManager.prototype.setupInput = function() {
                 /**
                  * Send the user command to the command handler
                  */
-                this.commandHandler.handleCommand(line, function(output) {
+                this.commandHandler.handleCommand(line, function(err, output) {
 
                     /**
                      * Print the command to the screen however the command handler thinks is best
@@ -246,16 +250,13 @@ ScreenManager.prototype.printCommandOutput = function(command, output) {
     var commandParts = command.replace(/([^\\])\|/g, "$1$1|").split(/[^\\]\|/);
 
     for (var i = 0; i < output.length; i++) {
-        if (output[i][2] !== null) {
 
-            /**
-             * Pass the data to the chosen formatter
-             */
-            var lines = this.formatters[output[i][2]](commandParts[0], output[i][1], output[i][3], this.settings, output[i][4], output[i][5], output[i][6]);
-            var pipedLines = this.processPipes(lines, commandParts, this.settings);
-            this.renderLines(pipedLines);
-
-        }
+        /**
+         * Pass the data to the chosen formatter
+         */
+        var lines = this.formatters[output[i][3]](output[i][0], output[i][2], output[i][4], this.settings, output[i][5], output[i][6], output[i][7]);
+        var pipedLines = this.processPipes(lines, commandParts, this.settings);
+        this.renderLines(pipedLines);
     };
 
     /**
@@ -277,12 +278,12 @@ ScreenManager.prototype.processPipes = function(linesIn, commandParts) {
 
         var commandName = commandParts[j].trim().split(" ")[0].toLowerCase();
 
-        if (!this.handlers[commandName]) {
+        if (!this.pipeHandlers[commandName]) {
             linesOut = ["Unknown command: " + commandName + ". try \\h for help"];
             continue;
         }
 
-        linesOut = this.handlers[commandName](linesOut, commandParts[j])
+        linesOut = this.pipeHandlers[commandName](linesOut, commandParts[j])
 
     }
 
@@ -305,6 +306,8 @@ ScreenManager.prototype.renderLines = function(lines) {
         console.log(line);
 
     }
+
+    console.log();
 }
 
 ScreenManager.prototype.error = function(message) {
