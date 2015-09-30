@@ -12,10 +12,10 @@ As well as having a smoother user interface, CenSQL also provides a lot more fun
 Finally, CenSQL has support for bar charts and line graphs inside the CLI interface for showing a 'at-a-glanse' view of the status and history of the instance, for example <code>\cpu</code> for showing the CPU usage for each host for the instance and <code>\smem</code> for showing the current shared memory.
 
 
-<a href="http://scn.sap.com/community/developer-center/hana/blog/2015/09/18/announcing-censql-a-cli-client-for-sap-hana">See an SCN about CenSQL</a>
+<a href="http://scn.sap.com/community/developer-center/hana/blog/2015/09/18/announcing-censql-a-cli-client-for-sap-hana">See an SCN article about CenSQL</a>
 
 ### Installation
-Note: CenSQL has been tested on Ubuntu, Debian, SLES, SLES4SAP, Windows Server 2003 and Windows 7/8 Desktop. I most likely works perfectly on OSX but no testing is done on this platform.
+Note: CenSQL has been tested on Ubuntu, Debian, SLES, SLES4SAP, Windows Server 2003 and Windows 7/8 Desktop. It most likely works perfectly on OSX but no testing is done on this platform.
 
 <ol>
   <li>Install NodeJS <strong>v0.10.30</strong> or higher (If not already installed)</li>
