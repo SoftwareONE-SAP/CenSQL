@@ -1,11 +1,12 @@
 var colors = require("colors");
 var moment = require("moment");
 
-module.exports = function(command, data, title, settings, graphWidth) {
+module.exports = function(command, data, title, settings, amountOfHours) {
 
     var lines = [];
     var emptyPointChar = "·";
     var filledPointChar = "■";
+    amountOfHours = amountOfHours + 1;
 
     /**
      * get keys
@@ -21,6 +22,7 @@ module.exports = function(command, data, title, settings, graphWidth) {
         return lines;
     }
 
+
     /**
      * Get sections
      */
@@ -29,13 +31,21 @@ module.exports = function(command, data, title, settings, graphWidth) {
 
     for (var k = 0; k < data.length; k++) {
 
-        if (sections.indexOf(data[k][keys[3]]) === -1) {
-            sections.push(data[k][keys[3]]);
+        if (sections.indexOf(data[k][keys[4]]) === -1) {
+            sections.push(data[k][keys[4]]);
         }
 
     }
 
     sections.sort();
+
+    /**
+     * Create the times for all the data
+     */
+    for (var k = 0; k < data.length; k++) {
+        data[k].timeDate = new Date(data[k][keys[0]], data[k][keys[1]], data[k][keys[2]], data[k][keys[3]], 0, 0, 0)
+        data[k].timeDateEpoch = data[k].timeDate.getTime();
+    }
 
     for (var s = 0; s < sections.length; s++) {
 
@@ -46,10 +56,9 @@ module.exports = function(command, data, title, settings, graphWidth) {
         var minValue = Number.MAX_VALUE;
 
         for (var k = 0; k < data.length; k++) {
-            if (data[k][keys[3]] !== sections[s]) continue;
 
-            if (maxValue < data[k][keys[4]]) maxValue = data[k][keys[4]];
-            if (minValue > data[k][keys[4]]) minValue = data[k][keys[4]];
+            if (maxValue < data[k][keys[5]]) maxValue = data[k][keys[5]];
+            if (minValue > data[k][keys[5]]) minValue = data[k][keys[5]];
 
         }
 
@@ -66,16 +75,11 @@ module.exports = function(command, data, title, settings, graphWidth) {
         var minTime = Number.MAX_VALUE;
 
         for (var k = 0; k < data.length; k++) {
-            // if (data[k][keys[3]] !== sections[s]) continue;
-
-            var diff = moment(data[k][keys[5]]).format("x");
-
-            if (maxTime < diff) maxTime = diff;
-            if (minTime > diff) minTime = diff;
-
+            if (maxTime < data[k].timeDateEpoch) maxTime = data[k].timeDateEpoch;
+            if (minTime > data[k].timeDateEpoch) minTime = data[k].timeDateEpoch;
         }
 
-        var totalTimeDiff = 3 * 24 * 60 * 60 * 1000; //maxTime - minTime;
+        var totalTimeDiff = amountOfHours * 60 * 60 * 1000; //maxTime - minTime;
 
         /**
          * Create empty plot
@@ -90,7 +94,7 @@ module.exports = function(command, data, title, settings, graphWidth) {
 
             plot[y] = [];
 
-            for (var x = 0; x < graphWidth; x++) {
+            for (var x = 0; x < amountOfHours; x++) {
 
                 plot[y][x] = emptyPointChar;
             }
@@ -101,15 +105,10 @@ module.exports = function(command, data, title, settings, graphWidth) {
          */
         for (var k = 0; k < data.length; k++) {
 
-            if (data[k][keys[3]] !== sections[s]) continue;
+            if (data[k][keys[4]] !== sections[s]) continue;
 
-            var val = parseInt(((data[k][keys[4]] - minValue) / (maxValue - minValue)) * settings.plotHeight);
-
-            if(val > settings.plotHeight){
-                console.log(val);
-            }
-
-            var percentInGraph = parseInt(((maxTime - moment(data[k][keys[5]]).format("x")) / totalTimeDiff) * (graphWidth + 1))
+            var val = parseInt(((data[k][keys[5]] - minValue) / (maxValue - minValue)) * settings.plotHeight);
+            var percentInGraph = parseInt(((maxTime - data[k].timeDateEpoch) / totalTimeDiff) * (amountOfHours + 1))
 
             plot[val][percentInGraph] = filledPointChar;
 
@@ -118,7 +117,7 @@ module.exports = function(command, data, title, settings, graphWidth) {
         /**
          * Display plot
          */
-        var widthRatio = Math.floor((process.stdout.columns - 3) / (graphWidth - 1));
+        var widthRatio = Math.floor((process.stdout.columns - 3) / (amountOfHours - 1));
 
         /**
          * Build the header line for the graph
@@ -152,6 +151,8 @@ module.exports = function(command, data, title, settings, graphWidth) {
             for (var o = 0; o < plot[y].length; o++) {
                 for (var w = 0; w < widthRatio; w++) {
 
+                    if (!plot[y][o]) plot[y][o] = "!"
+
                     if (plot[y][o] === "■") {
                         plot[y][o] = colors.cyan(plot[y][o])
                     } else {
@@ -160,7 +161,7 @@ module.exports = function(command, data, title, settings, graphWidth) {
 
                     line += plot[y][o];
 
-                    plot[y][o] = colors.green(plot[y][o])
+                    // plot[y][o] = colors.green(plot[y][o])
                 }
             };
 
@@ -185,8 +186,6 @@ module.exports = function(command, data, title, settings, graphWidth) {
         var xPadding = 2 + Math.ceil(((plot[0].length * widthRatio) - description.length) / 2);
 
         lines.push(new Array(xPadding).join(" ") + description);
-
-        lines.push("");
 
     }
 

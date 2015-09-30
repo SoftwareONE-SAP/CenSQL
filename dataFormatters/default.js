@@ -4,7 +4,7 @@ module.exports = function(command, data, title, settings){
 	var formatterIndex = command.lastIndexOf("\\");
 	var formatterTag = "table";
 
-	if(formatterIndex > 0){
+	if(formatterIndex !== -1){
 		formatterTag = command.slice(formatterIndex).substring(1);
 
 		if(formatterTag.length === 0){
@@ -33,7 +33,7 @@ module.exports = function(command, data, title, settings){
 			return require("./bar-chart.js")(command, data, title, settings);
 			break;
 
-		case "kbc":
+		case "kvbc":
 			return require("./key-value-bar-chart.js")(command, data, title, settings);
 			break;
 

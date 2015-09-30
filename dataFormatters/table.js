@@ -30,8 +30,5 @@ module.exports = function(command, data) {
 
     };
 
-    // Add an empty line onto the end of the output
-    lines.push("")
-
     return lines;
 }

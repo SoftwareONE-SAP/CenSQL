@@ -1,0 +1,1 @@
+module.exports = require("./key-value-bar-chart.js");
