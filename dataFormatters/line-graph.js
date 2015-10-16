@@ -6,7 +6,7 @@ module.exports = function(command, data, title, settings, amountOfHours) {
     var lines = [];
     var emptyPointChar = "·";
     var filledPointChar = "■";
-    amountOfHours = amountOfHours + 1;
+    // amountOfHours = amountOfHours + 1;
 
     /**
      * get keys
@@ -24,7 +24,7 @@ module.exports = function(command, data, title, settings, amountOfHours) {
 
 
     /**
-     * Get sections
+     * Get sections. eg hostnames
      */
 
     var sections = [];
@@ -72,14 +72,16 @@ module.exports = function(command, data, title, settings, amountOfHours) {
          */
 
         var maxTime = 0;
-        var minTime = Number.MAX_VALUE;
 
         for (var k = 0; k < data.length; k++) {
             if (maxTime < data[k].timeDateEpoch) maxTime = data[k].timeDateEpoch;
-            if (minTime > data[k].timeDateEpoch) minTime = data[k].timeDateEpoch;
+            // if (minTime > data[k].timeDateEpoch) minTime = data[k].timeDateEpoch;
         }
 
-        var totalTimeDiff = amountOfHours * 60 * 60 * 1000; //maxTime - minTime;
+        var totalTimeDiff = amountOfHours * 60 * 60 * 1000;
+
+        var minTime = maxTime - totalTimeDiff;
+
 
         /**
          * Create empty plot
@@ -100,6 +102,8 @@ module.exports = function(command, data, title, settings, amountOfHours) {
             }
         }
 
+        var count = 0;
+
         /**
          * Start creating graph
          */
@@ -108,11 +112,32 @@ module.exports = function(command, data, title, settings, amountOfHours) {
             if (data[k][keys[4]] !== sections[s]) continue;
 
             var val = parseInt(((data[k][keys[5]] - minValue) / (maxValue - minValue)) * settings.plotHeight);
-            var percentInGraph = parseInt(((maxTime - data[k].timeDateEpoch) / totalTimeDiff) * (amountOfHours + 1))
+            // var percentInGraph = parseInt(((maxTime - data[k].timeDateEpoch) / totalTimeDiff) * (amountOfHours + 1))
 
-            plot[val][percentInGraph] = filledPointChar;
+            // var percentInGraph = parseInt((((maxTime - minTime) - (data[k].timeDateEpoch - minTime)) / 100) * amountOfHours)
+
+            plot[val][count] = filledPointChar;
+
+            count++;
 
         }
+
+        /**
+         * Add padding if needed
+         */
+        var maxLength = 0;
+        for (var k = 0; k < plot.length; k++) {
+            if(plot[k].length > maxLength){
+                maxLength = plot[k].length;
+            }
+        };
+
+        for (var k = 0; k < plot.length; k++) {
+            if(plot[k].length < maxLength){
+                plot[k].push(emptyPointChar)
+            }
+        }
+
 
         /**
          * Display plot
@@ -131,6 +156,7 @@ module.exports = function(command, data, title, settings, amountOfHours) {
 
         headerLine += "╔" + maxValue
 
+        // return [plot[0].length]
         for (var k = 0; k < (plot[0].length * widthRatio) - ("" + maxValue).length; k++) {
             headerLine += "═"
         };
@@ -139,12 +165,13 @@ module.exports = function(command, data, title, settings, amountOfHours) {
 
         lines.push(colors.green(headerLine));
 
+
         /**
          * Build the data lines
          */
         for (var y = 0; y < plot.length; y++) {
 
-            plot[y].reverse();
+            // plot[y].reverse();
 
             var line = colors.green("║");
 
