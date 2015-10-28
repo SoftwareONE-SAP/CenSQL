@@ -28,7 +28,7 @@ CommandHandler.prototype.loadCommandHandlers = function() {
 
             var name = file.replace('.js', '');
 
-            this.handlers[name] = new(require('../baseCommands/' + file))();
+            this.handlers[name] = new(require('../baseCommands/' + file))(this);
 
         }
 

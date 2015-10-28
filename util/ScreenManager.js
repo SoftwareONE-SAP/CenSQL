@@ -237,7 +237,7 @@ ScreenManager.prototype.ready = function() {
  * @param  {String} command The command the user ran
  * @param  {Array} output  the data and how to display it
  */
-ScreenManager.prototype.printCommandOutput = function(command, output) {
+ScreenManager.prototype.printCommandOutput = function(command, output, noCursor) {
 
     /**
      * Re-enable the command line
@@ -262,7 +262,7 @@ ScreenManager.prototype.printCommandOutput = function(command, output) {
     /**
      * Dont display a prompt for batch requests
      */
-    if (!this.isBatch) {
+    if (!this.isBatch && !noCursor) {
         this.print(colors.cyan("> "));
     }
 }
@@ -306,8 +306,6 @@ ScreenManager.prototype.renderLines = function(lines) {
         console.log(line);
 
     }
-
-    console.log();
 }
 
 ScreenManager.prototype.error = function(message) {
@@ -320,6 +318,11 @@ ScreenManager.prototype.print = function(message) {
     } else {
         process.stdout.write(message);
     }
+}
+
+ScreenManager.prototype.clear = function(){
+    charm.erase("screen");
+    charm.position(0, 0);
 }
 
 module.exports = ScreenManager;
