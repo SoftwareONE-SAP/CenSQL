@@ -10,6 +10,8 @@ PingCommandHandler.prototype.run = function(command, cParts, conn, screen, callb
 	var isForever = cParts[1] == "-f" || cParts[1] == "--forever";
 	var delay = (cParts[2] && parseFloat(cParts[2]) > 0 ? parseFloat(cParts[2]) * 1000 : 500);
 
+	var pings = [];
+
 	/**
 	 * Is the command being ran in in constant ping mode
 	 */
@@ -29,6 +31,11 @@ PingCommandHandler.prototype.run = function(command, cParts, conn, screen, callb
 
 				console.log("Ping Time (ms): " + diff)
 
+				/** 
+				 * Store all ping times so we can generate an average
+				 */
+				pings.push(diff);
+
 				setTimeout(function(){
 					next();
 				}, delay);
@@ -36,7 +43,10 @@ PingCommandHandler.prototype.run = function(command, cParts, conn, screen, callb
 			});
 
 		}.bind(this), function(err){
-			callback([0, null, null]);
+			/**
+			 * Calculate average and display to user
+			 */
+			callback([null, "\nAverage: " + parseInt(pings.reduce(function(a, b) { return a + b; }) / pings.length), "message"]);
 		})
 
 	/**
