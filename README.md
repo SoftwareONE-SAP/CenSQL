@@ -1,6 +1,8 @@
 
 # CenSQL
 
+<img src="https://nodei.co/npm/censql.png?downloads=true&downloadRank=true&stars=true"></img>
+
 <img src="http://i.imgur.com/pEkKthe.gif"></img>
 
 ##### A better CLI client for SAP HANA
