@@ -36,11 +36,11 @@ module.exports = function(command, data, title, settings) {
 
             var dataLine = "";
 
-            var width = parseInt(process.stdout.columns * data[k][keys[1]] / sum);
+            var width = Math.floor(process.stdout.columns * data[k][keys[1]] / sum);
 
             dataLine += colors[ccolours[1]](new Array(width).join(barTypes[0]));
 
-            width = parseInt(process.stdout.columns * data[k][keys[2]] / sum);
+            width = Math.floor(process.stdout.columns * data[k][keys[2]] / sum);
 
             dataLine += colors[ccolours[0]](new Array(width).join(barTypes[1]));
 
