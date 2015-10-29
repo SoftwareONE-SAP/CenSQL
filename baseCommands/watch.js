@@ -49,7 +49,7 @@ WatchCommandHandler.prototype.run = function(command, cParts, conn, screen, call
         }.bind(this));
 
     }.bind(this).bind(this), function(err) {
-        callback([null, null, "default"]);
+        callback([null, "", "message"]);
     })
 
 
