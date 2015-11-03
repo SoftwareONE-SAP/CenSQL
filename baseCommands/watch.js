@@ -20,7 +20,7 @@ WatchCommandHandler.prototype.run = function(command, cParts, conn, screen, call
      */
     wParts.splice(0, 1);
 
-    if(wParts.length < 1){
+    if (wParts.length < 1) {
         callback([1, "Invalid syntax! Try: '\\watch -i 5 \\al' to get a view of the alerts for the instance updating every 5 seconds", "message"])
         return;
     }
@@ -31,18 +31,42 @@ WatchCommandHandler.prototype.run = function(command, cParts, conn, screen, call
     this.delay = this.getDelay(wParts);
 
     /**
+     * Save that we're now running
+     * @type {Boolean}
+     */
+    this.running = true;
+
+    /**
+     * Start the main loops
+     */
+    this.loop(wParts.join(" "), screen, callback);
+    this.listenForExit();
+
+}
+
+WatchCommandHandler.prototype.loop = function(command, screen, callback) {
+
+    /**
      * Whilst the user does not want to quit, run the command constantly
      */
     async.whilst(function() {
-        return !GLOBAL.SHOULD_EXIT
-    }, function(next) {
+        return this.running
+    }.bind(this), function(next) {
+
+        /**
+         * We shall need to call this exsternally to finally end this when the user exits
+         */
+        this.mainLoopCallback = next;
 
         /**
          * Run the command and get the output
          */
-        this.runCommand(wParts.join(" "), screen, function() {
+        this.runCommand(command, screen, function() {
 
-            setTimeout(function() {
+            /**
+             * Wait to to run again
+             */
+            this.delayTimeout = setTimeout(function() {
                 next();
             }, this.delay);
 
@@ -51,27 +75,71 @@ WatchCommandHandler.prototype.run = function(command, cParts, conn, screen, call
     }.bind(this).bind(this), function(err) {
         callback([null, "", "message"]);
     })
-
-
 }
 
-WatchCommandHandler.prototype.getDelay = function(wParts){
+WatchCommandHandler.prototype.listenForExit = function() {
+
+    /**
+     * Constantly check if we should exit. (This should probably be replaced with an event system one day)
+     */
+    async.whilst(function() {
+        return !GLOBAL.SHOULD_EXIT
+    }, function(next) {
+
+        /**
+         * Check again in 10ms
+         */
+        setTimeout(next, 10);
+
+    }.bind(this).bind(this), function(err) {
+
+        /**
+         * We should exit now!
+         */
+        
+        // console.log("Done listening for exit!");
+
+        /**
+         * Stop the main loop
+         */
+        this.running = false;
+
+        /**
+         * Kill the current delay
+         */
+        if(this.delayTimeout){
+
+            /**
+             * Get rid of the wait for the enxt loop
+             */
+            clearTimeout(this.delayTimeout);
+
+            /**
+             * End the main loop's last call
+             */
+            setTimeout(this.mainLoopCallback, 0);
+        }
+
+    }.bind(this))
+}
+
+WatchCommandHandler.prototype.getDelay = function(wParts) {
     var minDelay = 0.1;
     var defaultTime = 2000;
 
     for (var i = 0; i < wParts.length - 1; i++) {
-        if(wParts[i] == "-i" || wParts[i] == "--interval"){
-            
+        if (wParts[i] == "-i" || wParts[i] == "--interval") {
+
             /**
              * Get the delay
              */
             var delay = parseFloat(wParts[i + 1]);
 
-            if(isNaN(delay)){
+            if (isNaN(delay)) {
                 delay = 1;
             }
 
-            if(delay < minDelay){
+            if (delay < minDelay) {
                 delay = minDelay;
             }
 
@@ -87,9 +155,9 @@ WatchCommandHandler.prototype.getDelay = function(wParts){
     return defaultTime;
 }
 
-WatchCommandHandler.prototype.runCommand = function(command, screen, callback){
-    
-    this.commandHandler.onCommand(command, function(output){
+WatchCommandHandler.prototype.runCommand = function(command, screen, callback) {
+
+    this.commandHandler.onCommand(command, function(output) {
         screen.clear();
 
         screen.printCommandOutput(command, output, true);

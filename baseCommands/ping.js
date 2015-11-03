@@ -1,81 +1,155 @@
 var async = require("async")
 
-var PingCommandHandler = function(){
-	this.description = "Ping the HANA instance by making a new connection";
+var PingCommandHandler = function() {
+    this.description = "Ping the HANA instance by making a new connection";
 }
 
-PingCommandHandler.prototype.run = function(command, cParts, conn, screen, callback){
-	this.conn = conn;
+PingCommandHandler.prototype.run = function(command, cParts, conn, screen, callback) {
+    this.conn = conn;
 
-	var isForever = cParts[1] == "-f" || cParts[1] == "--forever";
-	var delay = (cParts[2] && parseFloat(cParts[2]) > 0 ? parseFloat(cParts[2]) * 1000 : 500);
+    /**
+     * Get command arguments
+     */
+    var isForever = cParts[1] == "-f" || cParts[1] == "--forever";
+    var delay = (cParts[2] && parseFloat(cParts[2]) > 0 ? parseFloat(cParts[2]) * 1000 : 500);
 
-	var pings = [];
+    /**
+     * Is the command being ran in in constant ping mode
+     */
+    if (isForever) {
 
-	/**
-	 * Is the command being ran in in constant ping mode
-	 */
-	if(isForever){
+        /**
+         * Allow the user to ^C out
+         */
+        process.stdin.resume();
 
-		/**
-		 * Allow the user to ^C out
-		 */
-		process.stdin.resume();
+        /**
+         * Save that we're now running
+         * @type {Boolean}
+         */
+        this.running = true;
 
-		/**
-		 * Whilst the user does not want to quit, ping constantly
-		 */
-		async.whilst(function(){return !GLOBAL.SHOULD_EXIT}, function(next){
+        /**
+         * Start the main loops
+         */
+        this.loop(delay, callback);
+        this.listenForExit();
 
-			this.ping(function(diff){
+        /**
+         * Run the command once
+         */
+    } else {
 
-				console.log("Ping Time (ms): " + diff)
+        this.ping(function(diff) {
 
-				/** 
-				 * Store all ping times so we can generate an average
-				 */
-				pings.push(diff);
+            callback([0, "Ping Time (ms): " + diff, "message"]);
 
-				setTimeout(function(){
-					next();
-				}, delay);
+        });
 
-			});
-
-		}.bind(this), function(err){
-			/**
-			 * Calculate average and display to user
-			 */
-			callback([null, "\nAverage: " + parseInt(pings.reduce(function(a, b) { return a + b; }) / pings.length), "message"]);
-		})
-
-	/**
-	 * Run the command once
-	 */
-	}else{
-
-		this.ping(function(diff){
-
-			callback([0, "Ping Time (ms): " + diff, "message"]);
-
-		});
-
-	}
+    }
 
 }
 
-PingCommandHandler.prototype.ping = function(callback){
-	var startTime = new Date().getTime();
+PingCommandHandler.prototype.loop = function(delay, callback) {
+    var pings = [];
 
-	this.conn.cloneConnection("conn", "ping-conn", function(){
+    /**
+     * Whilst the user does not want to quit, ping constantly
+     */
+    async.whilst(function() {
+        return this.running
+    }.bind(this), function(next) {
 
-		this.conn.close("ping-conn");
+    	/**
+         * We shall need to call this exsternally to finally end this when the user exits
+         */
+    	this.mainLoopCallback = next
 
-		var diff = new Date().getTime() - startTime;
+    	/**
+    	 * Run ping
+    	 */
+        this.ping(function(diff) {
 
-		callback(diff);
+            console.log("Ping Time (ms): " + diff)
 
-	}.bind(this));
+            /** 
+             * Store all ping times so we can generate an average
+             */
+            pings.push(diff);
+
+            this.delayTimeout = setTimeout(function() {
+                next();
+            }, delay);
+
+        }.bind(this));
+
+    }.bind(this), function(err) {
+        /**
+         * Calculate average and display to user
+         */
+        callback([null, "\nAverage: " + parseInt(pings.reduce(function(a, b) {
+            return a + b;
+        }) / pings.length), "message"]);
+    })
+}
+
+PingCommandHandler.prototype.listenForExit = function(){
+	/**
+     * Constantly check if we should exit. (This should probably be replaced with an event system one day)
+     */
+    async.whilst(function() {
+        return !GLOBAL.SHOULD_EXIT
+    }, function(next) {
+
+        /**
+         * Check again in 10ms
+         */
+        setTimeout(next, 10);
+
+    }.bind(this).bind(this), function(err) {
+
+        /**
+         * We should exit now!
+         */
+        
+        // console.log("Done listening for exit!");
+
+        /**
+         * Stop the main loop
+         */
+        this.running = false;
+
+        /**
+         * Kill the current delay
+         */
+        if(this.delayTimeout){
+
+            /**
+             * Get rid of the wait for the enxt loop
+             */
+            clearTimeout(this.delayTimeout);
+
+            /**
+             * End the main loop's last call
+             */
+            setTimeout(this.mainLoopCallback, 0);
+        }
+
+    }.bind(this))
+}
+
+PingCommandHandler.prototype.ping = function(callback) {
+    var startTime = new Date().getTime();
+
+    this.conn.cloneConnection("conn", "ping-conn", function() {
+
+        this.conn.close("ping-conn");
+
+        var diff = new Date().getTime() - startTime;
+
+        callback(diff);
+
+    }.bind(this));
 }
 
 module.exports = PingCommandHandler;

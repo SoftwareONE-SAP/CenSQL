@@ -113,6 +113,10 @@ ScreenManager.prototype.setupInput = function() {
                  */
                 process.stdin.pause();
 
+                /**
+                 * Save that we already have a running process
+                 * @type {Boolean}
+                 */
                 GLOBAL.censql.RUNNING_PROCESS = true;
 
                 /**
@@ -147,6 +151,11 @@ ScreenManager.prototype.setupInput = function() {
                      * @type {Boolean}
                      */
                     GLOBAL.censql.RUNNING_PROCESS = false;
+
+                    /**
+                     * Should the running process exit?
+                     * @type {Boolean}
+                     */
                     GLOBAL.SHOULD_EXIT = false;
 
                     /**
@@ -320,7 +329,7 @@ ScreenManager.prototype.print = function(message) {
     }
 }
 
-ScreenManager.prototype.clear = function(){
+ScreenManager.prototype.clear = function() {
     charm.erase("screen");
     charm.position(0, 0);
 }
