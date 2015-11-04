@@ -1,4 +1,4 @@
-#!/usr/local/bin/node
+#!/usr/bin/env node
 
 var ScreenManager = require("./util/ScreenManager.js");
 var CommandHandler = require("./util/CommandHandler.js");
