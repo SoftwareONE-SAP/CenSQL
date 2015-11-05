@@ -67,6 +67,7 @@ HelpCommandHandler.prototype.run = function(command, cParts, conn, screen, callb
                 colors.bold("Formatting:") + colors.grey(" Added onto the end of a query, for example: 'SELECT 1 FROM DUMMY\\g'"),
                 "\t\\g - Group output into each piece of data to it's own row",
                 "\t\\j - Display the data in JSON",
+                "\t\\jj - Display the data in pretty JSON",
                 "",
                 "Settings (Such as graph height) are saved to file in the current user's home folder in '.censql' not in HANA."
             ].join("\n"),

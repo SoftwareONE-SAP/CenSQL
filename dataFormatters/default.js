@@ -6,12 +6,8 @@ module.exports = function(command, data, title, settings){
 
 	if(formatterIndex !== -1){
 		formatterTag = command.slice(formatterIndex).substring(1);
-
-		if(formatterTag.length === 0){
-			formatterTag = "table";
-		}
 	}
-	
+
 	switch(formatterTag.toLowerCase().split(" ")[0]){
 		case "g":
 			return require("./group.js")(command, data);
@@ -19,6 +15,10 @@ module.exports = function(command, data, title, settings){
 
 		case "j":
 			return require("./json.js")(command, data);
+			break;
+
+		case "jj":
+			return require("./pretty-json.js")(command, data);
 			break;
 
 		case "m":
