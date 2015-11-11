@@ -49,6 +49,8 @@ HelpCommandHandler.prototype.run = function(command, cParts, conn, screen, callb
                 "\t\\rep\t\t\t- Show current replication status",
                 "\t\\stor\t\t\t- Show the current storage usage",
                 "\t\\disk\t\t\t- Show info about the disks",
+                "\t\\wl\t\t\t- Show the current instance workload ('current' being the last time HANA updated this metric)",
+                "\t\\pwl\t\t\t- Show the peak instance workload",
                 "",
                 colors.bold("\tHelper Commands:"),
                 "\t\\sgh\t\t\t\t\t - Set the height to draw graphs",
