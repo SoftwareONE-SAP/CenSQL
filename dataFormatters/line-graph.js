@@ -107,11 +107,11 @@ module.exports = function(command, data, title, settings, amountOfHours) {
         /**
          * Start creating graph
          */
-        for (var k = 0; k < data.length; k++) {
+        for (var k = data.length - 1; k >= 0; k--) {
 
             if (data[k][keys[4]] !== sections[s]) continue;
 
-            var val = parseInt(((data[k][keys[5]] - minValue) / (maxValue - minValue)) * settings.plotHeight);
+            var val = settings.plotHeight - parseInt(((data[k][keys[5]] - minValue) / (maxValue - minValue)) * settings.plotHeight);
             // var percentInGraph = parseInt(((maxTime - data[k].timeDateEpoch) / totalTimeDiff) * (amountOfHours + 1))
 
             // var percentInGraph = parseInt((((maxTime - minTime) - (data[k].timeDateEpoch - minTime)) / 100) * amountOfHours)
