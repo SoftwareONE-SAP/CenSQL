@@ -142,7 +142,10 @@ CommandHandler.prototype.splitStringBySemicolon = function(s) {
 CommandHandler.prototype.stripFormatterIdentifiers = function(string){
     for (var i = 0; i < this.screen.formattersNames.length; i++) {
 
-        if(string.substr(string.length - this.screen.formattersNames[i].length, this.screen.formattersNames[i].length) == this.screen.formattersNames[i]){
+        var formatter = string.slice(string.lastIndexOf("\\")).substring(1)
+
+        if(formatter.toLowerCase() == this.screen.formattersNames[i].toLowerCase()){
+
             return string.substr(0, string.length - this.screen.formattersNames[i].length - 1);
         }
     };
