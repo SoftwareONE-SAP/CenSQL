@@ -11,7 +11,7 @@ InsertsPerSecondHandler.prototype.run = function(command, cParts, conn, screen, 
 	 * Get command arguments
 	 */
 	var isForever = cParts[2] == "-f" || cParts[2] == "--forever";
-	this.schemaName = cParts[1];
+	this.schemaName = cParts[1] || "%";
 	this.delay = (cParts[3] && parseFloat(cParts[3]) > 0 ? parseFloat(cParts[3]) * 1000 : 2000);
 
 	/**
