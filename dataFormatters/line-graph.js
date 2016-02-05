@@ -4,7 +4,7 @@ var moment = require("moment");
 module.exports = function(command, data, title, settings, amountOfHours) {
 
     var lines = [];
-    var emptyPointChar = "·";
+    var emptyPointChar = "-";
     var filledPointChar = "■";
     // amountOfHours = amountOfHours + 1;
 
@@ -54,6 +54,10 @@ module.exports = function(command, data, title, settings, amountOfHours) {
          */
         var maxValue = 0;
         var minValue = Number.MAX_VALUE;
+
+        if(!settings.relativeGraphs && command.indexOf("-r") == -1){
+            minValue = 0;
+        }
 
         for (var k = 0; k < data.length; k++) {
 
@@ -180,7 +184,7 @@ module.exports = function(command, data, title, settings, amountOfHours) {
 
                     if (!plot[y][o]) plot[y][o] = "!"
 
-                    if (plot[y][o] === "■") {
+                    if (plot[y][o] === filledPointChar) {
                         plot[y][o] = colors.cyan(plot[y][o])
                     } else {
                         plot[y][o] = colors.magenta(plot[y][o])

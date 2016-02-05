@@ -42,11 +42,27 @@ CommandHandler.prototype.onCommand = function(enteredCommand, allCallback) {
      */
     async.mapSeries(this.splitStringBySemicolon(enteredCommand), function(command, callback) {
 
+        var cSegs = command.split("||");
+
+        var initialCommand = "";
+
+        //- /[^\\]\|/        
+
+        for (var i = 0; i < cSegs.length; i++) {
+            var splitOnPipes = cSegs[i].split(/[^\\]\|/);
+
+            initialCommand += splitOnPipes[0] + "||";
+
+            if(splitOnPipes.length > 1){
+                break;
+            }
+        };
+
         /**
          * The initial command before any pipes
          * @type {String}
          */
-        var initialCommand = command.replace(/([^\\])\|/g, "$1$1|").split(/[^\\]\|/)[0].trim();
+        initialCommand = initialCommand.substring(0, initialCommand.length - 2).trim();
 
         /**
          * The parts of the command

@@ -256,7 +256,17 @@ ScreenManager.prototype.printCommandOutput = function(command, output, noCursor)
     /**
      * Split command part by unescaped pipes
      */
-    var commandParts = command.replace(/([^\\])\|/g, "$1$1|").split(/[^\\]\|/);
+    var commandParts = [];
+
+    var cSegs = command.split("||");
+
+    //- /[^\\]\|/        
+
+    for (var i = 0; i < cSegs.length; i++) {
+        var splitOnPipes = cSegs[i].split(/[^\\]\|/);
+
+        commandParts.concat(splitOnPipes)
+    };
 
     for (var i = 0; i < output.length; i++) {
 

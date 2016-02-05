@@ -12,6 +12,8 @@ var fs = require("fs");
 
 var CenSql = function() {
 
+    process.browser = true;
+
     /**
      * get a global object for storing flags in
      */
@@ -89,6 +91,7 @@ CenSql.prototype.getSettings = function() {
      */
     if (!settings.plotHeight) settings.plotHeight = 11;
     if (!settings.barHeight) settings.barHeight = 1;
+    if (!"relativeGraphs" in settings) settings.relativeGraphs = false;
 
     /**
      * Save the defaults
