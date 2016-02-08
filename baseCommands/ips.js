@@ -71,14 +71,14 @@ InsertsPerSecondHandler.prototype.loop = function(callback) {
 		 */
 		this.getInsertsPerSecond(function(data) {
 
-			console.log("Current count: " + data.Count + ". Inserts per second: " + data.InsertsPerSecond)
+			if (this.running) {
+				console.log("Current count: " + data.Count + ". Inserts per second: " + data.InsertsPerSecond)
 
-			/** 
-			 * Store all ping times so we can generate an average
-			 */
-			counts.push(data.InsertsPerSecond);
+				/** 
+				 * Store all ping times so we can generate an average
+				 */
+				counts.push(data.InsertsPerSecond);
 
-			if(this.running){
 				this.delayTimeout = setTimeout(function() {
 					next();
 				}, 100);
@@ -87,6 +87,9 @@ InsertsPerSecondHandler.prototype.loop = function(callback) {
 		}.bind(this));
 
 	}.bind(this), function(err) {
+
+		if(counts.length == 0) counts = [0];
+
 		/**
 		 * Calculate average and display to user
 		 */
@@ -156,7 +159,10 @@ InsertsPerSecondHandler.prototype.getInsertsPerSecond = function(callback) {
 			this.conn.exec("conn", "SELECT SUM(RECORD_COUNT) AS ROW_COUNT FROM SYS.M_CS_TABLES WHERE SCHEMA_NAME LIKE '" + this.schemaName + "'", function(err, data) {
 				if (err) throw err;
 
-				callback({Count: data[0]['ROW_COUNT'], InsertsPerSecond: parseInt((data[0]['ROW_COUNT'] - startCount) / ((new Date().getTime() - startTime) / 1000))});
+				callback({
+					Count: data[0]['ROW_COUNT'],
+					InsertsPerSecond: parseInt((data[0]['ROW_COUNT'] - startCount) / ((new Date().getTime() - startTime) / 1000))
+				});
 			}.bind(this))
 
 		}.bind(this), this.delay);

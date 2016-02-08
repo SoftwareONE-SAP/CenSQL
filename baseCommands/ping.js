@@ -60,30 +60,37 @@ PingCommandHandler.prototype.loop = function(delay, callback) {
         return this.running
     }.bind(this), function(next) {
 
-    	/**
+        /**
          * We shall need to call this exsternally to finally end this when the user exits
          */
-    	this.mainLoopCallback = next
+        this.mainLoopCallback = next
 
-    	/**
-    	 * Run ping
-    	 */
+        /**
+         * Run ping
+         */
         this.ping(function(diff) {
 
-            console.log("Ping Time (ms): " + diff)
+            if (this.running) {
 
-            /** 
-             * Store all ping times so we can generate an average
-             */
-            pings.push(diff);
+                console.log("Ping Time (ms): " + diff)
 
-            this.delayTimeout = setTimeout(function() {
-                next();
-            }, delay);
+                /** 
+                 * Store all ping times so we can generate an average
+                 */
+                pings.push(diff);
+
+                this.delayTimeout = setTimeout(function() {
+                    next();
+                }, delay);
+
+            }
 
         }.bind(this));
 
     }.bind(this), function(err) {
+
+        if(pings.length == 0) pings = [-1];
+
         /**
          * Calculate average and display to user
          */
@@ -93,8 +100,8 @@ PingCommandHandler.prototype.loop = function(delay, callback) {
     })
 }
 
-PingCommandHandler.prototype.listenForExit = function(){
-	/**
+PingCommandHandler.prototype.listenForExit = function() {
+    /**
      * Constantly check if we should exit. (This should probably be replaced with an event system one day)
      */
     async.whilst(function() {
@@ -111,7 +118,7 @@ PingCommandHandler.prototype.listenForExit = function(){
         /**
          * We should exit now!
          */
-        
+
         // console.log("Done listening for exit!");
 
         /**
@@ -122,7 +129,7 @@ PingCommandHandler.prototype.listenForExit = function(){
         /**
          * Kill the current delay
          */
-        if(this.delayTimeout){
+        if (this.delayTimeout) {
 
             /**
              * Get rid of the wait for the enxt loop
