@@ -263,13 +263,6 @@ ScreenManager.prototype.printCommandOutput = function(command, output, noCursor)
     for (var i = 0; i < cSegs.length; i++) {
         var splitOnPipes = cSegs[i].split(/[^\\]\|/);
 
-        commandParts = commandParts.concat(splitOnPipes);
-    };
-
-
-    for (var i = 0; i < cSegs.length; i++) {
-        var splitOnPipes = cSegs[i].split(/[^\\]\|/);
-
         commandParts.concat(splitOnPipes)
     };
 

@@ -110,15 +110,21 @@ CommandHandler.prototype.runInternalCommand = function(command, cParts, callback
     
     cParts[0] = this.stripFormatterIdentifiers(cParts[0].substring(1, cParts[0].length));
 
+    var aParts = [];
+
+    for (var i = 0; i < cParts.length; i++) {
+        aParts = aParts.concat(cParts[i].split(" "));
+    };
+
     /**
      * Does baseCommand exist?
      */
-    if (!this.handlers[cParts[0]]) {
+    if (!this.handlers[aParts[0]]) {
         callback(null, [1, null, "Invalid command! Try \\h", "message"]);
         return;
     }
 
-    this.handlers[cParts[0]].run(command, cParts, this.conn, this.screen, function(data) {
+    this.handlers[aParts[0]].run(command, aParts, this.conn, this.screen, function(data) {
         data.unshift(command);
         callback(null, data)
     });
