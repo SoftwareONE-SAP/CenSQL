@@ -46,16 +46,20 @@ CommandHandler.prototype.onCommand = function(enteredCommand, allCallback) {
 
         var initialCommand = "";
 
+        /**
+         * The parts of the command
+         * @type {String[]}
+         */
+        var cParts = [];
+
         //- /[^\\]\|/        
 
         for (var i = 0; i < cSegs.length; i++) {
             var splitOnPipes = cSegs[i].split(/[^\\]\|/);
 
-            initialCommand += splitOnPipes[0] + "||";
+            initialCommand += cSegs[i] + "||";
 
-            if(splitOnPipes.length > 1){
-                break;
-            }
+            cParts = cParts.concat(splitOnPipes);
         };
 
         /**
@@ -63,12 +67,6 @@ CommandHandler.prototype.onCommand = function(enteredCommand, allCallback) {
          * @type {String}
          */
         initialCommand = initialCommand.substring(0, initialCommand.length - 2).trim();
-
-        /**
-         * The parts of the command
-         * @type {String[]}
-         */
-        var cParts = initialCommand.split(/\\| /);
 
         /**
          * Is the command an internal command? (Does it start with a '\')
@@ -109,8 +107,8 @@ CommandHandler.prototype.onCommand = function(enteredCommand, allCallback) {
  * Run a non SQL command from the 'baseCommands' folder
  */
 CommandHandler.prototype.runInternalCommand = function(command, cParts, callback) {
-
-    cParts.splice(0, 1);
+    
+    cParts[0] = this.stripFormatterIdentifiers(cParts[0].substring(1, cParts[0].length));
 
     /**
      * Does baseCommand exist?
@@ -156,6 +154,7 @@ CommandHandler.prototype.splitStringBySemicolon = function(s) {
 }
 
 CommandHandler.prototype.stripFormatterIdentifiers = function(string){
+
     for (var i = 0; i < this.screen.formattersNames.length; i++) {
 
         var formatter = string.slice(string.lastIndexOf("\\")).substring(1)
