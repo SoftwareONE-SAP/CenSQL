@@ -253,18 +253,55 @@ ScreenManager.prototype.printCommandOutput = function(command, output, noCursor)
      */
     process.stdin.resume();
 
-    /**
-     * Split command part by unescaped pipes
-     */
-    var commandParts = [];
+    var cSegs = command.split("||");
 
-    var cSegs = command.split("||");   
+    var initialCommand = "";
+
+    /**
+     * The parts of the command
+     * @type {String[]}
+     */
+    var cParts = [];
+
+    var hasReachedPipe = false;
 
     for (var i = 0; i < cSegs.length; i++) {
         var splitOnPipes = cSegs[i].split(/[^\\]\|/);
 
-        commandParts.concat(splitOnPipes)
+        // console.log(splitOnPipes)
+
+        if (!hasReachedPipe) {
+
+            if (splitOnPipes.length > 1) {
+
+                hasReachedPipe = true;
+
+                initialCommand += splitOnPipes[0];
+
+                splitOnPipes.shift()
+
+            } else {
+
+                initialCommand += cSegs[i];
+
+                if (i + 1 < cSegs.length) {
+                    initialCommand += " || ";
+                }
+
+            }
+        }
+
+        if (hasReachedPipe) {
+            cParts = cParts.concat(splitOnPipes);
+        }
+
     };
+
+    cParts.unshift(initialCommand);
+
+    // console.log(initialCommand);
+    // console.log(cParts);
+
 
     for (var i = 0; i < output.length; i++) {
 
@@ -272,7 +309,7 @@ ScreenManager.prototype.printCommandOutput = function(command, output, noCursor)
          * Pass the data to the chosen formatter
          */
         var lines = this.formatters[output[i][3]](output[i][0], output[i][2], output[i][4], this.settings, output[i][5], output[i][6], output[i][7]);
-        var pipedLines = this.processPipes(lines, commandParts, this.settings);
+        var pipedLines = this.processPipes(lines, cParts, this.settings);
         this.renderLines(pipedLines);
     };
 

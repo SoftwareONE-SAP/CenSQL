@@ -52,21 +52,40 @@ CommandHandler.prototype.onCommand = function(enteredCommand, allCallback) {
          */
         var cParts = [];
 
-        //- /[^\\]\|/        
+        var hasReachedPipe = false;
 
         for (var i = 0; i < cSegs.length; i++) {
             var splitOnPipes = cSegs[i].split(/[^\\]\|/);
 
-            initialCommand += cSegs[i] + "||";
+            // console.log(splitOnPipes)
 
-            cParts = cParts.concat(splitOnPipes);
+            if (!hasReachedPipe) {
+
+                if (splitOnPipes.length > 1) {
+                    hasReachedPipe = true;
+
+                    initialCommand += splitOnPipes[0];
+
+                    splitOnPipes.shift()
+                } else {
+                    initialCommand += cSegs[i];
+
+                    if (i + 1 < cSegs.length) {
+                        initialCommand += " || ";
+                    }
+                }
+            }
+
+            if (hasReachedPipe) {
+                cParts = cParts.concat(splitOnPipes);
+            }
+
         };
 
-        /**
-         * The initial command before any pipes
-         * @type {String}
-         */
-        initialCommand = initialCommand.substring(0, initialCommand.length - 2).trim();
+        cParts.unshift(initialCommand);
+
+        // console.log(initialCommand);
+        // console.log(cParts);
 
         /**
          * Is the command an internal command? (Does it start with a '\')
@@ -107,7 +126,7 @@ CommandHandler.prototype.onCommand = function(enteredCommand, allCallback) {
  * Run a non SQL command from the 'baseCommands' folder
  */
 CommandHandler.prototype.runInternalCommand = function(command, cParts, callback) {
-    
+
     cParts[0] = this.stripFormatterIdentifiers(cParts[0].substring(1, cParts[0].length));
 
     var aParts = [];
@@ -159,13 +178,13 @@ CommandHandler.prototype.splitStringBySemicolon = function(s) {
     return commands;
 }
 
-CommandHandler.prototype.stripFormatterIdentifiers = function(string){
+CommandHandler.prototype.stripFormatterIdentifiers = function(string) {
 
     for (var i = 0; i < this.screen.formattersNames.length; i++) {
 
         var formatter = string.slice(string.lastIndexOf("\\")).substring(1)
 
-        if(formatter.toLowerCase() == this.screen.formattersNames[i].toLowerCase()){
+        if (formatter.toLowerCase() == this.screen.formattersNames[i].toLowerCase()) {
 
             return string.substr(0, string.length - this.screen.formattersNames[i].length - 1);
         }
