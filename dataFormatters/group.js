@@ -7,12 +7,12 @@ module.exports = function(command, data) {
      */
     var keys = [];
 
-    if (data.length > 0) {
+    if (!(!data || data.length == 0 || !data[0])) {
 
         keys = Object.keys(data[0]);
     } else {
         renderedLines.push("No Results\n");
-        return lines;
+        return renderedLines;
     }
 
     keys.reverse()

@@ -4,7 +4,7 @@ module.exports = function(command, data) {
 
     var lines = [];
 
-    if (!data || data.length == 0) {
+    if (!data || data.length == 0 || !data[0]) {
         lines.push("No Results\n");
         return lines;
     }
