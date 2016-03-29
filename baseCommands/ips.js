@@ -12,42 +12,61 @@ InsertsPerSecondHandler.prototype.run = function(command, cParts, conn, screen, 
 	 */
 	var isForever = cParts[2] == "-f" || cParts[2] == "--forever";
 	this.schemaName = cParts[1] || "%";
-	this.delay = (cParts[3] && parseFloat(cParts[3]) > 0 ? parseFloat(cParts[3]) * 1000 : 2000);
+	this.delay = (cParts[(isForever ? 3 : 2)] && parseFloat(cParts[(isForever ? 3 : 2)]) > 0 ? parseFloat(cParts[(isForever ? 3 : 2)]) * 1000 : 2000);
 
-	/**
-	 * Is the command being ran in in constant mode
-	 */
-	if (isForever) {
+	this.lastAmountOfRows = -1;
+	this.lastCheckTime = null;
 
-		/**
-		 * Allow the user to ^C out
-		 */
-		process.stdin.resume();
+	this.init(function() {
 
 		/**
-		 * Save that we're now running
-		 * @type {Boolean}
+		 * Is the command being ran in in constant mode
 		 */
-		this.running = true;
+		if (isForever) {
 
-		/**
-		 * Start the main loops
-		 */
-		this.loop(callback);
-		this.listenForExit();
+			/**
+			 * Allow the user to ^C out
+			 */
+			process.stdin.resume();
 
-		/**
-		 * Run the command once
-		 */
-	} else {
+			/**
+			 * Save that we're now running
+			 * @type {Boolean}
+			 */
+			this.running = true;
 
-		this.getInsertsPerSecond(function(data) {
+			setTimeout(function() {
 
-			callback([0, [data], "default"]);
 
-		});
+				/**
+				 * Start the main loops
+				 */
+				this.loop(callback);
 
-	}
+
+				this.listenForExit();
+
+			}.bind(this), this.delay)
+
+
+			/**
+			 * Run the command once
+			 */
+		} else {
+
+			setTimeout(function() {
+
+				this.getInsertsPerSecond(function(data) {
+
+					callback([0, [data], "default"]);
+
+				});
+
+			}.bind(this), this.delay);
+
+		}
+
+	}.bind(this));
 
 }
 
@@ -81,17 +100,17 @@ InsertsPerSecondHandler.prototype.loop = function(callback) {
 
 				this.delayTimeout = setTimeout(function() {
 					next();
-				}, 100);
+				}, this.delay);
 			}
 
 		}.bind(this));
 
 	}.bind(this), function(err) {
 
-		if(counts.length == 0) counts = [0];
+		if (counts.length == 0) counts = [0];
 
 		/**
-		 * Calculate average and display to user
+		 * Calculate average/sum and display to user
 		 */
 		callback([null, "\nAverage: " + parseInt(counts.reduce(function(a, b) {
 			return a + b;
@@ -151,24 +170,32 @@ InsertsPerSecondHandler.prototype.getInsertsPerSecond = function(callback) {
 	this.conn.exec("conn", "SELECT SUM(RECORD_COUNT) AS ROW_COUNT FROM SYS.M_CS_TABLES WHERE SCHEMA_NAME LIKE '" + this.schemaName + "'", function(err, data) {
 		if (err) throw err;
 
-		var startCount = data[0]['ROW_COUNT'];
+		var ips = parseInt((data[0]['ROW_COUNT'] - this.lastAmountOfRows) / ((new Date().getTime() - this.lastCheckTime) / 1000));
 
-		var startTime = new Date().getTime()
+		this.lastAmountOfRows = data[0]['ROW_COUNT'];
 
-		setTimeout(function() {
-			this.conn.exec("conn", "SELECT SUM(RECORD_COUNT) AS ROW_COUNT FROM SYS.M_CS_TABLES WHERE SCHEMA_NAME LIKE '" + this.schemaName + "'", function(err, data) {
-				if (err) throw err;
+		this.lastCheckTime = new Date().getTime()
 
-				callback({
-					Count: data[0]['ROW_COUNT'],
-					InsertsPerSecond: parseInt((data[0]['ROW_COUNT'] - startCount) / ((new Date().getTime() - startTime) / 1000))
-				});
-			}.bind(this))
-
-		}.bind(this), this.delay);
+		callback({
+			Count: this.lastAmountOfRows,
+			InsertsPerSecond: ips
+		});
 
 	}.bind(this))
 
+}
+
+InsertsPerSecondHandler.prototype.init = function(callback) {
+	this.conn.exec("conn", "SELECT SUM(RECORD_COUNT) AS ROW_COUNT FROM SYS.M_CS_TABLES WHERE SCHEMA_NAME LIKE '" + this.schemaName + "'", function(err, data) {
+		if (err) throw err;
+
+		this.lastAmountOfRows = data[0]['ROW_COUNT'];
+
+		this.lastCheckTime = new Date().getTime()
+
+		callback();
+
+	}.bind(this))
 }
 
 module.exports = InsertsPerSecondHandler;
