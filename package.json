@@ -1,7 +1,7 @@
 {
   "name": "censql",
-  "version": "1.5.5",
-  "description": "A CLI application for SAP HANA",
+  "version": "1.5.6",
+  "description": "A CLI client for SAP HANA",
   "main": "./app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
