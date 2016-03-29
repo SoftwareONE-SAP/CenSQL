@@ -8,8 +8,9 @@ var CommandHandler = function(screen, conn, command) {
 
     if (command) {
         this.onCommand(command, function(output) {
-            this.screen.printCommandOutput(command, output);
-            process.exit(0)
+            this.screen.printCommandOutput(command, output, function(){
+                process.exit(0)
+            });
         }.bind(this));
     }
 

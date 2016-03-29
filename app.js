@@ -149,7 +149,7 @@ CenSql.prototype.createScreen = function(settings, callback) {
      */
     this.screen = new ScreenManager(
         // Command if given
-        argv.command,
+        !!argv.command,
         settings,
 
         // Command Handler

@@ -2,6 +2,7 @@ var readline = require('historic-readline');
 var charm = require('charm')(process.stdout);
 var colors = require("colors");
 var path = require('path');
+var async = require('async');
 var stripColorCodes = require('stripcolorcodes');
 var osHomedir = require('os-homedir');
 
@@ -144,24 +145,31 @@ ScreenManager.prototype.setupInput = function() {
                     /**
                      * Print the command to the screen however the command handler thinks is best
                      */
-                    this.printCommandOutput(line, output);
+                    this.printCommandOutput(line, output, function() {
+                        
+                        /**
+                         * Re-enable the command line
+                         */
+                        process.stdin.resume();
 
-                    /**
-                     * Reset running app state
-                     * @type {Boolean}
-                     */
-                    GLOBAL.censql.RUNNING_PROCESS = false;
+                        /**
+                         * Reset running app state
+                         * @type {Boolean}
+                         */
+                        GLOBAL.censql.RUNNING_PROCESS = false;
 
-                    /**
-                     * Should the running process exit?
-                     * @type {Boolean}
-                     */
-                    GLOBAL.SHOULD_EXIT = false;
+                        /**
+                         * Should the running process exit?
+                         * @type {Boolean}
+                         */
+                        GLOBAL.SHOULD_EXIT = false;
 
-                    /**
-                     * Reset the keypress function for stdin
-                     */
-                    process.stdin._events.keypress = process.stdin._events._keypress_full;
+                        /**
+                         * Reset the keypress function for stdin
+                         */
+                        process.stdin._events.keypress = process.stdin._events._keypress_full;
+
+                    }.bind(this));
 
                 }.bind(this));
 
@@ -244,14 +252,9 @@ ScreenManager.prototype.ready = function() {
 /**
  * Print the output to a command entered by the user
  * @param  {String} command The command the user ran
- * @param  {Array} output  the data and how to display it
+ * @param  {Array} outputs  the data and how to display it
  */
-ScreenManager.prototype.printCommandOutput = function(command, output, noCursor) {
-
-    /**
-     * Re-enable the command line
-     */
-    process.stdin.resume();
+ScreenManager.prototype.printCommandOutput = function(command, outputs, callback) {
 
     var cSegs = command.split("||");
 
@@ -303,22 +306,25 @@ ScreenManager.prototype.printCommandOutput = function(command, output, noCursor)
     // console.log(cParts);
 
 
-    for (var i = 0; i < output.length; i++) {
-
+    async.mapSeries(outputs, function(output, callback) {
         /**
          * Pass the data to the chosen formatter
          */
-        var lines = this.formatters[output[i][3]](output[i][0], output[i][2], output[i][4], this.settings, output[i][5], output[i][6], output[i][7]);
+        var lines = this.formatters[output[3]](output[0], output[2], output[4], this.settings, output[5], output[6], output[7]);
         var pipedLines = this.processPipes(lines, cParts, this.settings);
-        this.renderLines(pipedLines);
-    };
+        this.renderLines(pipedLines, callback);
+    }.bind(this), function() {
+        /**
+         * Dont display a prompt for batch requests
+         */
+        if (!this.isBatch) {
+            this.print(colors.cyan("> "));
+        }
 
-    /**
-     * Dont display a prompt for batch requests
-     */
-    if (!this.isBatch && !noCursor) {
-        this.print(colors.cyan("> "));
-    }
+        callback();
+
+    }.bind(this))
+
 }
 
 /**
@@ -348,29 +354,21 @@ ScreenManager.prototype.processPipes = function(linesIn, commandParts) {
 /**
  * Draw the data line by line, removing colour if the user requested no colour
  */
-ScreenManager.prototype.renderLines = function(lines) {
-
-    for (var i = 0; i < lines.length; i++) {
-        var line = lines[i];
-
-        if (!this.settings.colour) {
-            line = stripColorCodes(line);
-        }
-
-        console.log(line);
-
-    }
+ScreenManager.prototype.renderLines = function(lines, callback) {
+    async.mapSeries(lines, function(line, callback) {
+        this.print(line + "\n", callback);
+    }.bind(this), callback ? callback : null);
 }
 
 ScreenManager.prototype.error = function(message) {
     this.print(colors.red(message));
 }
 
-ScreenManager.prototype.print = function(message) {
+ScreenManager.prototype.print = function(message, callback) {
     if (!this.settings.colour) {
-        process.stdout.write(stripColorCodes(message));
+        process.stdout.write(stripColorCodes(message), callback ? callback : null);
     } else {
-        process.stdout.write(message);
+        process.stdout.write(message, callback ? callback : null);
     }
 }
 
