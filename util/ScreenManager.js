@@ -5,6 +5,7 @@ var path = require('path');
 var async = require('async');
 var stripColorCodes = require('stripcolorcodes');
 var osHomedir = require('os-homedir');
+var StudioSession = require("./StudioSession.js");
 
 var ScreenManager = function(isBatch, settings, commandHandler) {
     this.isBatch = isBatch;
@@ -23,6 +24,7 @@ ScreenManager.prototype.init = function() {
 
     if (!this.isBatch) {
         this.printHeader();
+        process.stdin.pause();
     }
 
     this.loadDataFormatters();
@@ -90,11 +92,12 @@ ScreenManager.prototype.setupInput = function() {
         return;
     }
 
-    readline.createInterface({
+    this.rl = readline.createInterface({
         input: process.stdin,
         output: process.stdout,
         path: path.join(osHomedir(), ".censql", "censql_hist"),
         maxLength: 2000,
+        prompt: colors.cyan("> "),
         next: function(rl) {
             this.rl = rl;
 
@@ -124,7 +127,7 @@ ScreenManager.prototype.setupInput = function() {
                  * Dont print the command if it was a batch command
                  */
                 if (!this.isBatch) {
-                    console.log("> " + line + "\n");
+                    this.print("\n> " + line + "\n");
                 }
 
                 /**
@@ -146,7 +149,7 @@ ScreenManager.prototype.setupInput = function() {
                      * Print the command to the screen however the command handler thinks is best
                      */
                     this.printCommandOutput(line, output, function() {
-                        
+
                         /**
                          * Re-enable the command line
                          */
@@ -225,9 +228,6 @@ ScreenManager.prototype.printHeader = function() {
     this.print(colors.cyan(colors.bold(colors.underline("Welcome to CenSQL for SAP HANA!\n\n\n"))));
 
     this.print(colors.yellow("Connecting to HANA..."))
-
-    process.stdin.pause();
-
 }
 
 /**
@@ -235,18 +235,19 @@ ScreenManager.prototype.printHeader = function() {
  */
 ScreenManager.prototype.ready = function() {
 
-    charm.up(1);
-    charm.erase("line");
+    this.clear()
 
     /**
-     * Todo: allow for teminals more than 9999999 chars wide
+     * Should we enter the cli or studio mode?
      */
-    charm.left(9999999);
+    if(this.settings.studio){
+        this.studio = new StudioSession(this);
+    }else{
+        this.print(colors.cyan(colors.bold("For help type \\h\n-----------------------------------------------------\n\n")));
+        this.print(colors.cyan("> "));
+        process.stdin.resume();
+    }
 
-    this.print(colors.cyan(colors.bold("For help type \\h\n-----------------------------------------------------\n\n")));
-    this.print(colors.cyan("> "));
-
-    process.stdin.resume();
 }
 
 /**
@@ -318,7 +319,7 @@ ScreenManager.prototype.printCommandOutput = function(command, outputs, callback
          * Dont display a prompt for batch requests
          */
         if (!this.isBatch) {
-            this.print(colors.cyan("> "));
+            this.print("\n" + colors.cyan("> "));
         }
 
         callback();
@@ -374,7 +375,7 @@ ScreenManager.prototype.print = function(message, callback) {
 
 ScreenManager.prototype.clear = function() {
     charm.erase("screen");
-    charm.position(0, 0);
+    charm.position(1, 1);
 }
 
 module.exports = ScreenManager;

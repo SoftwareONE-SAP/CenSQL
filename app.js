@@ -143,6 +143,7 @@ CenSql.prototype.createScreen = function(settings, callback) {
      * @type {[type]}
      */
     settings.colour = argv['nocolour'] || argv['nocolor'] ? false : true;
+    settings.studio = !!argv['studio'] || !!argv['s'];
 
     /**
      * Create screen object adn give it the command handler to handle user input
@@ -180,6 +181,8 @@ CenSql.prototype.showHelpTextIfNeeded = function(callback) {
             "--host\t\tThe host to connect to",
             "--port\t\tThe port to connect to the host with (Layout: '3<ID>15', Instance 99 would be 39915)",
             "--command\tOptionally run a command/sql without entering the interective terminal",
+            "",
+            "-s --studio\tEnter studio mode",
             "",
             "--nocolour\tdisable colour output",
             "--nocolor\talias of --no-colour",
