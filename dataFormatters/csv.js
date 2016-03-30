@@ -18,13 +18,22 @@ module.exports = function(command, data) {
     keys.reverse()
 
     for (var k = 0; k < data.length; k++) {
-        var rows = [];
+        var row = [];
 
         for (var j = keys.length - 1; j >= 0; j--) {
-            rows.push(data[k][keys[j]])
+
+            var value = data[k][keys[j]];
+
+            value = value.split('"').join('""');
+
+            if(value.indexOf(",") !== -1){
+                value = '"' + value + '"';
+            }
+
+            row.push(value)
         };
 
-        var rowString = rows.join(",");
+        var rowString = row.join(",");
 
         lines.push(rowString);
 
