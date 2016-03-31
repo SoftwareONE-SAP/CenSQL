@@ -81,6 +81,18 @@ StudioSession.prototype.onKeyPress = function(ch, key) {
 				}.bind(this),
 				"up": function() {
 					this.formatter.rotateSchemas(-1);
+				}.bind(this),
+				"right": function() {
+
+					this.studioDbHandler.getTables(this.formatter.schemas[0].SCHEMA_NAME, function(err, data){
+						if(err){
+							this.screen.error(err);
+							process.exit(1);
+						}
+
+						this.formatter.setTables(data);
+
+					}.bind(this))
 				}.bind(this)
 			}
 		},

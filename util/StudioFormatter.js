@@ -10,7 +10,7 @@ var StudioFormatter = function(screen) {
 
 	this.calculateSize();
 
-	this.refreshCheckDelay = 100;
+	this.refreshCheckDelay = 200;
 
 	this.borderTheme = "bgWhite"
 	this.sideBackgroundTheme = "bgBlue";
@@ -102,6 +102,7 @@ StudioFormatter.prototype.drawTableList = function() {
 		var yoffset = 4 + this.schemaBoxHeight;
 
 		for (var i = 0; i < Math.floor(this.tableBoxHeight / 2); i++) {
+
 			var name = pad(this.tables[i % this.tables.length].TABLE_NAME.substring(0, this.sideWidth - 3), this.sideWidth - 3);
 
 			if (i == 0) {
@@ -112,7 +113,8 @@ StudioFormatter.prototype.drawTableList = function() {
 		}
 
 		for (var i = Math.ceil(this.tableBoxHeight / 2); i > 0; i--) {
-			var name = pad(this.tables[(this.tables.length - i) % this.tables.length].TABLE_NAME.substring(0, this.sideWidth - 3), this.sideWidth - 3);
+
+			var name = pad(this.tables[this.tables.length - (i % this.tables.length) - 1].TABLE_NAME.substring(0, this.sideWidth - 3), this.sideWidth - 3);
 
 			if (i == 0) {
 				this.drawText(2, yoffset + Math.floor(this.tableBoxHeight / 2) - i, (" " + name)[this.sideBackgroundTheme].bold)
@@ -122,6 +124,7 @@ StudioFormatter.prototype.drawTableList = function() {
 		}
 	} catch (e) {
 		console.log(e);
+		// console.log(this.tables)
 	}
 }
 
@@ -224,6 +227,16 @@ StudioFormatter.prototype.rotateTables = function(d) {
 	}
 
 	this.drawTableList();
+}
+
+StudioFormatter.prototype.setTables = function(tables){
+	this.tables = tables;
+	this.drawTableList();
+}
+
+StudioFormatter.prototype.setSchemas = function(schemas){
+	this.schemas = schemas;
+	this.drawSchemaList();
 }
 
 module.exports = StudioFormatter;
