@@ -78,7 +78,7 @@ StudioFormatter.prototype.drawSchemaList = function() {
 		}
 
 		for (var i = Math.floor(this.schemaBoxHeight / 2); i > 0; i--) {
-			var name = pad(this.schemas[(this.schemas.length - i) % this.schemas.length].SCHEMA_NAME.substring(0, this.sideWidth - 3), this.sideWidth - 3);
+			var name = pad(this.schemas[this.schemas.length - (i % this.schemas.length)].SCHEMA_NAME.substring(0, this.sideWidth - 3), this.sideWidth - 3);
 
 			if (i == 0) {
 				this.drawText(2, yoffset + Math.floor(this.schemaBoxHeight / 2) - i, (" " + name)[this.sideBackgroundTheme].bold)
@@ -114,7 +114,7 @@ StudioFormatter.prototype.drawTableList = function() {
 
 		for (var i = Math.ceil(this.tableBoxHeight / 2); i > 0; i--) {
 
-			var name = pad(this.tables[this.tables.length - (i % this.tables.length) - 1].TABLE_NAME.substring(0, this.sideWidth - 3), this.sideWidth - 3);
+			var name = pad(this.tables[this.tables.length - ((i - 1) % this.tables.length) - 1].TABLE_NAME.substring(0, this.sideWidth - 3), this.sideWidth - 3);
 
 			if (i == 0) {
 				this.drawText(2, yoffset + Math.floor(this.tableBoxHeight / 2) - i, (" " + name)[this.sideBackgroundTheme].bold)
