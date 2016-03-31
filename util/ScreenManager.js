@@ -77,22 +77,15 @@ ScreenManager.prototype.loadDataFormatters = function() {
 ScreenManager.prototype.setupInput = function() {
 
     if (!process.stdout.isTTY) {
-
-        /**
-         * Spoof the width of the temrinal
-         */
-        process.stdout.columns = 80;
-
         process.stdout.on('error', function(err) {
             if (err.code == "EPIPE") {
                 process.exit(0);
             }
         })
-
         return;
     }
 
-    this.rl = readline.createInterface({
+    readline.createInterface({
         input: process.stdin,
         output: process.stdout,
         path: path.join(osHomedir(), ".censql", "censql_hist"),
@@ -108,9 +101,9 @@ ScreenManager.prototype.setupInput = function() {
                 /**
                  * remove the user input since we will add it back again later with colour
                  */
-                charm.up(1);
-                charm.erase("line");
-                charm.left(99999);
+                // charm.up(1);
+                // charm.erase("line");
+                // charm.left(99999);
 
                 /**
                  * Stop taking user input until we complete this request
@@ -122,13 +115,6 @@ ScreenManager.prototype.setupInput = function() {
                  * @type {Boolean}
                  */
                 GLOBAL.censql.RUNNING_PROCESS = true;
-
-                /**
-                 * Dont print the command if it was a batch command
-                 */
-                if (!this.isBatch) {
-                    this.print("\n> " + line + "\n");
-                }
 
                 /**
                  * Hide user input whilst a command is running (simply pausing stdin still allows scrolling through history)
@@ -183,7 +169,7 @@ ScreenManager.prototype.setupInput = function() {
              */
             this.rl.on('close', function() {
 
-                this.print(colors.green('\nHave a great day!\n'));
+                this.print(colors.green('\n\nHave a great day!\n'));
 
                 this.rl.close();
                 process.exit(0);
@@ -233,7 +219,7 @@ ScreenManager.prototype.printHeader = function() {
 /**
  * The rest of the program is ready for user input, start listening on stdin
  */
-ScreenManager.prototype.ready = function() {
+ScreenManager.prototype.ready = function(hdb) {
 
     this.clear()
 
@@ -241,7 +227,7 @@ ScreenManager.prototype.ready = function() {
      * Should we enter the cli or studio mode?
      */
     if(this.settings.studio){
-        this.studio = new StudioSession(this);
+        this.studio = new StudioSession(this, hdb);
     }else{
         this.print(colors.cyan(colors.bold("For help type \\h\n-----------------------------------------------------\n\n")));
         this.print(colors.cyan("> "));
@@ -375,7 +361,11 @@ ScreenManager.prototype.print = function(message, callback) {
 
 ScreenManager.prototype.clear = function() {
     charm.erase("screen");
-    charm.position(1, 1);
+    this.goto(1, 1);
+}
+
+ScreenManager.prototype.goto = function(x,y){
+    charm.position(x,y);
 }
 
 module.exports = ScreenManager;
