@@ -32,6 +32,7 @@ StudioFormatter.prototype.calculateSize = function() {
 	this.height = process.stdout.rows;
 	this.sideWidth = (parseInt(this.width / 4) < this.maxSideWidth ? parseInt(this.width / 4) : this.maxSideWidth);
 	this.schemaBoxHeight = parseInt(this.height / 3) - 2;
+	this.tableBoxHeight = (this.height - this.schemaBoxHeight) - 3
 }
 
 StudioFormatter.prototype.checkRefresh = function() {
@@ -53,28 +54,74 @@ StudioFormatter.prototype.redraw = function() {
 	this.screen.clear();
 	this.drawBorder();
 	this.drawSchemaList()
+	this.drawTableList();
 }
 
 StudioFormatter.prototype.drawSchemaList = function() {
 
-	for (var i = 0; i < Math.floor(this.schemaBoxHeight / 2); i++) {
-		var name = pad(this.schemas[i % this.schemas.length].SCHEMA_NAME.substring(0, this.sideWidth - 3), this.sideWidth - 3);
-
-		if (i == 0) {
-			this.drawText(2, 2 + i + Math.floor(this.schemaBoxHeight / 2), (" " + name)[this.sideBackgroundTheme].bold)
-		} else {
-			this.drawText(2, 2 + i + Math.floor(this.schemaBoxHeight / 2), (" " + name)[this.sideBackgroundTheme])
-		}
+	if (this.schemas.length == 0) {
+		return;
 	}
 
-	for (var i = Math.floor(this.schemaBoxHeight / 2); i > 0; i--) {
-		var name = pad(this.schemas[(this.schemas.length - i) % this.schemas.length].SCHEMA_NAME.substring(0, this.sideWidth - 3), this.sideWidth - 3);
+	try {
 
-		if (i == 0) {
-			this.drawText(2, Math.floor(this.schemaBoxHeight / 2) - i + 2, (" " + name)[this.sideBackgroundTheme].bold)
-		} else {
-			this.drawText(2, Math.floor(this.schemaBoxHeight / 2) - i + 2, (" " + name)[this.sideBackgroundTheme])
+		var yoffset = 2;
+
+		for (var i = 0; i < Math.floor(this.schemaBoxHeight / 2); i++) {
+			var name = pad(this.schemas[i % this.schemas.length].SCHEMA_NAME.substring(0, this.sideWidth - 3), this.sideWidth - 3);
+
+			if (i == 0) {
+				this.drawText(2, yoffset + i + Math.floor(this.schemaBoxHeight / 2), (" " + name)[this.sideBackgroundTheme].bold)
+			} else {
+				this.drawText(2, yoffset + i + Math.floor(this.schemaBoxHeight / 2), (" " + name)[this.sideBackgroundTheme])
+			}
 		}
+
+		for (var i = Math.floor(this.schemaBoxHeight / 2); i > 0; i--) {
+			var name = pad(this.schemas[(this.schemas.length - i) % this.schemas.length].SCHEMA_NAME.substring(0, this.sideWidth - 3), this.sideWidth - 3);
+
+			if (i == 0) {
+				this.drawText(2, yoffset + Math.floor(this.schemaBoxHeight / 2) - i, (" " + name)[this.sideBackgroundTheme].bold)
+			} else {
+				this.drawText(2, yoffset + Math.floor(this.schemaBoxHeight / 2) - i, (" " + name)[this.sideBackgroundTheme])
+			}
+		}
+
+	} catch (e) {
+		console.log(e);
+	}
+}
+
+StudioFormatter.prototype.drawTableList = function() {
+
+	if (this.tables.length == 0) {
+		return;
+	}
+
+	try {
+		var yoffset = 4 + this.schemaBoxHeight;
+
+		for (var i = 0; i < Math.floor(this.tableBoxHeight / 2); i++) {
+			var name = pad(this.tables[i % this.tables.length].TABLE_NAME.substring(0, this.sideWidth - 3), this.sideWidth - 3);
+
+			if (i == 0) {
+				this.drawText(2, yoffset + i + Math.floor(this.tableBoxHeight / 2), (" " + name)[this.sideBackgroundTheme].bold)
+			} else {
+				this.drawText(2, yoffset + i + Math.floor(this.tableBoxHeight / 2), (" " + name)[this.sideBackgroundTheme])
+			}
+		}
+
+		for (var i = Math.ceil(this.tableBoxHeight / 2); i > 0; i--) {
+			var name = pad(this.tables[(this.tables.length - i) % this.tables.length].TABLE_NAME.substring(0, this.sideWidth - 3), this.sideWidth - 3);
+
+			if (i == 0) {
+				this.drawText(2, yoffset + Math.floor(this.tableBoxHeight / 2) - i, (" " + name)[this.sideBackgroundTheme].bold)
+			} else {
+				this.drawText(2, yoffset + Math.floor(this.tableBoxHeight / 2) - i, (" " + name)[this.sideBackgroundTheme])
+			}
+		}
+	} catch (e) {
+		console.log(e);
 	}
 }
 
@@ -140,6 +187,11 @@ StudioFormatter.prototype.byebye = function() {
 }
 
 StudioFormatter.prototype.rotateSchemas = function(d) {
+
+	if(this.schemas.length == 0){
+		return;
+	}
+
 	for (var i = 0; i < Math.abs(d); i++) {
 
 		if (d < 0) {
@@ -152,6 +204,26 @@ StudioFormatter.prototype.rotateSchemas = function(d) {
 	}
 
 	this.drawSchemaList();
+}
+
+StudioFormatter.prototype.rotateTables = function(d) {
+
+	if(this.tables.length == 0){
+		return;
+	}
+
+	for (var i = 0; i < Math.abs(d); i++) {
+
+		if (d < 0) {
+			this.tables.unshift(this.tables.pop());
+		}
+
+		if (d > 0) {
+			this.tables.push(this.tables.shift());
+		}
+	}
+
+	this.drawTableList();
 }
 
 module.exports = StudioFormatter;

@@ -20,12 +20,12 @@ var StudioSession = function(screen, hdb) {
 	/**
 	 * Clone hana connection
 	 */
-	this.studioDbHandler.init(function(err, data){
-		if(err){
-			this.screen.error(err, function(){
+	this.studioDbHandler.init(function(err, data) {
+		if (err) {
+			this.screen.error(err, function() {
 				process.exit(1);
 			});
-		}else{
+		} else {
 			this.init();
 		}
 	}.bind(this))
@@ -44,17 +44,27 @@ StudioSession.prototype.init = function() {
 	 */
 	process.stdin._events.keypress = this.onKeyPress.bind(this);
 
-	this.studioDbHandler.getSchemas(function(err, schemas){
+	this.studioDbHandler.getSchemas(function(err, schemas) {
 
-		if(err){
+		if (err) {
 			console.log();
 			this.screen.error(err);
 			console.log();
 			process.exit(1);
 		}
 
-		this.formatter.init(schemas);
-	}.bind(this))
+		this.studioDbHandler.getTables(schemas[0], function(err, tables) {
+
+			if (err) {
+				console.log();
+				this.screen.error(err);
+				console.log();
+				process.exit(1);
+			}
+
+			this.formatter.init(schemas, tables);
+		}.bind(this));
+	}.bind(this));
 
 }
 
