@@ -11,7 +11,12 @@ var osHomedir = require('os-homedir');
 var fs = require("fs");
 
 var CenSql = function() {
+    this.setTitle();
 
+    /**
+     * Bodge to fix hdb module
+     * @type {Boolean}
+     */
     process.browser = true;
 
     /**
@@ -39,6 +44,14 @@ var CenSql = function() {
 
 }
 
+CenSql.prototype.setTitle = function() {
+
+    var title = "Censql";
+
+    process.stdout.write(String.fromCharCode(27) + "]0;" + title + String.fromCharCode(7));
+    process.title = title;
+}
+
 CenSql.prototype.getSettings = function() {
     /**
      * Load settings
@@ -51,11 +64,11 @@ CenSql.prototype.getSettings = function() {
      * Save settings to file
      */
     settings.save = function() {
-    	var self = JSON.parse(JSON.stringify(this));
+        var self = JSON.parse(JSON.stringify(this));
 
-    	delete self.save;
-    	delete self.load;
-    	delete self.colour;
+        delete self.save;
+        delete self.load;
+        delete self.colour;
 
         fs.writeFileSync(settingsFilePath, JSON.stringify(self));
     }
@@ -71,17 +84,17 @@ CenSql.prototype.getSettings = function() {
             var keys = Object.keys(data);
 
             for (var i = keys.length - 1; i >= 0; i--) {
-            	this[keys[i]] = data[keys[i]];
+                this[keys[i]] = data[keys[i]];
             };
 
-        } catch(e){
-        	/**
-        	 * Since we had an error, this is likely to do with the file not existing. Lets save a default file and then load that
-        	 */
-        	this.save();
-        	this.load();
+        } catch (e) {
+            /**
+             * Since we had an error, this is likely to do with the file not existing. Lets save a default file and then load that
+             */
+            this.save();
+            this.load();
         }
-        
+
     }
 
     settings.load();
@@ -138,7 +151,7 @@ CenSql.prototype.connectToHdb = function() {
 
 CenSql.prototype.createScreen = function(settings, callback) {
 
-	/**
+    /**
      * keep the colour var in settings just to make it easy to use, but we wont actually save it
      * @type {[type]}
      */

@@ -2,16 +2,25 @@ var charm = require('charm')(process.stdout);
 var colors = require("colors");
 var _ = require('lodash');
 var StudioFormatter = require('./StudioFormatter.js');
+var StudioDbHandler = require('./StudioDbHandler.js');
 
 var StudioSession = function(screen, hdb) {
 	this.formatter = new StudioFormatter(screen);
+	this.studioDbHandler = new StudioDbHandler(hdb);
+
 	this.screen = screen;
 	this.hdb = hdb;
 
+	/**
+	 * Print temp loading screen
+	 */
 	this.screen.clear();
 	this.screen.print(colors.yellow("Loading..."));
 
-	this.hdb.cloneConnection("conn", "studioConn", function(err, data){
+	/**
+	 * Clone hana connection
+	 */
+	this.studioDbHandler.init(function(err, data){
 		if(err){
 			this.screen.error(err, function(){
 				process.exit(1);
@@ -35,7 +44,18 @@ StudioSession.prototype.init = function() {
 	 */
 	process.stdin._events.keypress = this.onKeyPress.bind(this);
 
-	this.formatter.init();
+	this.studioDbHandler.getSchemas(function(err, schemas){
+
+		if(err){
+			console.log();
+			this.screen.error(err);
+			console.log();
+			process.exit(1);
+		}
+
+		this.formatter.init(schemas);
+	}.bind(this))
+
 }
 
 StudioSession.prototype.onKeyPress = function(ch, key) {
@@ -46,14 +66,23 @@ StudioSession.prototype.onKeyPress = function(ch, key) {
 	var keys = {
 		false: {
 			true: {
-				"s": function() {
-					console.log("Banflute");
-				}
+				"down": function() {
+					this.formatter.rotateSchemas(1);
+				}.bind(this),
+				"up": function() {
+					this.formatter.rotateSchemas(-1);
+				}.bind(this)
 			}
 		},
 		true: {
 			false: {
 				"c": this.exitStudio.bind(this),
+				"down": function() {
+					this.formatter.rotateTables(1);
+				}.bind(this),
+				"up": function() {
+					this.formatter.rotateTables(-1);
+				}.bind(this)
 			}
 		}
 	}

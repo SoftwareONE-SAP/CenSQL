@@ -21,6 +21,7 @@
     "moment": "^2.10.6",
     "optimist": "^0.6.1",
     "os-homedir": "^1.0.1",
+    "pad": "^1.0.0",
     "stripcolorcodes": "^0.1.0"
   },
   "bin": {
