@@ -53,7 +53,7 @@ StudioSession.prototype.init = function() {
 			process.exit(1);
 		}
 
-		this.studioDbHandler.getTables(schemas[0], function(err, tables) {
+		this.studioDbHandler.getTables(schemas[0].SCHEMA_NAME, function(err, tables) {
 
 			if (err) {
 				console.log();
@@ -83,16 +83,30 @@ StudioSession.prototype.onKeyPress = function(ch, key) {
 					this.formatter.rotateSchemas(-1);
 				}.bind(this),
 				"right": function() {
+					if (this.formatter.tableListMode == "Views") {
 
-					this.studioDbHandler.getTables(this.formatter.schemas[0].SCHEMA_NAME, function(err, data) {
-						if (err) {
-							this.screen.error(err);
-							process.exit(1);
-						}
+						this.studioDbHandler.getViews(this.formatter.schemas[0].SCHEMA_NAME, function(err, data) {
+							if (err) {
+								this.screen.error(err);
+								process.exit(1);
+							}
 
-						this.formatter.setTables(data);
+							this.formatter.setTables(data);
 
-					}.bind(this))
+						}.bind(this))
+					} else {
+
+						this.studioDbHandler.getTables(this.formatter.schemas[0].SCHEMA_NAME, function(err, data) {
+							if (err) {
+								this.screen.error(err);
+								process.exit(1);
+							}
+
+							this.formatter.setTables(data);
+
+						}.bind(this))
+
+					}
 				}.bind(this),
 				"tab": function() {
 					if (this.formatter.tableListMode == "Tables") {

@@ -15,15 +15,15 @@ var StudioFormatter = function(screen) {
 	this.tableListMode = "Tables";
 
 	this.borderTheme = "bgWhite"
-	this.sideBackgroundTheme = "bgBlue";
-	this.sideBackgroundActive = "bgWhite";
+	this.sideBackgroundTheme = "bgCyan";
 	this.bottomBarTheme = 'bgBlack'
+	this.tableBoxBackgroundTheme = {"Tables": "bgBlue", "Views": "bgRed"};
 }
 
 StudioFormatter.prototype.init = function(schemas, tables) {
 	this.schemas = schemas;
 	this.tables = tables;
-
+	
 	this.redraw();
 
 	setTimeout(this.checkRefresh.bind(this), this.refreshCheckDelay);
@@ -99,7 +99,7 @@ StudioFormatter.prototype.drawSchemaList = function() {
 StudioFormatter.prototype.drawTableList = function() {
 
 	if (this.tables.length == 0) {
-		this.drawBox(2, this.schemaBoxHeight + 5, this.sideWidth - 2, this.tableBoxHeight + 1, " " [this.sideBackgroundTheme]);
+		this.drawBox(2, this.schemaBoxHeight + 5, this.sideWidth - 2, this.tableBoxHeight + 1, " " [this.tableBoxBackgroundTheme[this.tableListMode]]);
 		return;
 	}
 
@@ -111,9 +111,9 @@ StudioFormatter.prototype.drawTableList = function() {
 			var name = pad(this.tables[i % this.tables.length].NAME.substring(0, this.sideWidth - 4), this.sideWidth - 3);
 
 			if (i == 0) {
-				this.drawText(2, yoffset + i + parseInt(this.tableBoxHeight / 2), (" " + name)[this.sideBackgroundTheme].bold)
+				this.drawText(2, yoffset + i + parseInt(this.tableBoxHeight / 2), (" " + name)[this.tableBoxBackgroundTheme[this.tableListMode]].bold)
 			} else {
-				this.drawText(2, yoffset + i + parseInt(this.tableBoxHeight / 2), (" " + name)[this.sideBackgroundTheme])
+				this.drawText(2, yoffset + i + parseInt(this.tableBoxHeight / 2), (" " + name)[this.tableBoxBackgroundTheme[this.tableListMode]])
 			}
 		}
 
@@ -122,9 +122,9 @@ StudioFormatter.prototype.drawTableList = function() {
 			var name = pad(this.tables[this.tables.length - ((i - 1) % this.tables.length) - 1].NAME.substring(0, this.sideWidth - 4), this.sideWidth - 3);
 
 			if (i == 0) {
-				this.drawText(2, yoffset + parseInt(this.tableBoxHeight / 2) - i, (" " + name)[this.sideBackgroundTheme].bold)
+				this.drawText(2, yoffset + parseInt(this.tableBoxHeight / 2) - i, (" " + name)[this.tableBoxBackgroundTheme[this.tableListMode]].bold)
 			} else {
-				this.drawText(2, yoffset + parseInt(this.tableBoxHeight / 2) - i, (" " + name)[this.sideBackgroundTheme])
+				this.drawText(2, yoffset + parseInt(this.tableBoxHeight / 2) - i, (" " + name)[this.tableBoxBackgroundTheme[this.tableListMode]])
 			}
 		}
 	} catch (e) {
@@ -148,11 +148,6 @@ StudioFormatter.prototype.drawBorder = function() {
 	 * Draw sideline
 	 */
 	this.drawBox(this.sideWidth, 2, 1, this.height - 1, " " [this.borderTheme]);
-
-	/**
-	 * Draw sideBox
-	 */
-	this.drawBox(2, 3, this.sideWidth - 2, this.height - 2, " " [this.sideBackgroundTheme]);
 
 	/**
 	 * Draw side box divider
