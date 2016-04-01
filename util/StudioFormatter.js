@@ -19,7 +19,7 @@ var StudioFormatter = function(screen) {
 	this.bottomBarTheme = 'bgBlack'
 	this.tableBoxBackgroundTheme = {
 		"Tables": "bgBlue",
-		"Views": "bgRed"
+		"Views": "bgMagenta"
 	};
 }
 
@@ -208,12 +208,54 @@ StudioFormatter.prototype.drawBox = function(x, y, w, h, c) {
 	// this.screen.goto(1, 1);
 }
 
-StudioFormatter.prototype.drawTableView = function(schema, table, columns, dataPreview) {
-	console.log("yay!")
+StudioFormatter.prototype.clearMainPanel = function() {
+	this.drawBox(this.sideWidth + 1, 2, this.width - this.sideWidth - 1, this.height - 1, " ");
+}
+
+StudioFormatter.prototype.drawTableView = function(schema, table, columns, dataPreview, isView) {
+	this.drawTableMetaInfo(schema, table, columns, isView);
+}
+
+StudioFormatter.prototype.drawTableMetaInfo = function(schema, table, columns, isView) {
+
+	this.clearMainPanel();
+
+	var height = 4;
+	var xoffset = 2;
+
+	var colNames = [];
+
+	for (var i = columns.length - 1; i >= 0; i--) {
+		colNames.push(columns[i].COLUMN_NAME)
+	}
+
+	var columnString = colNames.join(", ");
+
+	var maxColumnStringWidth = this.width - this.sideWidth - 13;
+
+	if(columnString.length > maxColumnStringWidth){
+		columnString = columnString.substring(0, maxColumnStringWidth - 3) + "..."
+	}
+
+	/**
+	 * Draw meta box
+	 */
+	this.drawBox(this.sideWidth + 1, 2, this.width - this.sideWidth - 1, height + 1, " ".bgBlack);
+	this.drawBox(this.sideWidth + 1, height + 2, this.width - this.sideWidth - 1, 1, " " [this.borderTheme]);
+
+	this.drawText(this.sideWidth + xoffset, 3, "Schema Name: ".bold.bgBlack + schema.substring(0, 23)['bgBlack'])
+
+	if (isView) {
+		this.drawText(this.sideWidth + xoffset + 39, 3, "View Name: ".bold.bgBlack + table.substring(0, 25)['bgBlack'])
+	} else {
+		this.drawText(this.sideWidth + xoffset + 39, 3, "Table Name: ".bold.bgBlack + table.substring(0, 25)['bgBlack'])
+	}
+
+	this.drawText(this.sideWidth + xoffset, 4, "Columns: ".bold.bgBlack + columnString['bgBlack'])
 }
 
 StudioFormatter.prototype.fullPageError = function(err) {
-	this.drawBox(this.sideWidth + 1, 2, this.width - this.sideWidth - 1, this.height - 1, " ");
+	this.clearMainPanel();
 
 	var s = "" + err;
 
@@ -221,13 +263,13 @@ StudioFormatter.prototype.fullPageError = function(err) {
 
 	var stringCutdown = (s).match(new RegExp(".{1," + (width - 3) + "}", "g"));
 
-	if(stringCutdown.length == 1){
+	if (stringCutdown.length == 1) {
 		width = stringCutdown[0].length + 3
 	}
 
 	var height = stringCutdown.length + 3;
 	var ypos = (this.height / 2) - (this.height / (this.height / height));
-	var xpos = parseInt(this.sideWidth + (((this.width - this.sideWidth) / 2)- (width / 2)));
+	var xpos = parseInt(this.sideWidth + (((this.width - this.sideWidth) / 2) - (width / 2)));
 
 	this.drawBox(xpos - 1, ypos + 1, width, height, " " ["bgBlack"]);
 	this.drawBox(xpos, ypos, width, height, " " ["bgRed"]);

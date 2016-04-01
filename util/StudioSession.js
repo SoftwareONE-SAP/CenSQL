@@ -124,7 +124,7 @@ StudioSession.prototype.onKeyPress = function(ch, key) {
 					this.formatter.rotateTables(-1);
 				}.bind(this),
 				"right": function() {
-					this.loadTableView(this.formatter.schemas[0].SCHEMA_NAME, this.formatter.tables[0].NAME);
+					this.loadTableView(this.formatter.schemas[0].SCHEMA_NAME, this.formatter.tables[0].NAME, this.formatter.tableListMode == "Views");
 				}.bind(this)
 			}
 		}
@@ -137,7 +137,7 @@ StudioSession.prototype.onKeyPress = function(ch, key) {
 	// console.log(key.ctrl, key.shift, key.name);
 }
 
-StudioSession.prototype.loadTableView = function(schema, table){
+StudioSession.prototype.loadTableView = function(schema, table, isView){
 
 	async.parallel([
 		function(callback){
@@ -153,7 +153,7 @@ StudioSession.prototype.loadTableView = function(schema, table){
 			return;
 		}
 
-		this.formatter.drawTableView(schema, table, data[0], data[1]);
+		this.formatter.drawTableView(schema, table, data[0], data[1], isView);
 	}.bind(this))
 	
 }

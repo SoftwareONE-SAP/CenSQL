@@ -7,7 +7,7 @@ StudioDbHandler.prototype.init = function(callback) {
 }
 
 StudioDbHandler.prototype.getSchemas = function(callback){
-	this.hdb.exec("studioConn", "SELECT * FROM SYS.SCHEMAS ORDER BY SCHEMA_NAME", callback);
+	this.hdb.exec("studioConn", "SELECT * FROM SYS.SCHEMAS ORDER BY SCHEMA_NAME DESC", callback);
 }
 
 StudioDbHandler.prototype.getTables = function(schema, callback){
