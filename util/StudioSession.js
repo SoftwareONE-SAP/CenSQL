@@ -84,8 +84,8 @@ StudioSession.prototype.onKeyPress = function(ch, key) {
 				}.bind(this),
 				"right": function() {
 
-					this.studioDbHandler.getTables(this.formatter.schemas[0].SCHEMA_NAME, function(err, data){
-						if(err){
+					this.studioDbHandler.getTables(this.formatter.schemas[0].SCHEMA_NAME, function(err, data) {
+						if (err) {
 							this.screen.error(err);
 							process.exit(1);
 						}
@@ -93,6 +93,36 @@ StudioSession.prototype.onKeyPress = function(ch, key) {
 						this.formatter.setTables(data);
 
 					}.bind(this))
+				}.bind(this),
+				"tab": function() {
+					if (this.formatter.tableListMode == "Tables") {
+
+						this.formatter.setTableListMode("Views");
+
+						this.studioDbHandler.getViews(this.formatter.schemas[0].SCHEMA_NAME, function(err, data) {
+							if (err) {
+								this.screen.error(err);
+								process.exit(1);
+							}
+
+							this.formatter.setTables(data);
+
+						}.bind(this))
+					} else {
+
+						this.formatter.setTableListMode("Tables");
+
+						this.studioDbHandler.getTables(this.formatter.schemas[0].SCHEMA_NAME, function(err, data) {
+							if (err) {
+								this.screen.error(err);
+								process.exit(1);
+							}
+
+							this.formatter.setTables(data);
+
+						}.bind(this))
+
+					}
 				}.bind(this)
 			}
 		},

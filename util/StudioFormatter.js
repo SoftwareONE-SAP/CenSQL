@@ -10,7 +10,9 @@ var StudioFormatter = function(screen) {
 
 	this.calculateSize();
 
-	this.refreshCheckDelay = 200;
+	this.refreshCheckDelay = 150;
+
+	this.tableListMode = "Tables";
 
 	this.borderTheme = "bgWhite"
 	this.sideBackgroundTheme = "bgBlue";
@@ -30,9 +32,9 @@ StudioFormatter.prototype.init = function(schemas, tables) {
 StudioFormatter.prototype.calculateSize = function() {
 	this.width = process.stdout.columns;
 	this.height = process.stdout.rows;
-	this.sideWidth = (parseInt(this.width / 4) < this.maxSideWidth ? parseInt(this.width / 4) : this.maxSideWidth);
-	this.schemaBoxHeight = parseInt(this.height / 3) - 2;
-	this.tableBoxHeight = (this.height - this.schemaBoxHeight) - 3
+	this.sideWidth = (Math.ceil(this.width / 4) < this.maxSideWidth ? Math.ceil(this.width / 4) : this.maxSideWidth);
+	this.schemaBoxHeight = Math.ceil(this.height / 4);
+	this.tableBoxHeight = this.height - this.schemaBoxHeight - 5
 }
 
 StudioFormatter.prototype.checkRefresh = function() {
@@ -63,27 +65,29 @@ StudioFormatter.prototype.drawSchemaList = function() {
 		return;
 	}
 
+	// console.log(this.schemaBoxHeight)
+
 	try {
 
-		var yoffset = 2;
+		var yoffset = 3;
 
-		for (var i = 0; i < Math.floor(this.schemaBoxHeight / 2); i++) {
-			var name = pad(this.schemas[i % this.schemas.length].SCHEMA_NAME.substring(0, this.sideWidth - 3), this.sideWidth - 3);
+		for (var i = 0; i < Math.ceil(this.schemaBoxHeight / 2); i++) {
+			var name = pad(this.schemas[i % this.schemas.length].SCHEMA_NAME.substring(0, this.sideWidth - 4), this.sideWidth - 3);
 
 			if (i == 0) {
-				this.drawText(2, yoffset + i + Math.floor(this.schemaBoxHeight / 2), (" " + name)[this.sideBackgroundTheme].bold)
+				this.drawText(2, yoffset + i + parseInt(this.schemaBoxHeight / 2), (" " + name)[this.sideBackgroundTheme].bold)
 			} else {
-				this.drawText(2, yoffset + i + Math.floor(this.schemaBoxHeight / 2), (" " + name)[this.sideBackgroundTheme])
+				this.drawText(2, yoffset + i + parseInt(this.schemaBoxHeight / 2), (" " + name)[this.sideBackgroundTheme])
 			}
 		}
 
 		for (var i = Math.floor(this.schemaBoxHeight / 2); i > 0; i--) {
-			var name = pad(this.schemas[this.schemas.length - (i % this.schemas.length)].SCHEMA_NAME.substring(0, this.sideWidth - 3), this.sideWidth - 3);
+			var name = pad(this.schemas[this.schemas.length - (i % this.schemas.length)].SCHEMA_NAME.substring(0, this.sideWidth - 4), this.sideWidth - 3);
 
 			if (i == 0) {
-				this.drawText(2, yoffset + Math.floor(this.schemaBoxHeight / 2) - i, (" " + name)[this.sideBackgroundTheme].bold)
+				this.drawText(2, yoffset + parseInt(this.schemaBoxHeight / 2) - i, (" " + name)[this.sideBackgroundTheme].bold)
 			} else {
-				this.drawText(2, yoffset + Math.floor(this.schemaBoxHeight / 2) - i, (" " + name)[this.sideBackgroundTheme])
+				this.drawText(2, yoffset + parseInt(this.schemaBoxHeight / 2) - i, (" " + name)[this.sideBackgroundTheme])
 			}
 		}
 
@@ -95,31 +99,32 @@ StudioFormatter.prototype.drawSchemaList = function() {
 StudioFormatter.prototype.drawTableList = function() {
 
 	if (this.tables.length == 0) {
+		this.drawBox(2, this.schemaBoxHeight + 5, this.sideWidth - 2, this.tableBoxHeight + 1, " " [this.sideBackgroundTheme]);
 		return;
 	}
 
 	try {
-		var yoffset = 4 + this.schemaBoxHeight;
+		var yoffset = 5 + this.schemaBoxHeight;
 
-		for (var i = 0; i < Math.floor(this.tableBoxHeight / 2); i++) {
+		for (var i = 0; i < Math.ceil(this.tableBoxHeight / 2); i++) {
 
-			var name = pad(this.tables[i % this.tables.length].TABLE_NAME.substring(0, this.sideWidth - 3), this.sideWidth - 3);
+			var name = pad(this.tables[i % this.tables.length].NAME.substring(0, this.sideWidth - 4), this.sideWidth - 3);
 
 			if (i == 0) {
-				this.drawText(2, yoffset + i + Math.floor(this.tableBoxHeight / 2), (" " + name)[this.sideBackgroundTheme].bold)
+				this.drawText(2, yoffset + i + parseInt(this.tableBoxHeight / 2), (" " + name)[this.sideBackgroundTheme].bold)
 			} else {
-				this.drawText(2, yoffset + i + Math.floor(this.tableBoxHeight / 2), (" " + name)[this.sideBackgroundTheme])
+				this.drawText(2, yoffset + i + parseInt(this.tableBoxHeight / 2), (" " + name)[this.sideBackgroundTheme])
 			}
 		}
 
-		for (var i = Math.ceil(this.tableBoxHeight / 2); i > 0; i--) {
+		for (var i = Math.floor(this.tableBoxHeight / 2); i > 0; i--) {
 
-			var name = pad(this.tables[this.tables.length - ((i - 1) % this.tables.length) - 1].TABLE_NAME.substring(0, this.sideWidth - 3), this.sideWidth - 3);
+			var name = pad(this.tables[this.tables.length - ((i - 1) % this.tables.length) - 1].NAME.substring(0, this.sideWidth - 4), this.sideWidth - 3);
 
 			if (i == 0) {
-				this.drawText(2, yoffset + Math.floor(this.tableBoxHeight / 2) - i, (" " + name)[this.sideBackgroundTheme].bold)
+				this.drawText(2, yoffset + parseInt(this.tableBoxHeight / 2) - i, (" " + name)[this.sideBackgroundTheme].bold)
 			} else {
-				this.drawText(2, yoffset + Math.floor(this.tableBoxHeight / 2) - i, (" " + name)[this.sideBackgroundTheme])
+				this.drawText(2, yoffset + parseInt(this.tableBoxHeight / 2) - i, (" " + name)[this.sideBackgroundTheme])
 			}
 		}
 	} catch (e) {
@@ -147,19 +152,30 @@ StudioFormatter.prototype.drawBorder = function() {
 	/**
 	 * Draw sideBox
 	 */
-	this.drawBox(2, 2, this.sideWidth - 2, this.height - 1, " " [this.sideBackgroundTheme]);
+	this.drawBox(2, 3, this.sideWidth - 2, this.height - 2, " " [this.sideBackgroundTheme]);
 
 	/**
 	 * Draw side box divider
 	 */
-	this.drawBox(2, this.schemaBoxHeight + 2, this.sideWidth - 2, 1, " " [this.borderTheme]);
+	this.drawBox(2, this.schemaBoxHeight + 3, this.sideWidth - 2, 1, " " [this.borderTheme]);
+
+	/**
+	 * Draw side headers
+	 */
+	this.drawText(2, 2, colors.bgBlack(pad(" Schemas", this.sideWidth - 2)));
+
+	this.drawTableBoxHeader();
 
 	/**
 	 * Draw bottom help bar
 	 */
 	this.drawBox(this.sideWidth + 1, this.height, this.width - this.sideWidth - 1, 2, " " [this.bottomBarTheme]);
-	this.drawText(this.sideWidth + 1, this.height, "Help" [this.bottomBarTheme]);
+	this.drawText(this.sideWidth + 1, this.height, " Help" [this.bottomBarTheme]);
 
+}
+
+StudioFormatter.prototype.drawTableBoxHeader = function(){
+	this.drawText(2, this.schemaBoxHeight + 4, colors.bgBlack(pad(" " + this.tableListMode, this.sideWidth - 2)));
 }
 
 StudioFormatter.prototype.drawText = function(x, y, t) {
@@ -191,7 +207,7 @@ StudioFormatter.prototype.byebye = function() {
 
 StudioFormatter.prototype.rotateSchemas = function(d) {
 
-	if(this.schemas.length == 0){
+	if (this.schemas.length == 0) {
 		return;
 	}
 
@@ -211,7 +227,7 @@ StudioFormatter.prototype.rotateSchemas = function(d) {
 
 StudioFormatter.prototype.rotateTables = function(d) {
 
-	if(this.tables.length == 0){
+	if (this.tables.length == 0) {
 		return;
 	}
 
@@ -229,14 +245,19 @@ StudioFormatter.prototype.rotateTables = function(d) {
 	this.drawTableList();
 }
 
-StudioFormatter.prototype.setTables = function(tables){
+StudioFormatter.prototype.setTables = function(tables) {
 	this.tables = tables;
 	this.drawTableList();
 }
 
-StudioFormatter.prototype.setSchemas = function(schemas){
+StudioFormatter.prototype.setSchemas = function(schemas) {
 	this.schemas = schemas;
 	this.drawSchemaList();
+}
+
+StudioFormatter.prototype.setTableListMode = function(mode) {
+	this.tableListMode = mode;
+	this.drawTableBoxHeader();
 }
 
 module.exports = StudioFormatter;
