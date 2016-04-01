@@ -2,7 +2,8 @@ var charm = require('charm')(process.stdout);
 var colors = require("colors");
 var _ = require('lodash');
 var pad = require('pad');
-var Table = require('cli-table');
+var cliTable = require('cli-table');
+var stripColorCodes = require('stripcolorcodes');
 
 var StudioFormatter = function(screen) {
 	this.screen = screen;
@@ -214,25 +215,6 @@ StudioFormatter.prototype.clearMainPanel = function() {
 }
 
 StudioFormatter.prototype.drawTableView = function(schema, table, columns, dataPreview, isView) {
-	this.drawTableMetaInfo(schema, table, columns, isView);
-	this.drawDataView(columns, dataPreview);
-}
-
-StudioFormatter.prototype.drawDataView = function(columns, data){
-	if(data.length == 0){
-		this.fullPageError("Table/View is empty", "bgBlue", true);
-		return;
-	}
-
-	
-}
-
-StudioFormatter.prototype.drawTableMetaInfo = function(schema, table, columns, isView) {
-
-	this.clearMainPanel();
-
-	var height = 4;
-	var xoffset = 2;
 
 	var colNames = [];
 
@@ -240,11 +222,64 @@ StudioFormatter.prototype.drawTableMetaInfo = function(schema, table, columns, i
 		colNames.push(columns[i].COLUMN_NAME)
 	}
 
+	this.drawTableMetaInfo(schema, table, colNames, isView);
+	this.drawDataView(colNames, dataPreview);
+}
+
+StudioFormatter.prototype.drawDataView = function(colNames, data) {
+	if (data.length == 0) {
+		this.fullPageError("Table/View is empty", "bgBlue", true);
+		return;
+	}
+
+	var table = new cliTable({
+		head: colNames
+	});
+
+	for (var k = 0; k < data.length; k++) {
+        var rows = [];
+
+        for (var j = 0; j < colNames.length; j++) {
+            
+            var value = data[k][colNames[j]];
+
+            if(value == null) value = "NULL";
+
+            rows.push(value)
+        };
+
+        table.push(rows);
+    };
+
+    var rows = table.toString().split("\n");
+
+    var yPadding = 7;
+
+    var x = 0;
+    var y = 0;
+
+    var awidth = this.width - this.sideWidth - 2;
+
+    for (var i = rows.length - 1; i >= 0; i--) {
+
+    	var line = stripColorCodes(rows[i]).substring(x, x + awidth);
+
+    	this.drawText(this.sideWidth + 1, yPadding+i, line)
+    }
+}
+
+StudioFormatter.prototype.drawTableMetaInfo = function(schema, table, colNames, isView) {
+
+	this.clearMainPanel();
+
+	var height = 4;
+	var xoffset = 2;
+
 	var columnString = colNames.join(", ");
 
 	var maxColumnStringWidth = this.width - this.sideWidth - 13;
 
-	if(columnString.length > maxColumnStringWidth){
+	if (columnString.length > maxColumnStringWidth) {
 		columnString = columnString.substring(0, maxColumnStringWidth - 3) + "..."
 	}
 
@@ -266,11 +301,11 @@ StudioFormatter.prototype.drawTableMetaInfo = function(schema, table, columns, i
 }
 
 StudioFormatter.prototype.fullPageError = function(err, colour, shouldClear) {
-	if(!shouldClear){
+	if (!shouldClear) {
 		this.clearMainPanel();
 	}
 
-	if(!colour){
+	if (!colour) {
 		colour = "bgRed"
 	}
 
