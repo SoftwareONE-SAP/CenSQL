@@ -51,7 +51,7 @@ StudioSession.prototype.init = function() {
 
 		if (err) {
 			console.log();
-			this.screen.error(err);
+			this.formatter.fullPageError(err);
 			console.log();
 			process.exit(1);
 		}
@@ -60,7 +60,7 @@ StudioSession.prototype.init = function() {
 
 			if (err) {
 				console.log();
-				this.screen.error(err);
+				this.formatter.fullPageError(err);
 				console.log();
 				process.exit(1);
 			}
@@ -90,7 +90,7 @@ StudioSession.prototype.onKeyPress = function(ch, key) {
 
 						this.studioDbHandler.getViews(this.formatter.schemas[0].SCHEMA_NAME, function(err, data) {
 							if (err) {
-								this.screen.error(err);
+								this.formatter.fullPageError(err);
 								process.exit(1);
 							}
 
@@ -101,7 +101,7 @@ StudioSession.prototype.onKeyPress = function(ch, key) {
 
 						this.studioDbHandler.getTables(this.formatter.schemas[0].SCHEMA_NAME, function(err, data) {
 							if (err) {
-								this.screen.error(err);
+								this.formatter.fullPageError(err);
 								process.exit(1);
 							}
 
@@ -165,7 +165,7 @@ StudioSession.prototype.toggleTableBoxView = function() {
 
 		this.studioDbHandler.getViews(this.formatter.schemas[0].SCHEMA_NAME, function(err, data) {
 			if (err) {
-				this.screen.error(err);
+				this.formatter.fullPageError(err);
 				process.exit(1);
 			}
 
@@ -178,7 +178,7 @@ StudioSession.prototype.toggleTableBoxView = function() {
 
 		this.studioDbHandler.getTables(this.formatter.schemas[0].SCHEMA_NAME, function(err, data) {
 			if (err) {
-				this.screen.error(err);
+				this.formatter.fullPageError(err);
 				process.exit(1);
 			}
 
