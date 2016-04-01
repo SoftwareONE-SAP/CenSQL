@@ -1,5 +1,6 @@
 var charm = require('charm')(process.stdout);
 var colors = require("colors");
+var async = require("async");
 var _ = require('lodash');
 var StudioFormatter = require('./StudioFormatter.js');
 var StudioDbHandler = require('./StudioDbHandler.js');
@@ -10,6 +11,8 @@ var StudioSession = function(screen, hdb) {
 
 	this.screen = screen;
 	this.hdb = hdb;
+
+	this.dataPreviewRows = 10;
 
 	/**
 	 * Print temp loading screen
@@ -108,36 +111,7 @@ StudioSession.prototype.onKeyPress = function(ch, key) {
 
 					}
 				}.bind(this),
-				"tab": function() {
-					if (this.formatter.tableListMode == "Tables") {
-
-						this.formatter.setTableListMode("Views");
-
-						this.studioDbHandler.getViews(this.formatter.schemas[0].SCHEMA_NAME, function(err, data) {
-							if (err) {
-								this.screen.error(err);
-								process.exit(1);
-							}
-
-							this.formatter.setTables(data);
-
-						}.bind(this))
-					} else {
-
-						this.formatter.setTableListMode("Tables");
-
-						this.studioDbHandler.getTables(this.formatter.schemas[0].SCHEMA_NAME, function(err, data) {
-							if (err) {
-								this.screen.error(err);
-								process.exit(1);
-							}
-
-							this.formatter.setTables(data);
-
-						}.bind(this))
-
-					}
-				}.bind(this)
+				"tab": this.toggleTableBoxView.bind(this)
 			}
 		},
 		true: {
@@ -148,6 +122,9 @@ StudioSession.prototype.onKeyPress = function(ch, key) {
 				}.bind(this),
 				"up": function() {
 					this.formatter.rotateTables(-1);
+				}.bind(this),
+				"right": function() {
+					this.loadTableView(this.formatter.schemas[0].SCHEMA_NAME, this.formatter.tables[0].NAME);
 				}.bind(this)
 			}
 		}
@@ -158,6 +135,58 @@ StudioSession.prototype.onKeyPress = function(ch, key) {
 	}
 
 	// console.log(key.ctrl, key.shift, key.name);
+}
+
+StudioSession.prototype.loadTableView = function(schema, table){
+
+	async.parallel([
+		function(callback){
+			this.studioDbHandler.loadStructure(schema, table, callback)
+		}.bind(this),
+		function(callback){
+			this.studioDbHandler.selectAllLimit(schema, table, this.dataPreviewRows, callback)
+		}.bind(this),
+	], function(err, data){
+
+		if(err){
+			this.formatter.fullPageError(err);
+			return;
+		}
+
+		this.formatter.drawTableView(schema, table, data[0], data[1]);
+	}.bind(this))
+	
+}
+
+StudioSession.prototype.toggleTableBoxView = function() {
+	if (this.formatter.tableListMode == "Tables") {
+
+		this.formatter.setTableListMode("Views");
+
+		this.studioDbHandler.getViews(this.formatter.schemas[0].SCHEMA_NAME, function(err, data) {
+			if (err) {
+				this.screen.error(err);
+				process.exit(1);
+			}
+
+			this.formatter.setTables(data);
+
+		}.bind(this))
+	} else {
+
+		this.formatter.setTableListMode("Tables");
+
+		this.studioDbHandler.getTables(this.formatter.schemas[0].SCHEMA_NAME, function(err, data) {
+			if (err) {
+				this.screen.error(err);
+				process.exit(1);
+			}
+
+			this.formatter.setTables(data);
+
+		}.bind(this))
+
+	}
 }
 
 StudioSession.prototype.exitStudio = function() {

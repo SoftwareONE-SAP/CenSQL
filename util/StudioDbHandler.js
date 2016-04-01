@@ -19,4 +19,12 @@ StudioDbHandler.prototype.getViews = function(schema, callback){
 	this.hdb.exec("studioConn", "SELECT VIEW_NAME AS NAME FROM SYS.VIEWS WHERE  SCHEMA_NAME = '" + schema + "' ORDER BY NAME", callback);
 }
 
+StudioDbHandler.prototype.loadStructure = function(schema, table, callback){
+	this.hdb.exec("studioConn", "SELECT COLUMN_NAME FROM (SELECT SCHEMA_NAME, VIEW_NAME AS NAME, COLUMN_NAME AS COLUMN_NAME FROM SYS.VIEW_COLUMNS UNION ALL SELECT SCHEMA_NAME, TABLE_NAME AS NAME, COLUMN_NAME FROM SYS.TABLE_COLUMNS) WHERE SCHEMA_NAME = '" + schema + "' AND NAME = '" + table + "'", callback)
+}
+
+StudioDbHandler.prototype.selectAllLimit = function(schema, table, limit, callback){
+	this.hdb.exec("studioConn", 'SELECT * FROM "' + schema + '"."' + table + '" LIMIT ' + limit, callback);
+}
+
 module.exports = StudioDbHandler;

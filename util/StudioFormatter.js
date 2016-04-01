@@ -17,13 +17,16 @@ var StudioFormatter = function(screen) {
 	this.borderTheme = "bgWhite"
 	this.sideBackgroundTheme = "bgCyan";
 	this.bottomBarTheme = 'bgBlack'
-	this.tableBoxBackgroundTheme = {"Tables": "bgBlue", "Views": "bgRed"};
+	this.tableBoxBackgroundTheme = {
+		"Tables": "bgBlue",
+		"Views": "bgRed"
+	};
 }
 
 StudioFormatter.prototype.init = function(schemas, tables) {
 	this.schemas = schemas;
 	this.tables = tables;
-	
+
 	this.redraw();
 
 	setTimeout(this.checkRefresh.bind(this), this.refreshCheckDelay);
@@ -31,7 +34,7 @@ StudioFormatter.prototype.init = function(schemas, tables) {
 
 StudioFormatter.prototype.calculateSize = function() {
 	this.width = process.stdout.columns;
-	this.height = process.stdout.rows;
+	this.height = process.stdout.rows - 2;
 	this.sideWidth = (Math.ceil(this.width / 4) < this.maxSideWidth ? Math.ceil(this.width / 4) : this.maxSideWidth);
 	this.schemaBoxHeight = Math.ceil(this.height / 4);
 	this.tableBoxHeight = this.height - this.schemaBoxHeight - 5
@@ -39,7 +42,7 @@ StudioFormatter.prototype.calculateSize = function() {
 
 StudioFormatter.prototype.checkRefresh = function() {
 
-	if (this.width != process.stdout.columns || this.height != process.stdout.rows) {
+	if (this.width != process.stdout.columns || this.height != process.stdout.rows - 2) {
 
 		/**
 		 * Regenerate size
@@ -141,13 +144,13 @@ StudioFormatter.prototype.drawBorder = function() {
 	this.drawBox(1, 1, this.width, 1, " " [this.borderTheme]);
 	this.drawBox(1, this.height, this.width, 1, " " [this.borderTheme]);
 
-	this.drawBox(1, 2, 1, this.height - 1, " " [this.borderTheme]);
-	this.drawBox(this.width, 2, 1, this.height - 1, " " [this.borderTheme]);
+	this.drawBox(1, 2, 1, this.height, " " [this.borderTheme]);
+	this.drawBox(this.width, 2, 1, this.height, " " [this.borderTheme]);
 
 	/**
 	 * Draw sideline
 	 */
-	this.drawBox(this.sideWidth, 2, 1, this.height - 1, " " [this.borderTheme]);
+	this.drawBox(this.sideWidth, 2, 1, this.height, " " [this.borderTheme]);
 
 	/**
 	 * Draw side box divider
@@ -164,12 +167,24 @@ StudioFormatter.prototype.drawBorder = function() {
 	/**
 	 * Draw bottom help bar
 	 */
-	this.drawBox(this.sideWidth + 1, this.height, this.width - this.sideWidth - 1, 2, " " [this.bottomBarTheme]);
-	this.drawText(this.sideWidth + 1, this.height, " Help" [this.bottomBarTheme]);
+	this.drawHelpText();
 
 }
 
-StudioFormatter.prototype.drawTableBoxHeader = function(){
+StudioFormatter.prototype.drawHelpText = function() {
+	this.drawBox(1, this.height + 1, this.width, 3, " " [this.bottomBarTheme]);
+
+	this.drawText(2, this.height + 1, colors.bgBlack.bold("Shft + ▲/▼") + " scroll schemas." [this.bottomBarTheme]);
+	this.drawText(2, this.height + 2, colors.bgBlack.bold("Ctrl + ▲/▼") + " scroll tables" [this.bottomBarTheme]);
+
+	this.drawText(29, this.height + 1, colors.bgBlack.bold("Shft + ⯈") + " select schema." [this.bottomBarTheme]);
+	this.drawText(29, this.height + 2, colors.bgBlack.bold("Ctrl + ⯈") + " select table." [this.bottomBarTheme]);
+
+	this.drawText(53, this.height + 1, colors.bgBlack.bold("Shft + Tab") + " toggle between tables/views." [this.bottomBarTheme]);
+
+}
+
+StudioFormatter.prototype.drawTableBoxHeader = function() {
 	this.drawText(2, this.schemaBoxHeight + 4, colors.bgBlack(pad(" " + this.tableListMode, this.sideWidth - 2)));
 }
 
@@ -191,6 +206,36 @@ StudioFormatter.prototype.drawBox = function(x, y, w, h, c) {
 	}
 
 	// this.screen.goto(1, 1);
+}
+
+StudioFormatter.prototype.drawTableView = function(schema, table, columns, dataPreview) {
+	console.log("yay!")
+}
+
+StudioFormatter.prototype.fullPageError = function(err) {
+	this.drawBox(this.sideWidth + 1, 2, this.width - this.sideWidth - 1, this.height - 1, " ");
+
+	var s = "" + err;
+
+	var width = parseInt((this.width - this.sideWidth) * 0.50);
+
+	var stringCutdown = (s).match(new RegExp(".{1," + (width - 3) + "}", "g"));
+
+	if(stringCutdown.length == 1){
+		width = stringCutdown[0].length + 3
+	}
+
+	var height = stringCutdown.length + 3;
+	var ypos = (this.height / 2) - (this.height / (this.height / height));
+	var xpos = parseInt(this.sideWidth + (((this.width - this.sideWidth) / 2)- (width / 2)));
+
+	this.drawBox(xpos - 1, ypos + 1, width, height, " " ["bgBlack"]);
+	this.drawBox(xpos, ypos, width, height, " " ["bgRed"]);
+
+	for (var i = stringCutdown.length - 1; i >= 0; i--) {
+		this.drawText(xpos + 2, ypos + 1 + i, stringCutdown[i].bgRed.bold);
+	}
+
 }
 
 StudioFormatter.prototype.byebye = function() {
