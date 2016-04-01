@@ -2,6 +2,7 @@ var charm = require('charm')(process.stdout);
 var colors = require("colors");
 var _ = require('lodash');
 var pad = require('pad');
+var Table = require('cli-table');
 
 var StudioFormatter = function(screen) {
 	this.screen = screen;
@@ -214,6 +215,16 @@ StudioFormatter.prototype.clearMainPanel = function() {
 
 StudioFormatter.prototype.drawTableView = function(schema, table, columns, dataPreview, isView) {
 	this.drawTableMetaInfo(schema, table, columns, isView);
+	this.drawDataView(columns, dataPreview);
+}
+
+StudioFormatter.prototype.drawDataView = function(columns, data){
+	if(data.length == 0){
+		this.fullPageError("Table/View is empty", "bgBlue", true);
+		return;
+	}
+
+	
 }
 
 StudioFormatter.prototype.drawTableMetaInfo = function(schema, table, columns, isView) {
@@ -254,8 +265,14 @@ StudioFormatter.prototype.drawTableMetaInfo = function(schema, table, columns, i
 	this.drawText(this.sideWidth + xoffset, 4, "Columns: ".bold.bgBlack + columnString['bgBlack'])
 }
 
-StudioFormatter.prototype.fullPageError = function(err) {
-	this.clearMainPanel();
+StudioFormatter.prototype.fullPageError = function(err, colour, shouldClear) {
+	if(!shouldClear){
+		this.clearMainPanel();
+	}
+
+	if(!colour){
+		colour = "bgRed"
+	}
 
 	var s = "" + err;
 
@@ -272,10 +289,10 @@ StudioFormatter.prototype.fullPageError = function(err) {
 	var xpos = parseInt(this.sideWidth + (((this.width - this.sideWidth) / 2) - (width / 2)));
 
 	this.drawBox(xpos - 1, ypos + 1, width, height, " " ["bgBlack"]);
-	this.drawBox(xpos, ypos, width, height, " " ["bgRed"]);
+	this.drawBox(xpos, ypos, width, height, " " [colour]);
 
 	for (var i = stringCutdown.length - 1; i >= 0; i--) {
-		this.drawText(xpos + 2, ypos + 1 + i, stringCutdown[i].bgRed.bold);
+		this.drawText(xpos + 2, ypos + 1 + i, stringCutdown[i][colour].bold);
 	}
 
 }

@@ -353,9 +353,9 @@ ScreenManager.prototype.error = function(message) {
 
 ScreenManager.prototype.print = function(message, callback) {
     if (!this.settings.colour) {
-        process.stdout.write(stripColorCodes(message), callback ? callback : null);
+        process.stdout.write(stripColorCodes(message || "NULL"), callback ? callback : null);
     } else {
-        process.stdout.write(message, callback ? callback : null);
+        process.stdout.write(message || "NULL", callback ? callback : null);
     }
 }
 

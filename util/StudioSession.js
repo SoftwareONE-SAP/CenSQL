@@ -124,7 +124,9 @@ StudioSession.prototype.onKeyPress = function(ch, key) {
 					this.formatter.rotateTables(-1);
 				}.bind(this),
 				"right": function() {
-					this.loadTableView(this.formatter.schemas[0].SCHEMA_NAME, this.formatter.tables[0].NAME, this.formatter.tableListMode == "Views");
+					if(this.formatter.schemas[0] && this.formatter.tables[0]){
+						this.loadTableView(this.formatter.schemas[0].SCHEMA_NAME, this.formatter.tables[0].NAME, this.formatter.tableListMode == "Views");
+					}
 				}.bind(this)
 			}
 		}
