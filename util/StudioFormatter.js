@@ -23,7 +23,7 @@ var StudioFormatter = function(screen) {
 		"Views": "bgMagenta"
 	};
 
-	this.scrollDataPaneDebounced = _.throttle(this.scrollDataPane.bind(this), 80, {leading: true});
+	this.scrollDataPaneDebounced = _.throttle(this.scrollDataPane.bind(this), 80, {trailing: true});
 }
 
 StudioFormatter.prototype.init = function(schemas, tables) {
@@ -301,7 +301,7 @@ StudioFormatter.prototype.drawDataView = function() {
 	for (var i = this.dataPane.scroll.y; i < aheight + this.dataPane.scroll.y; i++) {
 
 		if (i + 1 > rows.length) {
-			continue;
+			break;
 		}
 
 		count++;

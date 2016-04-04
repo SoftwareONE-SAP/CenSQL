@@ -127,10 +127,10 @@ StudioSession.prototype.onKeyPress = function(ch, key) {
 					this.formatter.scrollDataPaneDebounced(0, -5)
 				}.bind(this),
 				"pagedown": function() {
-					this.formatter.scrollDataPaneDebounced(0, 50)
+					this.formatter.scrollDataPaneDebounced(0, Math.abs(this.formatter.height - 10))
 				}.bind(this),
 				"pageup": function() {
-					this.formatter.scrollDataPaneDebounced(0, -50)
+					this.formatter.scrollDataPaneDebounced(0, -Math.abs(this.formatter.height - 10))
 				}.bind(this),
 				"home": function() {
 					this.formatter.scrollDataPaneDebounced(-Infinity, -Infinity)
