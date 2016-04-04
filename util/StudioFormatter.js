@@ -22,6 +22,8 @@ var StudioFormatter = function(screen) {
 		"Tables": "bgBlue",
 		"Views": "bgMagenta"
 	};
+
+	this.scrollDataPaneDebounced = _.throttle(this.scrollDataPane.bind(this), 80, {leading: true});
 }
 
 StudioFormatter.prototype.init = function(schemas, tables) {
@@ -241,7 +243,7 @@ StudioFormatter.prototype.drawTableView = function(schema, table, columns, dataP
 
 	this.dataPane.meta = {
 		schema: schema,
-		table: schema,
+		table: table,
 		columns: colNames,
 		isView: isView
 	}
@@ -257,8 +259,8 @@ StudioFormatter.prototype.drawTableView = function(schema, table, columns, dataP
 }
 
 StudioFormatter.prototype.drawDataView = function() {
-	if (this.dataPane.data.length == 0) {
-		this.fullPageError("Table/View is empty", "bgBlue", true);
+	if (!this.dataPane.data || this.dataPane.data.length == 0) {
+		this.fullPageError("Nothing to show", "bgBlue", true);
 		return;
 	}
 
@@ -388,6 +390,9 @@ StudioFormatter.prototype.byebye = function() {
 }
 
 StudioFormatter.prototype.scrollDataPane = function(dx, dy) {
+	var oldx = this.dataPane.scroll.x;
+	var oldy = this.dataPane.scroll.y;
+
 	this.dataPane.scroll.x += dx;
 	this.dataPane.scroll.y += dy;
 
@@ -399,7 +404,9 @@ StudioFormatter.prototype.scrollDataPane = function(dx, dy) {
 		this.dataPane.scroll.y = 0;
 	}
 
-	this.drawDataView();
+	if(oldx != this.dataPane.scroll.x || oldy != this.dataPane.scroll.y){
+		this.drawDataView();
+	}
 }
 
 StudioFormatter.prototype.rotateSchemas = function(d) {

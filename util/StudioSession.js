@@ -115,16 +115,25 @@ StudioSession.prototype.onKeyPress = function(ch, key) {
 			},
 			false: {
 				"right": function() {
-					this.formatter.scrollDataPane(10, 0)
+					this.formatter.scrollDataPaneDebounced(10, 0)
 				}.bind(this),
 				"left": function() {
-					this.formatter.scrollDataPane(-10, 0)
+					this.formatter.scrollDataPaneDebounced(-10, 0)
 				}.bind(this),
 				"down": function() {
-					this.formatter.scrollDataPane(0, 10)
+					this.formatter.scrollDataPaneDebounced(0, 5)
 				}.bind(this),
 				"up": function() {
-					this.formatter.scrollDataPane(0, -10)
+					this.formatter.scrollDataPaneDebounced(0, -5)
+				}.bind(this),
+				"pagedown": function() {
+					this.formatter.scrollDataPaneDebounced(0, 50)
+				}.bind(this),
+				"pageup": function() {
+					this.formatter.scrollDataPaneDebounced(0, -50)
+				}.bind(this),
+				"home": function() {
+					this.formatter.scrollDataPaneDebounced(-Infinity, -Infinity)
 				}.bind(this),
 			}
 		},
