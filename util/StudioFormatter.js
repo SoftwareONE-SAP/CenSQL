@@ -24,7 +24,7 @@ var StudioFormatter = function(screen) {
 		"Views": "bgMagenta"
 	};
 
-	this.scrollDataPaneDebounced = _.throttle(this.scrollDataPane.bind(this), 80, {trailing: true});
+	this.scrollDataPaneDebounced = _.throttle(this.scrollDataPane.bind(this), 70, {trailing: true});
 }
 
 StudioFormatter.prototype.init = function(schemas, tables) {
@@ -249,32 +249,23 @@ StudioFormatter.prototype.drawTableView = function(schema, table, columns, dataP
 		isView: isView
 	}
 
-	this.dataPane.data = dataPreview;
+	this.dataPane.rawData = dataPreview;
 
 	this.dataPane.scroll = {
 		x: 0,
 		y: 0
 	}
 
-	this.redrawDataPane();
-}
-
-StudioFormatter.prototype.drawDataView = function() {
-	if (!this.dataPane.data || this.dataPane.data.length == 0) {
-		this.fullPageAlert("Nothing to show", "bgBlue", true);
-		return;
-	}
-
 	var table = new cliTable({
 		head: this.dataPane.meta.columns
 	});
 
-	for (var k = 0; k < this.dataPane.data.length; k++) {
+	for (var k = 0; k < this.dataPane.rawData.length; k++) {
 		var rows = [];
 
 		for (var j = 0; j < this.dataPane.meta.columns.length; j++) {
 
-			var value = this.dataPane.data[k][this.dataPane.meta.columns[j]];
+			var value = this.dataPane.rawData[k][this.dataPane.meta.columns[j]];
 
 			if (value == null) value = "NULL";
 
@@ -284,8 +275,17 @@ StudioFormatter.prototype.drawDataView = function() {
 		table.push(rows);
 	};
 
-	var rows = table.toString().split("\n");
+	this.dataPane.data = table.toString().split("\n");
 
+	this.redrawDataPane();
+}
+
+StudioFormatter.prototype.drawDataView = function() {
+	if (!this.dataPane.rawData || this.dataPane.rawData.length == 0) {
+		this.fullPageAlert("Nothing to show", "bgBlue", true);
+		return;
+	}
+	
 	var yPadding = 7;
 
 	var x = 0;
@@ -301,13 +301,13 @@ StudioFormatter.prototype.drawDataView = function() {
 	 */
 	for (var i = this.dataPane.scroll.y; i < aheight + this.dataPane.scroll.y; i++) {
 
-		if (i + 1 > rows.length) {
+		if (i + 1 > this.dataPane.data.length) {
 			break;
 		}
 
 		count++;
 
-		var line = ansiSubstr(rows[i], x + this.dataPane.scroll.x, x + awidth + this.dataPane.scroll.x);
+		var line = ansiSubstr(this.dataPane.data[i], x + this.dataPane.scroll.x, x + awidth + this.dataPane.scroll.x);
 
 		line = pad(line, awidth, {colors: true, char: " "});
 
