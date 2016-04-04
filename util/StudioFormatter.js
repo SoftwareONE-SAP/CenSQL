@@ -261,7 +261,7 @@ StudioFormatter.prototype.drawTableView = function(schema, table, columns, dataP
 
 StudioFormatter.prototype.drawDataView = function() {
 	if (!this.dataPane.data || this.dataPane.data.length == 0) {
-		this.fullPageError("Nothing to show", "bgBlue", true);
+		this.fullPageAlert("Nothing to show", "bgBlue", true);
 		return;
 	}
 
@@ -351,7 +351,7 @@ StudioFormatter.prototype.drawTableMetaInfo = function() {
 	this.drawText(this.sideWidth + xoffset, 4, "Columns: ".bold.bgBlack + columnString['bgBlack'])
 }
 
-StudioFormatter.prototype.fullPageError = function(err, colour, shouldClear) {
+StudioFormatter.prototype.fullPageAlert = function(err, colour, shouldClear) {
 	if (!shouldClear) {
 		this.clearMainPanel();
 	}

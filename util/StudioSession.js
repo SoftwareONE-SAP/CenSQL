@@ -51,7 +51,7 @@ StudioSession.prototype.init = function() {
 
 		if (err) {
 			console.log();
-			this.formatter.fullPageError(err);
+			this.formatter.fullPageAlert(err);
 			console.log();
 			process.exit(1);
 		}
@@ -60,7 +60,7 @@ StudioSession.prototype.init = function() {
 
 			if (err) {
 				console.log();
-				this.formatter.fullPageError(err);
+				this.formatter.fullPageAlert(err);
 				console.log();
 				process.exit(1);
 			}
@@ -90,7 +90,7 @@ StudioSession.prototype.onKeyPress = function(ch, key) {
 
 						this.studioDbHandler.getViews(this.formatter.schemas[0].SCHEMA_NAME, function(err, data) {
 							if (err) {
-								this.formatter.fullPageError(err);
+								this.formatter.fullPageAlert(err);
 								process.exit(1);
 							}
 
@@ -101,7 +101,7 @@ StudioSession.prototype.onKeyPress = function(ch, key) {
 
 						this.studioDbHandler.getTables(this.formatter.schemas[0].SCHEMA_NAME, function(err, data) {
 							if (err) {
-								this.formatter.fullPageError(err);
+								this.formatter.fullPageAlert(err);
 								process.exit(1);
 							}
 
@@ -164,6 +164,8 @@ StudioSession.prototype.onKeyPress = function(ch, key) {
 
 StudioSession.prototype.loadTableView = function(schema, table, isView) {
 
+	this.formatter.fullPageAlert('Loading ' + this.dataPreviewRows + ' rows from "' + schema + '"."' + table + '"...', "bgYellow");
+
 	async.parallel([
 		function(callback) {
 			this.studioDbHandler.loadStructure(schema, table, callback)
@@ -174,7 +176,7 @@ StudioSession.prototype.loadTableView = function(schema, table, isView) {
 	], function(err, data) {
 
 		if (err) {
-			this.formatter.fullPageError(err);
+			this.formatter.fullPageAlert(err);
 			return;
 		}
 
@@ -190,7 +192,7 @@ StudioSession.prototype.toggleTableBoxView = function() {
 
 		this.studioDbHandler.getViews(this.formatter.schemas[0].SCHEMA_NAME, function(err, data) {
 			if (err) {
-				this.formatter.fullPageError(err);
+				this.formatter.fullPageAlert(err);
 				process.exit(1);
 			}
 
@@ -203,7 +205,7 @@ StudioSession.prototype.toggleTableBoxView = function() {
 
 		this.studioDbHandler.getTables(this.formatter.schemas[0].SCHEMA_NAME, function(err, data) {
 			if (err) {
-				this.formatter.fullPageError(err);
+				this.formatter.fullPageAlert(err);
 				process.exit(1);
 			}
 
