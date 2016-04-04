@@ -12,7 +12,7 @@ var StudioSession = function(screen, hdb) {
 	this.screen = screen;
 	this.hdb = hdb;
 
-	this.dataPreviewRows = 100;
+	this.dataPreviewRows = 1000;
 
 	/**
 	 * Print temp loading screen

@@ -308,7 +308,9 @@ ScreenManager.prototype.printCommandOutput = function(command, outputs, callback
             this.print("\n" + colors.cyan("> "));
         }
 
-        callback();
+        if(callback) {
+            callback();
+        }
 
     }.bind(this))
 

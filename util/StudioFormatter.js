@@ -291,10 +291,7 @@ StudioFormatter.prototype.drawDataView = function() {
 	var awidth = this.width - this.sideWidth - 2;
 	var aheight = this.height - 7;
 
-	/**
-	 * Clear panel first
-	 */
-	this.drawBox(this.sideWidth + 1, yPadding, awidth, aheight + 1, " ");
+	var count =- 0;
 
 	/**
 	 * Draw table
@@ -305,9 +302,17 @@ StudioFormatter.prototype.drawDataView = function() {
 			continue;
 		}
 
+		count++;
+
 		var line = stripColorCodes(rows[i]).substring(x + this.dataPane.scroll.x, x + awidth + this.dataPane.scroll.x);
 
+		line = pad(line, awidth, " ")
+
 		this.drawText(this.sideWidth + 1, yPadding + i - this.dataPane.scroll.y, line)
+	}
+
+	for (var i = count; i < aheight; i++) {
+		this.drawText(this.sideWidth + 1, yPadding + i, pad("-", awidth, " "))
 	}
 }
 
