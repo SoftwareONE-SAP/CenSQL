@@ -4,6 +4,7 @@ var _ = require('lodash');
 var pad = require('pad');
 var cliTable = require('cli-table');
 var stripColorCodes = require('stripcolorcodes');
+var ansiSubstr = require('ansi-substring');
 
 var StudioFormatter = function(screen) {
 	this.screen = screen;
@@ -306,9 +307,9 @@ StudioFormatter.prototype.drawDataView = function() {
 
 		count++;
 
-		var line = stripColorCodes(rows[i]).substring(x + this.dataPane.scroll.x, x + awidth + this.dataPane.scroll.x);
+		var line = ansiSubstr(rows[i], x + this.dataPane.scroll.x, x + awidth + this.dataPane.scroll.x);
 
-		line = pad(line, awidth, " ")
+		line = pad(line, awidth, {colors: true, char: " "});
 
 		this.drawText(this.sideWidth + 1, yPadding + i - this.dataPane.scroll.y, line)
 	}
