@@ -121,10 +121,10 @@ StudioSession.prototype.onKeyPress = function(ch, key) {
 					this.formatter.scrollDataPaneDebounced(-10, 0)
 				}.bind(this),
 				"down": function() {
-					this.formatter.scrollDataPaneDebounced(0, 5)
+					this.formatter.scrollDataPaneDebounced(0, 3)
 				}.bind(this),
 				"up": function() {
-					this.formatter.scrollDataPaneDebounced(0, -5)
+					this.formatter.scrollDataPaneDebounced(0, -3)
 				}.bind(this),
 				"pagedown": function() {
 					this.formatter.scrollDataPaneDebounced(0, Math.abs(this.formatter.height - 10))
