@@ -160,7 +160,7 @@ WatchCommandHandler.prototype.runCommand = function(command, screen, callback) {
     this.commandHandler.onCommand(command, function(output) {
         screen.clear();
 
-        screen.printCommandOutput(command, output, true);
+        screen.printCommandOutput(command, output);
 
         callback();
     });
