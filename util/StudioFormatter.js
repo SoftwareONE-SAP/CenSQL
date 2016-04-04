@@ -9,10 +9,9 @@ var StudioFormatter = function(screen) {
 	this.screen = screen;
 
 	this.maxSideWidth = 45;
+	this.refreshCheckDelay = 150;
 
 	this.calculateSize();
-
-	this.refreshCheckDelay = 150;
 
 	this.tableListMode = "Tables";
 
@@ -28,6 +27,13 @@ var StudioFormatter = function(screen) {
 StudioFormatter.prototype.init = function(schemas, tables) {
 	this.schemas = schemas;
 	this.tables = tables;
+
+	this.dataPane = {
+		scroll: {
+			x: 0,
+			y: 0
+		}
+	};
 
 	this.redraw();
 
@@ -62,6 +68,14 @@ StudioFormatter.prototype.redraw = function() {
 	this.drawBorder();
 	this.drawSchemaList()
 	this.drawTableList();
+	this.redrawDataPane();
+}
+
+StudioFormatter.prototype.redrawDataPane = function() {
+	if (this.dataPane.mode == "tablePreview") {
+		this.drawTableMetaInfo();
+		this.drawDataView();
+	}
 }
 
 StudioFormatter.prototype.drawSchemaList = function() {
@@ -170,7 +184,6 @@ StudioFormatter.prototype.drawBorder = function() {
 	 * Draw bottom help bar
 	 */
 	this.drawHelpText();
-
 }
 
 StudioFormatter.prototype.drawHelpText = function() {
@@ -183,7 +196,6 @@ StudioFormatter.prototype.drawHelpText = function() {
 	this.drawText(29, this.height + 2, colors.bgBlack.bold("Ctrl + ⯈") + " select table." [this.bottomBarTheme]);
 
 	this.drawText(53, this.height + 1, colors.bgBlack.bold("Shft + Tab") + " toggle between tables/views." [this.bottomBarTheme]);
-
 }
 
 StudioFormatter.prototype.drawTableBoxHeader = function() {
@@ -222,60 +234,91 @@ StudioFormatter.prototype.drawTableView = function(schema, table, columns, dataP
 		colNames.push(columns[i].COLUMN_NAME)
 	}
 
-	this.drawTableMetaInfo(schema, table, colNames, isView);
-	this.drawDataView(colNames, dataPreview);
+	/**
+	 * Save this state
+	 */
+	this.dataPane.mode = "tablePreview"
+
+	this.dataPane.meta = {
+		schema: schema,
+		table: schema,
+		columns: colNames,
+		isView: isView
+	}
+
+	this.dataPane.data = dataPreview;
+
+	this.dataPane.scroll = {
+		x: 0,
+		y: 0
+	}
+
+	this.redrawDataPane();
 }
 
-StudioFormatter.prototype.drawDataView = function(colNames, data) {
-	if (data.length == 0) {
+StudioFormatter.prototype.drawDataView = function() {
+	if (this.dataPane.data.length == 0) {
 		this.fullPageError("Table/View is empty", "bgBlue", true);
 		return;
 	}
 
 	var table = new cliTable({
-		head: colNames
+		head: this.dataPane.meta.columns
 	});
 
-	for (var k = 0; k < data.length; k++) {
-        var rows = [];
+	for (var k = 0; k < this.dataPane.data.length; k++) {
+		var rows = [];
 
-        for (var j = 0; j < colNames.length; j++) {
-            
-            var value = data[k][colNames[j]];
+		for (var j = 0; j < this.dataPane.meta.columns.length; j++) {
 
-            if(value == null) value = "NULL";
+			var value = this.dataPane.data[k][this.dataPane.meta.columns[j]];
 
-            rows.push(value)
-        };
+			if (value == null) value = "NULL";
 
-        table.push(rows);
-    };
+			rows.push(value)
+		};
 
-    var rows = table.toString().split("\n");
+		table.push(rows);
+	};
 
-    var yPadding = 7;
+	var rows = table.toString().split("\n");
 
-    var x = 0;
-    var y = 0;
+	var yPadding = 7;
 
-    var awidth = this.width - this.sideWidth - 2;
+	var x = 0;
+	var y = 0;
 
-    for (var i = rows.length - 1; i >= 0; i--) {
+	var awidth = this.width - this.sideWidth - 2;
+	var aheight = this.height - 7;
 
-    	var line = stripColorCodes(rows[i]).substring(x, x + awidth);
+	/**
+	 * Clear panel first
+	 */
+	this.drawBox(this.sideWidth + 1, yPadding, awidth, aheight + 1, " ");
 
-    	this.drawText(this.sideWidth + 1, yPadding+i, line)
-    }
+	/**
+	 * Draw table
+	 */
+	for (var i = this.dataPane.scroll.y; i < aheight + this.dataPane.scroll.y; i++) {
+
+		if (i + 1 > rows.length) {
+			continue;
+		}
+
+		var line = stripColorCodes(rows[i]).substring(x + this.dataPane.scroll.x, x + awidth + this.dataPane.scroll.x);
+
+		this.drawText(this.sideWidth + 1, yPadding + i - this.dataPane.scroll.y, line)
+	}
 }
 
-StudioFormatter.prototype.drawTableMetaInfo = function(schema, table, colNames, isView) {
+StudioFormatter.prototype.drawTableMetaInfo = function() {
 
 	this.clearMainPanel();
 
 	var height = 4;
 	var xoffset = 2;
 
-	var columnString = colNames.join(", ");
+	var columnString = this.dataPane.meta.columns.join(", ");
 
 	var maxColumnStringWidth = this.width - this.sideWidth - 13;
 
@@ -289,12 +332,12 @@ StudioFormatter.prototype.drawTableMetaInfo = function(schema, table, colNames, 
 	this.drawBox(this.sideWidth + 1, 2, this.width - this.sideWidth - 1, height + 1, " ".bgBlack);
 	this.drawBox(this.sideWidth + 1, height + 2, this.width - this.sideWidth - 1, 1, " " [this.borderTheme]);
 
-	this.drawText(this.sideWidth + xoffset, 3, "Schema Name: ".bold.bgBlack + schema.substring(0, 23)['bgBlack'])
+	this.drawText(this.sideWidth + xoffset, 3, "Schema Name: ".bold.bgBlack + this.dataPane.meta.schema.substring(0, 23)['bgBlack'])
 
-	if (isView) {
-		this.drawText(this.sideWidth + xoffset + 39, 3, "View Name: ".bold.bgBlack + table.substring(0, 25)['bgBlack'])
+	if (this.dataPane.meta.isView) {
+		this.drawText(this.sideWidth + xoffset + 39, 3, "View Name: ".bold.bgBlack + this.dataPane.meta.table.substring(0, 25)['bgBlack'])
 	} else {
-		this.drawText(this.sideWidth + xoffset + 39, 3, "Table Name: ".bold.bgBlack + table.substring(0, 25)['bgBlack'])
+		this.drawText(this.sideWidth + xoffset + 39, 3, "Table Name: ".bold.bgBlack + this.dataPane.meta.table.substring(0, 25)['bgBlack'])
 	}
 
 	this.drawText(this.sideWidth + xoffset, 4, "Columns: ".bold.bgBlack + columnString['bgBlack'])
@@ -337,6 +380,21 @@ StudioFormatter.prototype.byebye = function() {
 	this.screen.clear()
 	this.screen.print(colors.green("Bye Bye!"), false)
 	this.screen.print("\n");
+}
+
+StudioFormatter.prototype.scrollDataPane = function(dx, dy) {
+	this.dataPane.scroll.x += dx;
+	this.dataPane.scroll.y += dy;
+
+	if(this.dataPane.scroll.x < 0){
+		this.dataPane.scroll.x = 0;
+	}
+
+	if(this.dataPane.scroll.y < 0){
+		this.dataPane.scroll.y = 0;
+	}
+
+	this.drawDataView();
 }
 
 StudioFormatter.prototype.rotateSchemas = function(d) {

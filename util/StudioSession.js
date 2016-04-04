@@ -12,7 +12,7 @@ var StudioSession = function(screen, hdb) {
 	this.screen = screen;
 	this.hdb = hdb;
 
-	this.dataPreviewRows = 10;
+	this.dataPreviewRows = 100;
 
 	/**
 	 * Print temp loading screen
@@ -112,6 +112,20 @@ StudioSession.prototype.onKeyPress = function(ch, key) {
 					}
 				}.bind(this),
 				"tab": this.toggleTableBoxView.bind(this)
+			},
+			false: {
+				"right": function() {
+					this.formatter.scrollDataPane(10, 0)
+				}.bind(this),
+				"left": function() {
+					this.formatter.scrollDataPane(-10, 0)
+				}.bind(this),
+				"down": function() {
+					this.formatter.scrollDataPane(0, 10)
+				}.bind(this),
+				"up": function() {
+					this.formatter.scrollDataPane(0, -10)
+				}.bind(this),
 			}
 		},
 		true: {
@@ -124,7 +138,7 @@ StudioSession.prototype.onKeyPress = function(ch, key) {
 					this.formatter.rotateTables(-1);
 				}.bind(this),
 				"right": function() {
-					if(this.formatter.schemas[0] && this.formatter.tables[0]){
+					if (this.formatter.schemas[0] && this.formatter.tables[0]) {
 						this.loadTableView(this.formatter.schemas[0].SCHEMA_NAME, this.formatter.tables[0].NAME, this.formatter.tableListMode == "Views");
 					}
 				}.bind(this)
@@ -139,25 +153,25 @@ StudioSession.prototype.onKeyPress = function(ch, key) {
 	// console.log(key.ctrl, key.shift, key.name);
 }
 
-StudioSession.prototype.loadTableView = function(schema, table, isView){
+StudioSession.prototype.loadTableView = function(schema, table, isView) {
 
 	async.parallel([
-		function(callback){
+		function(callback) {
 			this.studioDbHandler.loadStructure(schema, table, callback)
 		}.bind(this),
-		function(callback){
+		function(callback) {
 			this.studioDbHandler.selectAllLimit(schema, table, this.dataPreviewRows, callback)
 		}.bind(this),
-	], function(err, data){
+	], function(err, data) {
 
-		if(err){
+		if (err) {
 			this.formatter.fullPageError(err);
 			return;
 		}
 
 		this.formatter.drawTableView(schema, table, data[0], data[1], isView);
 	}.bind(this))
-	
+
 }
 
 StudioSession.prototype.toggleTableBoxView = function() {
