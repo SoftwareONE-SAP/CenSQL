@@ -133,6 +133,9 @@ StudioSession.prototype.onKeyPress = function(ch, key) {
 				"home": function() {
 					this.formatter.scrollDataPaneDebounced(-Infinity, -Infinity)
 				}.bind(this),
+				"tab": function() {
+					this.formatter.toggleFocus();
+				}.bind(this),
 			}
 		},
 		true: {

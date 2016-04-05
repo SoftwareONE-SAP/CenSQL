@@ -10,7 +10,7 @@ var StudioFormatter = function(screen) {
 	this.screen = screen;
 
 	this.maxSideWidth = 45;
-	this.maxSqlConsoleHeight = 20;
+	this.maxSqlConsoleHeight = 15;
 
 	this.refreshCheckDelay = 150;
 
@@ -21,6 +21,7 @@ var StudioFormatter = function(screen) {
 	this.borderTheme = "bgWhite"
 	this.sideBackgroundTheme = "bgCyan";
 	this.bottomBarTheme = 'bgBlack'
+	this.metaBoxTheme = "bgMagenta"
 	this.tableBoxBackgroundTheme = {
 		"Tables": "bgBlue",
 		"Views": "bgMagenta"
@@ -40,6 +41,8 @@ StudioFormatter.prototype.init = function(schemas, tables) {
 		}
 	};
 
+	this.focus = "sql-console";
+
 	this.redraw();
 
 	setTimeout(this.checkRefresh.bind(this), this.refreshCheckDelay);
@@ -51,7 +54,7 @@ StudioFormatter.prototype.calculateSize = function() {
 	this.sideWidth = (Math.ceil(this.width / 4) < this.maxSideWidth ? Math.ceil(this.width / 4) : this.maxSideWidth);
 	this.schemaBoxHeight = Math.ceil(this.height / 4);
 	this.tableBoxHeight = this.height - this.schemaBoxHeight - 5
-	this.sqlConsoleHeight = (Math.ceil(this.height / 4) < this.maxSqlConsoleHeight ? Math.ceil(this.height / 4) : this.maxSqlConsoleHeight);
+	this.sqlConsoleHeight = (Math.ceil(this.height / 5) < this.maxSqlConsoleHeight ? Math.ceil(this.height / 5) : this.maxSqlConsoleHeight);
 	this.dataPaneHeight = this.height - this.sqlConsoleHeight;
 	this.metaWindowHeight = 6;
 }
@@ -80,9 +83,20 @@ StudioFormatter.prototype.redraw = function() {
 	this.drawSqlConsole();
 }
 
+StudioFormatter.prototype.toggleFocus = function(){
+	if(this.focus == "sql-console"){
+		this.focus = "data-pane";
+	}else{
+		this.focus = "sql-console";
+	}
+
+	this.drawBorder();
+}
+
 StudioFormatter.prototype.redrawDataPane = function() {
 	if (this.dataPane.mode == "tablePreview") {
 		this.drawTableMetaInfo();
+		this.drawActiveBorders();
 		this.drawDataView();
 	}
 }
@@ -175,11 +189,6 @@ StudioFormatter.prototype.drawBorder = function() {
 	this.drawBox(this.width, 2, 1, this.height, " " [this.borderTheme]);
 
 	/**
-	 * Draw sideline
-	 */
-	this.drawBox(this.sideWidth, 2, 1, this.height, " " [this.borderTheme]);
-
-	/**
 	 * Draw side box divider
 	 */
 	this.drawBox(2, this.schemaBoxHeight + 3, this.sideWidth - 2, 1, " " [this.borderTheme]);
@@ -192,20 +201,45 @@ StudioFormatter.prototype.drawBorder = function() {
 	this.drawTableBoxHeader();
 
 	/** 
-	 * Draw sql border
+	 * Draw active borders
 	 */
-	
-	var char = " "[this.borderTheme]
-
-	this.drawBox(this.sideWidth + 1, this.dataPaneHeight + 1, this.width - this.sideWidth - 1, 1, char);
-	this.drawBox(this.sideWidth + 1, this.height, this.width - this.sideWidth - 1, 1, char);
-	this.drawBox(this.sideWidth, this.dataPaneHeight + 1, 1, this.sqlConsoleHeight + 1, char);
-	this.drawBox(this.width, this.dataPaneHeight + 1, 1, this.sqlConsoleHeight + 1, char);
+	this.drawActiveBorders();
 
 	/**
 	 * Draw bottom help bar
 	 */
 	this.drawHelpText();
+}
+
+StudioFormatter.prototype.drawActiveBorders = function(){
+		
+	var focusedChar = " ".bgYellow
+	var nonfocusedChar = " "[this.borderTheme]
+
+	/**
+	 * Shared by both
+	 */
+	this.drawBox(this.sideWidth + 1, this.height, this.width - this.sideWidth - 1, 1, (this.focus == "sql-console" ? focusedChar : nonfocusedChar));
+
+	/**
+	 * Data pane
+	 */
+	
+	this.drawBox(this.sideWidth + 1, 1, this.width - this.sideWidth - 1, 1, (this.focus == "data-pane" ? focusedChar : nonfocusedChar));
+	this.drawBox(this.sideWidth, 1, 1, this.height - this.sqlConsoleHeight + 1, (this.focus == "data-pane" ? focusedChar : nonfocusedChar));
+	this.drawBox(this.width, 1, 1, this.height - this.sqlConsoleHeight + 1, (this.focus == "data-pane" ? focusedChar : nonfocusedChar));
+
+	if(this.dataPane.mode == "tablePreview"){
+		this.drawBox(this.sideWidth + 1, this.metaWindowHeight, this.width - this.sideWidth - 1, 1, (this.focus == "data-pane" ? focusedChar : nonfocusedChar));
+	}
+
+	/**
+	 * SQL console
+	 */
+	this.drawBox(this.sideWidth, this.dataPaneHeight + 1, this.width - this.sideWidth + 1, 1, focusedChar);
+
+	this.drawBox(this.sideWidth, this.dataPaneHeight + 2, 1, this.sqlConsoleHeight, (this.focus == "sql-console" ? focusedChar : nonfocusedChar));
+	this.drawBox(this.width, this.dataPaneHeight + 2, 1, this.sqlConsoleHeight, (this.focus == "sql-console" ? focusedChar : nonfocusedChar));
 }
 
 StudioFormatter.prototype.drawHelpText = function() {
@@ -352,21 +386,21 @@ StudioFormatter.prototype.drawTableMetaInfo = function() {
 		columnString = columnString.substring(0, maxColumnStringWidth - 3) + "..."
 	}
 
+
 	/**
 	 * Draw meta box
 	 */
-	this.drawBox(this.sideWidth + 1, 2, this.width - this.sideWidth - 1, height + 1, " ".bgBlack);
-	this.drawBox(this.sideWidth + 1, height + 2, this.width - this.sideWidth - 1, 1, " " [this.borderTheme]);
+	this.drawBox(this.sideWidth + 1, 2, this.width - this.sideWidth - 1, height + 1, " "[this.metaBoxTheme]);
 
-	this.drawText(this.sideWidth + xoffset, 3, "Schema Name: ".bold.bgBlack + this.dataPane.meta.schema.substring(0, 23)['bgBlack'])
+	this.drawText(this.sideWidth + xoffset, 3, "Schema Name: ".bold[this.metaBoxTheme] + this.dataPane.meta.schema.substring(0, 23)[this.metaBoxTheme])
 
 	if (this.dataPane.meta.isView) {
-		this.drawText(this.sideWidth + xoffset + 39, 3, "View Name: ".bold.bgBlack + this.dataPane.meta.table.substring(0, 25)['bgBlack'])
+		this.drawText(this.sideWidth + xoffset + 39, 3, "View Name: ".bold[this.metaBoxTheme] + this.dataPane.meta.table.substring(0, 25)[this.metaBoxTheme])
 	} else {
-		this.drawText(this.sideWidth + xoffset + 39, 3, "Table Name: ".bold.bgBlack + this.dataPane.meta.table.substring(0, 25)['bgBlack'])
+		this.drawText(this.sideWidth + xoffset + 39, 3, "Table Name: ".bold[this.metaBoxTheme] + this.dataPane.meta.table.substring(0, 25)[this.metaBoxTheme])
 	}
 
-	this.drawText(this.sideWidth + xoffset, 4, "Columns: ".bold.bgBlack + columnString['bgBlack'])
+	this.drawText(this.sideWidth + xoffset, 4, "Columns: ".bold[this.metaBoxTheme] + columnString[this.metaBoxTheme])
 }
 
 StudioFormatter.prototype.fullPageAlert = function(err, colour, shouldClear, isFullScreen) {
