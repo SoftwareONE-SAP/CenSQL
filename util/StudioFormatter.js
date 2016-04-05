@@ -10,6 +10,8 @@ var StudioFormatter = function(screen) {
 	this.screen = screen;
 
 	this.maxSideWidth = 45;
+	this.maxSqlConsoleHeight = 20;
+
 	this.refreshCheckDelay = 150;
 
 	this.calculateSize();
@@ -49,6 +51,9 @@ StudioFormatter.prototype.calculateSize = function() {
 	this.sideWidth = (Math.ceil(this.width / 4) < this.maxSideWidth ? Math.ceil(this.width / 4) : this.maxSideWidth);
 	this.schemaBoxHeight = Math.ceil(this.height / 4);
 	this.tableBoxHeight = this.height - this.schemaBoxHeight - 5
+	this.sqlConsoleHeight = (Math.ceil(this.height / 4) < this.maxSqlConsoleHeight ? Math.ceil(this.height / 4) : this.maxSqlConsoleHeight);
+	this.dataPaneHeight = this.height - this.sqlConsoleHeight;
+	this.metaWindowHeight = 6;
 }
 
 StudioFormatter.prototype.checkRefresh = function() {
@@ -72,6 +77,7 @@ StudioFormatter.prototype.redraw = function() {
 	this.drawSchemaList()
 	this.drawTableList();
 	this.redrawDataPane();
+	this.drawSqlConsole();
 }
 
 StudioFormatter.prototype.redrawDataPane = function() {
@@ -81,13 +87,15 @@ StudioFormatter.prototype.redrawDataPane = function() {
 	}
 }
 
+StudioFormatter.prototype.drawSqlConsole = function(){
+	this.drawBox(this.sideWidth + 1, this.dataPaneHeight + 2, this.width - this.sideWidth - 1, this.sqlConsoleHeight - 1, "-".bgBlack.grey);
+}
+
 StudioFormatter.prototype.drawSchemaList = function() {
 
 	if (this.schemas.length == 0) {
 		return;
 	}
-
-	// console.log(this.schemaBoxHeight)
 
 	try {
 
@@ -183,6 +191,17 @@ StudioFormatter.prototype.drawBorder = function() {
 
 	this.drawTableBoxHeader();
 
+	/** 
+	 * Draw sql border
+	 */
+	
+	var char = " "[this.borderTheme]
+
+	this.drawBox(this.sideWidth + 1, this.dataPaneHeight + 1, this.width - this.sideWidth - 1, 1, char);
+	this.drawBox(this.sideWidth + 1, this.height, this.width - this.sideWidth - 1, 1, char);
+	this.drawBox(this.sideWidth, this.dataPaneHeight + 1, 1, this.sqlConsoleHeight + 1, char);
+	this.drawBox(this.width, this.dataPaneHeight + 1, 1, this.sqlConsoleHeight + 1, char);
+
 	/**
 	 * Draw bottom help bar
 	 */
@@ -217,9 +236,7 @@ StudioFormatter.prototype.drawBox = function(x, y, w, h, c) {
 	this.screen.goto(x, y);
 
 	for (var dy = 0; dy < h; dy++) {
-		for (var dx = 0; dx < w; dx++) {
-			this.screen.print(c);
-		}
+		this.screen.print(new Array(w + 1).join(c || " "));
 		this.screen.goto(x, y + dy);
 	}
 
@@ -227,7 +244,7 @@ StudioFormatter.prototype.drawBox = function(x, y, w, h, c) {
 }
 
 StudioFormatter.prototype.clearMainPanel = function() {
-	this.drawBox(this.sideWidth + 1, 2, this.width - this.sideWidth - 1, this.height - 1, " ");
+	this.drawBox(this.sideWidth + 1, 2, this.width - this.sideWidth - 1, this.dataPaneHeight, " ");
 }
 
 StudioFormatter.prototype.drawTableView = function(schema, table, columns, dataPreview, isView) {
@@ -292,8 +309,8 @@ StudioFormatter.prototype.drawDataView = function() {
 	var x = 0;
 	var y = 0;
 
-	var awidth = this.width - this.sideWidth - 2;
-	var aheight = this.height - 7;
+	var awidth = this.width - this.sideWidth - 1;
+	var aheight = this.dataPaneHeight - this.metaWindowHeight;
 
 	var count =- 0;
 
@@ -352,7 +369,7 @@ StudioFormatter.prototype.drawTableMetaInfo = function() {
 	this.drawText(this.sideWidth + xoffset, 4, "Columns: ".bold.bgBlack + columnString['bgBlack'])
 }
 
-StudioFormatter.prototype.fullPageAlert = function(err, colour, shouldClear) {
+StudioFormatter.prototype.fullPageAlert = function(err, colour, shouldClear, isFullScreen) {
 	if (!shouldClear) {
 		this.clearMainPanel();
 	}
@@ -372,8 +389,12 @@ StudioFormatter.prototype.fullPageAlert = function(err, colour, shouldClear) {
 	}
 
 	var height = stringCutdown.length + 3;
-	var ypos = (this.height / 2) - (this.height / (this.height / height));
+	var ypos = this.metaWindowHeight + (this.dataPaneHeight / 2) - (this.dataPaneHeight / (this.dataPaneHeight / height));
 	var xpos = parseInt(this.sideWidth + (((this.width - this.sideWidth) / 2) - (width / 2)));
+
+	if(isFullScreen){
+		xpos = parseInt((this.width / 2) - (width / 2));
+	}
 
 	this.drawBox(xpos - 1, ypos + 1, width, height, " " ["bgBlack"]);
 	this.drawBox(xpos, ypos, width, height, " " [colour]);

@@ -50,19 +50,17 @@ StudioSession.prototype.init = function() {
 	this.studioDbHandler.getSchemas(function(err, schemas) {
 
 		if (err) {
-			console.log();
-			this.formatter.fullPageAlert(err);
-			console.log();
-			process.exit(1);
+			this.screen.clear();
+			this.formatter.fullPageAlert(err, "bgRed", false, true);
+			return
 		}
 
 		this.studioDbHandler.getTables(schemas[0].SCHEMA_NAME, function(err, tables) {
 
 			if (err) {
-				console.log();
-				this.formatter.fullPageAlert(err);
-				console.log();
-				process.exit(1);
+				this.screen.clear();
+				this.formatter.fullPageAlert(err, "bgRed", false, true);
+				return
 			}
 
 			this.formatter.init(schemas, tables);
