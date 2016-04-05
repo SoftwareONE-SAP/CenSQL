@@ -1,6 +1,6 @@
 {
   "name": "censql",
-  "version": "1.5.7",
+  "version": "1.6.0",
   "description": "A CLI client for SAP HANA",
   "main": "./app.js",
   "scripts": {
