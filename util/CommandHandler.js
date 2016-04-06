@@ -120,9 +120,6 @@ CommandHandler.prototype.onCommand = function(enteredCommand, allCallback) {
 
         cParts.unshift(initialCommand);
 
-        // console.log(initialCommand);
-        // console.log(cParts);
-
         /**
          * Is the command an internal command? (Does it start with a '\')
          */

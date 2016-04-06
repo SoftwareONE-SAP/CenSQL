@@ -24,7 +24,7 @@ module.exports = function(command, data) {
 
             var value = data[k][keys[j]];
 
-            value = value.split('"').join('""');
+            value = value.toString().split('"').join('""');
 
             if(value.indexOf(",") !== -1){
                 value = '"' + value + '"';
