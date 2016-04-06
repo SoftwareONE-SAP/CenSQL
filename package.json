@@ -37,12 +37,12 @@
   },
   "nexe": {
     "input": "./app.js",
-    "output": "app",
+    "output": "app^$",
     "runtime": {
-        "framework": "node",
-        "version": "5.4.1",
-        "js-flags": "",
-        "ignoreFlags": true
+      "framework": "node",
+      "version": "5.4.1",
+      "js-flags": "",
+      "ignoreFlags": true
     }
   }
 }
