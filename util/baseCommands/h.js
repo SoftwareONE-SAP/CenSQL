@@ -10,7 +10,7 @@ HelpCommandHandler.prototype.run = function(command, cParts, conn, screen, callb
     callback(
         [
             0, [
-                colors.bold(colors.green("CenSQL") + " v" + require(path.join(path.dirname(require.main.filename), 'package.json')).version + " Help"),
+                colors.bold(colors.green("CenSQL") + " Help"),
                 "-----------------------------------------------------",
                 colors.bold("Commands:"),
                 colors.bold("\tBasic:"),

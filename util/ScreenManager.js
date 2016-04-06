@@ -37,38 +37,40 @@ ScreenManager.prototype.loadPipeHandlers = function() {
     this.pipeHandlers = {};
     this.pipeHandlersNames = [];
 
-    require('fs').readdirSync(path.join(__dirname, '/../pipeCommands/')).forEach(function(file) {
+    this.pipeHandlers["cut"] = require("./pipeCommands/cut.js");
+    this.pipeHandlers["grep"] = require("./pipeCommands/grep.js");
+    this.pipeHandlers["head"] = require("./pipeCommands/head.js");
+    this.pipeHandlers["tail"] = require("./pipeCommands/tail.js");
+    this.pipeHandlers["wc"] = require("./pipeCommands/wc.js");
 
-        if (file.match(/\.js$/) !== null) {
-
-            var name = file.replace('.js', '');
-
-            this.pipeHandlersNames.push(name);
-            this.pipeHandlers[name] = require('../pipeCommands/' + file);
-
-        }
-
-    }.bind(this));
+    this.pipeHandlersNames = Object.keys(this.pipeHandlers);
 
 }
 
 ScreenManager.prototype.loadDataFormatters = function() {
     this.formatters = {};
-    this.formattersNames = [];
 
-    require('fs').readdirSync(__dirname + '/../dataFormatters/').forEach(function(file) {
+    this.formatters["bar-chart"] = require("./dataFormatters/bar-chart.js");
+    this.formatters["bc"] = require("./dataFormatters/bc.js");
+    this.formatters["c"] = require("./dataFormatters/c.js");
+    this.formatters["csv"] = require("./dataFormatters/csv.js");
+    this.formatters["default"] = require("./dataFormatters/default.js");
+    this.formatters["g"] = require("./dataFormatters/g.js");
+    this.formatters["group"] = require("./dataFormatters/group.js");
+    this.formatters["jj"] = require("./dataFormatters/jj.js");
+    this.formatters["j"] = require("./dataFormatters/j.js");
+    this.formatters["json"] = require("./dataFormatters/json.js");
+    this.formatters["key-value-bar-chart"] = require("./dataFormatters/key-value-bar-chart.js");
+    this.formatters["kvbc"] = require("./dataFormatters/kvbc.js");
+    this.formatters["lg"] = require("./dataFormatters/lg.js");
+    this.formatters["line-graph"] = require("./dataFormatters/line-graph.js");
+    this.formatters["message"] = require("./dataFormatters/message.js");
+    this.formatters["m"] = require("./dataFormatters/m.js");
+    this.formatters["pretty-json"] = require("./dataFormatters/pretty-json.js");
+    this.formatters["table"] = require("./dataFormatters/table.js");
+    this.formatters["t"] = require("./dataFormatters/t.js");
 
-        if (file.match(/\.js$/) !== null) {
-
-            var name = file.replace('.js', '');
-
-            this.formattersNames.push(name);
-            this.formatters[name] = require('../dataFormatters/' + file);
-
-        }
-
-    }.bind(this));
-
+    this.formattersNames = Object.keys(this.formatters);
 }
 
 /**
@@ -226,9 +228,9 @@ ScreenManager.prototype.ready = function(hdb) {
     /**
      * Should we enter the cli or studio mode?
      */
-    if(this.settings.studio){
+    if (this.settings.studio) {
         this.studio = new StudioSession(this, hdb);
-    }else{
+    } else {
         this.print(colors.cyan(colors.bold("For help type \\h\n-----------------------------------------------------\n\n")));
         this.print(colors.cyan("> "));
         process.stdin.resume();
@@ -308,7 +310,7 @@ ScreenManager.prototype.printCommandOutput = function(command, outputs, callback
             this.print("\n" + colors.cyan("> "));
         }
 
-        if(callback) {
+        if (callback) {
             callback();
         }
 
@@ -366,8 +368,8 @@ ScreenManager.prototype.clear = function() {
     this.goto(1, 1);
 }
 
-ScreenManager.prototype.goto = function(x,y){
-    charm.position(x,y);
+ScreenManager.prototype.goto = function(x, y) {
+    charm.position(x, y);
 }
 
 module.exports = ScreenManager;

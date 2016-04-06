@@ -34,5 +34,15 @@
   },
   "engines": {
     "node": ">= 0.10.30"
+  },
+  "nexe": {
+    "input": "./app.js",
+    "output": "app",
+    "runtime": {
+        "framework": "node",
+        "version": "5.4.1",
+        "js-flags": "",
+        "ignoreFlags": true
+    }
   }
 }

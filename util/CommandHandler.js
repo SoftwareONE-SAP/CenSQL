@@ -1,4 +1,5 @@
 var async = require("async");
+var path = require("path");
 
 var CommandHandler = function(screen, conn, command) {
     this.screen = screen;
@@ -23,17 +24,51 @@ CommandHandler.prototype.loadCommandHandlers = function() {
 
     this.handlers = {};
 
-    require('fs').readdirSync(__dirname + '/../baseCommands/').forEach(function(file) {
-
-        if (file.match(/\.js$/) !== null) {
-
-            var name = file.replace('.js', '');
-
-            this.handlers[name] = new(require('../baseCommands/' + file))(this);
-
-        }
-
-    }.bind(this));
+    this.handlers["al"] = new (require("./baseCommands/al.js"))(this);
+    this.handlers["ba"] = new (require("./baseCommands/ba.js"))(this);
+    this.handlers["con"] = new (require("./baseCommands/con.js"))(this);
+    this.handlers["cpu"] = new (require("./baseCommands/cpu.js"))(this);
+    this.handlers["csc"] = new (require("./baseCommands/csc.js"))(this);
+    this.handlers["csd"] = new (require("./baseCommands/csd.js"))(this);
+    this.handlers["csm"] = new (require("./baseCommands/csm.js"))(this);
+    this.handlers["csr"] = new (require("./baseCommands/csr.js"))(this);
+    this.handlers["csw"] = new (require("./baseCommands/csw.js"))(this);
+    this.handlers["disk"] = new (require("./baseCommands/disk.js"))(this);
+    this.handlers["ds"] = new (require("./baseCommands/ds.js"))(this);
+    this.handlers["dt"] = new (require("./baseCommands/dt.js"))(this);
+    this.handlers["du"] = new (require("./baseCommands/du.js"))(this);
+    this.handlers["dv"] = new (require("./baseCommands/dv.js"))(this);
+    this.handlers["help"] = new (require("./baseCommands/help.js"))(this);
+    this.handlers["h"] = new (require("./baseCommands/h.js"))(this);
+    this.handlers["hmem"] = new (require("./baseCommands/hmem.js"))(this);
+    this.handlers["imem"] = new (require("./baseCommands/imem.js"))(this);
+    this.handlers["in"] = new (require("./baseCommands/in.js"))(this);
+    this.handlers["ips"] = new (require("./baseCommands/ips.js"))(this);
+    this.handlers["li"] = new (require("./baseCommands/li.js"))(this);
+    this.handlers["logs"] = new (require("./baseCommands/logs.js"))(this);
+    this.handlers["mem"] = new (require("./baseCommands/mem.js"))(this);
+    this.handlers["ping"] = new (require("./baseCommands/ping.js"))(this);
+    this.handlers["pwl"] = new (require("./baseCommands/pwl.js"))(this);
+    this.handlers["rep"] = new (require("./baseCommands/rep.js"))(this);
+    this.handlers["row"] = new (require("./baseCommands/row.js"))(this);
+    this.handlers["sbh"] = new (require("./baseCommands/sbh.js"))(this);
+    this.handlers["sc"] = new (require("./baseCommands/sc.js"))(this);
+    this.handlers["scpu"] = new (require("./baseCommands/scpu.js"))(this);
+    this.handlers["serv"] = new (require("./baseCommands/serv.js"))(this);
+    this.handlers["sgh"] = new (require("./baseCommands/sgh.js"))(this);
+    this.handlers["smem"] = new (require("./baseCommands/smem.js"))(this);
+    this.handlers["st"] = new (require("./baseCommands/st.js"))(this);
+    this.handlers["stor"] = new (require("./baseCommands/stor.js"))(this);
+    this.handlers["swap"] = new (require("./baseCommands/swap.js"))(this);
+    this.handlers["ta"] = new (require("./baseCommands/ta.js"))(this);
+    this.handlers["tmem"] = new (require("./baseCommands/tmem.js"))(this);
+    this.handlers["tt"] = new (require("./baseCommands/tt.js"))(this);
+    this.handlers["ul"] = new (require("./baseCommands/ul.js"))(this);
+    this.handlers["us"] = new (require("./baseCommands/us.js"))(this);
+    this.handlers["vol"] = new (require("./baseCommands/vol.js"))(this);
+    this.handlers["vs"] = new (require("./baseCommands/vs.js"))(this);
+    this.handlers["watch"] = new (require("./baseCommands/watch.js"))(this);
+    this.handlers["wl"] = new (require("./baseCommands/wl.js"))(this);
 }
 
 CommandHandler.prototype.onCommand = function(enteredCommand, allCallback) {
