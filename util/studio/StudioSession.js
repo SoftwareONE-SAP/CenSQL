@@ -4,13 +4,15 @@ var async = require("async");
 var _ = require('lodash');
 var StudioFormatter = require('./StudioFormatter.js');
 var StudioDbHandler = require('./StudioDbHandler.js');
+var StudioSqlConsole = require('./StudioSqlConsole.js');
 
 var StudioSession = function(screen, hdb) {
-	this.formatter = new StudioFormatter(screen);
-	this.studioDbHandler = new StudioDbHandler(hdb);
-
 	this.screen = screen;
 	this.hdb = hdb;
+
+	this.studioDbHandler = new StudioDbHandler(hdb);
+	this.sqlConsole = new StudioSqlConsole(screen, this.studioDbHandler);
+	this.formatter = new StudioFormatter(screen, this.sqlConsole);
 
 	this.dataPreviewRows = 5000;
 
@@ -64,6 +66,7 @@ StudioSession.prototype.init = function() {
 			}
 
 			this.formatter.init(schemas, tables);
+
 		}.bind(this));
 	}.bind(this));
 
@@ -109,20 +112,36 @@ StudioSession.prototype.onKeyPress = function(ch, key) {
 
 					}
 				}.bind(this),
-				"tab": this.toggleTableBoxView.bind(this)
+				"tab": this.toggleTableBoxView.bind(this),
 			},
 			false: {
 				"right": function() {
-					this.formatter.scrollDataPaneDebounced(10, 0)
+					if (this.formatter.focus == "sql-console") {
+						this.sqlConsole.moveCursor(1, 0)
+					} else {
+						this.formatter.scrollDataPaneDebounced(10, 0)
+					}
 				}.bind(this),
 				"left": function() {
-					this.formatter.scrollDataPaneDebounced(-10, 0)
+					if (this.formatter.focus == "sql-console") {
+						this.sqlConsole.moveCursor(-1, 0)
+					} else {
+						this.formatter.scrollDataPaneDebounced(-10, 0)
+					}
 				}.bind(this),
 				"down": function() {
-					this.formatter.scrollDataPaneDebounced(0, 3)
+					if (this.formatter.focus == "sql-console") {
+						this.sqlConsole.moveCursor(0, 1)
+					} else {
+						this.formatter.scrollDataPaneDebounced(0, 3)
+					}
 				}.bind(this),
 				"up": function() {
-					this.formatter.scrollDataPaneDebounced(0, -3)
+					if (this.formatter.focus == "sql-console") {
+						this.sqlConsole.moveCursor(0, -1)
+					} else {
+						this.formatter.scrollDataPaneDebounced(0, -3)
+					}
 				}.bind(this),
 				"pagedown": function() {
 					this.formatter.scrollDataPaneDebounced(0, Math.abs(this.formatter.height - 10))
@@ -156,11 +175,19 @@ StudioSession.prototype.onKeyPress = function(ch, key) {
 		}
 	}
 
-	if (_.has(keys, key.ctrl + "." + key.shift + "." + key.name)) {
-		_.get(keys, key.ctrl + "." + key.shift + "." + key.name)();
+	var pressed = false;
+
+	if (key) {
+		if (_.has(keys, key.ctrl + "." + key.shift + "." + key.name)) {
+			_.get(keys, key.ctrl + "." + key.shift + "." + key.name)();
+			pressed = true;
+		}
+
 	}
 
-	// console.log(key.ctrl, key.shift, key.name);
+	if (!pressed && ch) {
+		this.sqlConsole.type(ch);
+	}
 }
 
 StudioSession.prototype.loadTableView = function(schema, table, isView) {

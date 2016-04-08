@@ -5,7 +5,8 @@ var path = require('path');
 var async = require('async');
 var stripColorCodes = require('stripcolorcodes');
 var osHomedir = require('os-homedir');
-var StudioSession = require("./StudioSession.js");
+var StudioSession = require("./studio/StudioSession.js");
+var StudioGraphics = require("./studio/StudioGraphics.js");
 
 var ScreenManager = function(isBatch, settings, commandHandler) {
     this.isBatch = isBatch;
@@ -229,6 +230,7 @@ ScreenManager.prototype.ready = function(hdb) {
      * Should we enter the cli or studio mode?
      */
     if (this.settings.studio) {
+        this.graphics = new StudioGraphics(this);
         this.studio = new StudioSession(this, hdb);
     } else {
         this.print(colors.cyan(colors.bold("For help type \\h\n-----------------------------------------------------\n\n")));

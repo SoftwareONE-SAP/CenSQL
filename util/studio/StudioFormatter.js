@@ -6,8 +6,9 @@ var cliTable = require('cli-table');
 var stripColorCodes = require('stripcolorcodes');
 var ansiSubstr = require('ansi-substring');
 
-var StudioFormatter = function(screen) {
+var StudioFormatter = function(screen, sqlConsole) {
 	this.screen = screen;
+	this.sqlConsole = sqlConsole;
 
 	this.maxSideWidth = 45;
 	this.maxSqlConsoleHeight = 15;
@@ -57,6 +58,13 @@ StudioFormatter.prototype.calculateSize = function() {
 	this.sqlConsoleHeight = (Math.ceil(this.height / 5) < this.maxSqlConsoleHeight ? Math.ceil(this.height / 5) : this.maxSqlConsoleHeight);
 	this.dataPaneHeight = this.height - this.sqlConsoleHeight;
 	this.metaWindowHeight = 6;
+
+	this.sqlConsole.setRegion(
+		this.sideWidth + 1,
+		this.dataPaneHeight + 2,
+		this.width - this.sideWidth - 1,
+		this.sqlConsoleHeight
+	)
 }
 
 StudioFormatter.prototype.checkRefresh = function() {
@@ -80,7 +88,7 @@ StudioFormatter.prototype.redraw = function() {
 	this.drawSchemaList()
 	this.drawTableList();
 	this.redrawDataPane();
-	this.drawSqlConsole();
+	this.sqlConsole.draw(true);
 }
 
 StudioFormatter.prototype.toggleFocus = function(){
@@ -101,10 +109,6 @@ StudioFormatter.prototype.redrawDataPane = function() {
 	}
 }
 
-StudioFormatter.prototype.drawSqlConsole = function(){
-	this.drawBox(this.sideWidth + 1, this.dataPaneHeight + 2, this.width - this.sideWidth - 1, this.sqlConsoleHeight - 1, "-".bgBlack.grey);
-}
-
 StudioFormatter.prototype.drawSchemaList = function() {
 
 	if (this.schemas.length == 0) {
@@ -119,9 +123,9 @@ StudioFormatter.prototype.drawSchemaList = function() {
 			var name = pad(this.schemas[i % this.schemas.length].SCHEMA_NAME.substring(0, this.sideWidth - 4), this.sideWidth - 3);
 
 			if (i == 0) {
-				this.drawText(2, yoffset + i + parseInt(this.schemaBoxHeight / 2), (" " + name)[this.sideBackgroundTheme].bold)
+				this.screen.graphics.drawText(2, yoffset + i + parseInt(this.schemaBoxHeight / 2), (" " + name)[this.sideBackgroundTheme].bold)
 			} else {
-				this.drawText(2, yoffset + i + parseInt(this.schemaBoxHeight / 2), (" " + name)[this.sideBackgroundTheme])
+				this.screen.graphics.drawText(2, yoffset + i + parseInt(this.schemaBoxHeight / 2), (" " + name)[this.sideBackgroundTheme])
 			}
 		}
 
@@ -129,9 +133,9 @@ StudioFormatter.prototype.drawSchemaList = function() {
 			var name = pad(this.schemas[this.schemas.length - (i % this.schemas.length)].SCHEMA_NAME.substring(0, this.sideWidth - 4), this.sideWidth - 3);
 
 			if (i == 0) {
-				this.drawText(2, yoffset + parseInt(this.schemaBoxHeight / 2) - i, (" " + name)[this.sideBackgroundTheme].bold)
+				this.screen.graphics.drawText(2, yoffset + parseInt(this.schemaBoxHeight / 2) - i, (" " + name)[this.sideBackgroundTheme].bold)
 			} else {
-				this.drawText(2, yoffset + parseInt(this.schemaBoxHeight / 2) - i, (" " + name)[this.sideBackgroundTheme])
+				this.screen.graphics.drawText(2, yoffset + parseInt(this.schemaBoxHeight / 2) - i, (" " + name)[this.sideBackgroundTheme])
 			}
 		}
 
@@ -143,7 +147,7 @@ StudioFormatter.prototype.drawSchemaList = function() {
 StudioFormatter.prototype.drawTableList = function() {
 
 	if (this.tables.length == 0) {
-		this.drawBox(2, this.schemaBoxHeight + 5, this.sideWidth - 2, this.tableBoxHeight + 1, " " [this.tableBoxBackgroundTheme[this.tableListMode]]);
+		this.screen.graphics.drawBox(2, this.schemaBoxHeight + 5, this.sideWidth - 2, this.tableBoxHeight + 1, " " [this.tableBoxBackgroundTheme[this.tableListMode]]);
 		return;
 	}
 
@@ -155,9 +159,9 @@ StudioFormatter.prototype.drawTableList = function() {
 			var name = pad(this.tables[i % this.tables.length].NAME.substring(0, this.sideWidth - 4), this.sideWidth - 3);
 
 			if (i == 0) {
-				this.drawText(2, yoffset + i + parseInt(this.tableBoxHeight / 2), (" " + name)[this.tableBoxBackgroundTheme[this.tableListMode]].bold)
+				this.screen.graphics.drawText(2, yoffset + i + parseInt(this.tableBoxHeight / 2), (" " + name)[this.tableBoxBackgroundTheme[this.tableListMode]].bold)
 			} else {
-				this.drawText(2, yoffset + i + parseInt(this.tableBoxHeight / 2), (" " + name)[this.tableBoxBackgroundTheme[this.tableListMode]])
+				this.screen.graphics.drawText(2, yoffset + i + parseInt(this.tableBoxHeight / 2), (" " + name)[this.tableBoxBackgroundTheme[this.tableListMode]])
 			}
 		}
 
@@ -166,9 +170,9 @@ StudioFormatter.prototype.drawTableList = function() {
 			var name = pad(this.tables[this.tables.length - ((i - 1) % this.tables.length) - 1].NAME.substring(0, this.sideWidth - 4), this.sideWidth - 3);
 
 			if (i == 0) {
-				this.drawText(2, yoffset + parseInt(this.tableBoxHeight / 2) - i, (" " + name)[this.tableBoxBackgroundTheme[this.tableListMode]].bold)
+				this.screen.graphics.drawText(2, yoffset + parseInt(this.tableBoxHeight / 2) - i, (" " + name)[this.tableBoxBackgroundTheme[this.tableListMode]].bold)
 			} else {
-				this.drawText(2, yoffset + parseInt(this.tableBoxHeight / 2) - i, (" " + name)[this.tableBoxBackgroundTheme[this.tableListMode]])
+				this.screen.graphics.drawText(2, yoffset + parseInt(this.tableBoxHeight / 2) - i, (" " + name)[this.tableBoxBackgroundTheme[this.tableListMode]])
 			}
 		}
 	} catch (e) {
@@ -177,26 +181,74 @@ StudioFormatter.prototype.drawTableList = function() {
 	}
 }
 
+StudioFormatter.prototype.drawActiveBorders = function(){
+		
+	var focusedChar = " ".bgYellow
+	var nonfocusedChar = " "[this.borderTheme]
+
+	/**
+	 * Shared by both
+	 */
+	this.screen.graphics.drawBox(this.sideWidth + 1, this.height, this.width - this.sideWidth - 1, 1, (this.focus == "sql-console" ? focusedChar : nonfocusedChar));
+
+	/**
+	 * Data pane
+	 */
+	
+	this.screen.graphics.drawBox(this.sideWidth + 1, 1, this.width - this.sideWidth - 1, 1, (this.focus == "data-pane" ? focusedChar : nonfocusedChar));
+	this.screen.graphics.drawBox(this.sideWidth, 1, 1, this.height - this.sqlConsoleHeight + 1, (this.focus == "data-pane" ? focusedChar : nonfocusedChar));
+	this.screen.graphics.drawBox(this.width, 1, 1, this.height - this.sqlConsoleHeight + 1, (this.focus == "data-pane" ? focusedChar : nonfocusedChar));
+
+	if(this.dataPane.mode == "tablePreview"){
+		this.screen.graphics.drawBox(this.sideWidth + 1, this.metaWindowHeight, this.width - this.sideWidth - 1, 1, (this.focus == "data-pane" ? focusedChar : nonfocusedChar));
+	}
+
+	/**
+	 * SQL console
+	 */
+	this.screen.graphics.drawBox(this.sideWidth, this.dataPaneHeight + 1, this.width - this.sideWidth + 1, 1, focusedChar);
+
+	this.screen.graphics.drawBox(this.sideWidth, this.dataPaneHeight + 2, 1, this.sqlConsoleHeight, (this.focus == "sql-console" ? focusedChar : nonfocusedChar));
+	this.screen.graphics.drawBox(this.width, this.dataPaneHeight + 2, 1, this.sqlConsoleHeight, (this.focus == "sql-console" ? focusedChar : nonfocusedChar));
+}
+
+StudioFormatter.prototype.drawHelpText = function() {
+	this.screen.graphics.drawBox(1, this.height + 1, this.width, 3, " " [this.bottomBarTheme]);
+
+	this.screen.graphics.drawText(2, this.height + 1, colors.bgBlack.bold("Shft + ⮙ ⮛") + " scroll schemas." [this.bottomBarTheme]);
+	this.screen.graphics.drawText(2, this.height + 2, colors.bgBlack.bold("Ctrl + ⮙ ⮛") + " scroll tables" [this.bottomBarTheme]);
+
+	this.screen.graphics.drawText(29, this.height + 1, colors.bgBlack.bold("Shft + ⮚") + " select schema." [this.bottomBarTheme]);
+	this.screen.graphics.drawText(29, this.height + 2, colors.bgBlack.bold("Ctrl + ⮚") + " select table." [this.bottomBarTheme]);
+
+	this.screen.graphics.drawText(53, this.height + 1, colors.bgBlack.bold("Shft + Tab") + "    toggle between tables/views." [this.bottomBarTheme]);
+	this.screen.graphics.drawText(53, this.height + 2, colors.bgBlack.bold("⮘ / ⮙ / ⮚ / ⮛") + " scroll data pane" [this.bottomBarTheme]);
+}
+
+StudioFormatter.prototype.drawTableBoxHeader = function() {
+	this.screen.graphics.drawText(2, this.schemaBoxHeight + 4, colors.bgBlack(pad(" " + this.tableListMode, this.sideWidth - 2)));
+}
+
 StudioFormatter.prototype.drawBorder = function() {
 
 	/**
 	 * Draw outer border
 	 */
-	this.drawBox(1, 1, this.width, 1, " " [this.borderTheme]);
-	this.drawBox(1, this.height, this.width, 1, " " [this.borderTheme]);
+	this.screen.graphics.drawBox(1, 1, this.width, 1, " " [this.borderTheme]);
+	this.screen.graphics.drawBox(1, this.height, this.width, 1, " " [this.borderTheme]);
 
-	this.drawBox(1, 2, 1, this.height, " " [this.borderTheme]);
-	this.drawBox(this.width, 2, 1, this.height, " " [this.borderTheme]);
+	this.screen.graphics.drawBox(1, 2, 1, this.height, " " [this.borderTheme]);
+	this.screen.graphics.drawBox(this.width, 2, 1, this.height, " " [this.borderTheme]);
 
 	/**
 	 * Draw side box divider
 	 */
-	this.drawBox(2, this.schemaBoxHeight + 3, this.sideWidth - 2, 1, " " [this.borderTheme]);
+	this.screen.graphics.drawBox(2, this.schemaBoxHeight + 3, this.sideWidth - 2, 1, " " [this.borderTheme]);
 
 	/**
 	 * Draw side headers
 	 */
-	this.drawText(2, 2, colors.bgBlack(pad(" Schemas", this.sideWidth - 2)));
+	this.screen.graphics.drawText(2, 2, colors.bgBlack(pad(" Schemas", this.sideWidth - 2)));
 
 	this.drawTableBoxHeader();
 
@@ -211,74 +263,8 @@ StudioFormatter.prototype.drawBorder = function() {
 	this.drawHelpText();
 }
 
-StudioFormatter.prototype.drawActiveBorders = function(){
-		
-	var focusedChar = " ".bgYellow
-	var nonfocusedChar = " "[this.borderTheme]
-
-	/**
-	 * Shared by both
-	 */
-	this.drawBox(this.sideWidth + 1, this.height, this.width - this.sideWidth - 1, 1, (this.focus == "sql-console" ? focusedChar : nonfocusedChar));
-
-	/**
-	 * Data pane
-	 */
-	
-	this.drawBox(this.sideWidth + 1, 1, this.width - this.sideWidth - 1, 1, (this.focus == "data-pane" ? focusedChar : nonfocusedChar));
-	this.drawBox(this.sideWidth, 1, 1, this.height - this.sqlConsoleHeight + 1, (this.focus == "data-pane" ? focusedChar : nonfocusedChar));
-	this.drawBox(this.width, 1, 1, this.height - this.sqlConsoleHeight + 1, (this.focus == "data-pane" ? focusedChar : nonfocusedChar));
-
-	if(this.dataPane.mode == "tablePreview"){
-		this.drawBox(this.sideWidth + 1, this.metaWindowHeight, this.width - this.sideWidth - 1, 1, (this.focus == "data-pane" ? focusedChar : nonfocusedChar));
-	}
-
-	/**
-	 * SQL console
-	 */
-	this.drawBox(this.sideWidth, this.dataPaneHeight + 1, this.width - this.sideWidth + 1, 1, focusedChar);
-
-	this.drawBox(this.sideWidth, this.dataPaneHeight + 2, 1, this.sqlConsoleHeight, (this.focus == "sql-console" ? focusedChar : nonfocusedChar));
-	this.drawBox(this.width, this.dataPaneHeight + 2, 1, this.sqlConsoleHeight, (this.focus == "sql-console" ? focusedChar : nonfocusedChar));
-}
-
-StudioFormatter.prototype.drawHelpText = function() {
-	this.drawBox(1, this.height + 1, this.width, 3, " " [this.bottomBarTheme]);
-
-	this.drawText(2, this.height + 1, colors.bgBlack.bold("Shft + ⮙ ⮛") + " scroll schemas." [this.bottomBarTheme]);
-	this.drawText(2, this.height + 2, colors.bgBlack.bold("Ctrl + ⮙ ⮛") + " scroll tables" [this.bottomBarTheme]);
-
-	this.drawText(29, this.height + 1, colors.bgBlack.bold("Shft + ⮚") + " select schema." [this.bottomBarTheme]);
-	this.drawText(29, this.height + 2, colors.bgBlack.bold("Ctrl + ⮚") + " select table." [this.bottomBarTheme]);
-
-	this.drawText(53, this.height + 1, colors.bgBlack.bold("Shft + Tab") + "    toggle between tables/views." [this.bottomBarTheme]);
-	this.drawText(53, this.height + 2, colors.bgBlack.bold("⮘ / ⮙ / ⮚ / ⮛") + " scroll data pane" [this.bottomBarTheme]);
-}
-
-StudioFormatter.prototype.drawTableBoxHeader = function() {
-	this.drawText(2, this.schemaBoxHeight + 4, colors.bgBlack(pad(" " + this.tableListMode, this.sideWidth - 2)));
-}
-
-StudioFormatter.prototype.drawText = function(x, y, t) {
-	this.screen.goto(x, y);
-	this.screen.print(t);
-	this.screen.goto(0, 0);
-}
-
-StudioFormatter.prototype.drawBox = function(x, y, w, h, c) {
-
-	this.screen.goto(x, y);
-
-	for (var dy = 0; dy < h; dy++) {
-		this.screen.print(new Array(w + 1).join(c || " "));
-		this.screen.goto(x, y + dy);
-	}
-
-	// this.screen.goto(1, 1);
-}
-
 StudioFormatter.prototype.clearMainPanel = function() {
-	this.drawBox(this.sideWidth + 1, 2, this.width - this.sideWidth - 1, this.dataPaneHeight, " ");
+	this.screen.graphics.drawBox(this.sideWidth + 1, 2, this.width - this.sideWidth - 1, this.dataPaneHeight, " ");
 }
 
 StudioFormatter.prototype.drawTableView = function(schema, table, columns, dataPreview, isView) {
@@ -363,11 +349,11 @@ StudioFormatter.prototype.drawDataView = function() {
 
 		line = pad(line, awidth, {colors: true, char: " "});
 
-		this.drawText(this.sideWidth + 1, yPadding + i - this.dataPane.scroll.y, line)
+		this.screen.graphics.drawText(this.sideWidth + 1, yPadding + i - this.dataPane.scroll.y, line)
 	}
 
 	for (var i = count; i < aheight; i++) {
-		this.drawText(this.sideWidth + 1, yPadding + i, pad("-", awidth, " "))
+		this.screen.graphics.drawText(this.sideWidth + 1, yPadding + i, pad("-", awidth, " "))
 	}
 }
 
@@ -390,17 +376,17 @@ StudioFormatter.prototype.drawTableMetaInfo = function() {
 	/**
 	 * Draw meta box
 	 */
-	this.drawBox(this.sideWidth + 1, 2, this.width - this.sideWidth - 1, height + 1, " "[this.metaBoxTheme]);
+	this.screen.graphics.drawBox(this.sideWidth + 1, 2, this.width - this.sideWidth - 1, height + 1, " "[this.metaBoxTheme]);
 
-	this.drawText(this.sideWidth + xoffset, 3, "Schema Name: ".bold[this.metaBoxTheme] + this.dataPane.meta.schema.substring(0, 23)[this.metaBoxTheme])
+	this.screen.graphics.drawText(this.sideWidth + xoffset, 3, "Schema Name: ".bold[this.metaBoxTheme] + this.dataPane.meta.schema.substring(0, 23)[this.metaBoxTheme])
 
 	if (this.dataPane.meta.isView) {
-		this.drawText(this.sideWidth + xoffset + 39, 3, "View Name: ".bold[this.metaBoxTheme] + this.dataPane.meta.table.substring(0, 25)[this.metaBoxTheme])
+		this.screen.graphics.drawText(this.sideWidth + xoffset + 39, 3, "View Name: ".bold[this.metaBoxTheme] + this.dataPane.meta.table.substring(0, 25)[this.metaBoxTheme])
 	} else {
-		this.drawText(this.sideWidth + xoffset + 39, 3, "Table Name: ".bold[this.metaBoxTheme] + this.dataPane.meta.table.substring(0, 25)[this.metaBoxTheme])
+		this.screen.graphics.drawText(this.sideWidth + xoffset + 39, 3, "Table Name: ".bold[this.metaBoxTheme] + this.dataPane.meta.table.substring(0, 25)[this.metaBoxTheme])
 	}
 
-	this.drawText(this.sideWidth + xoffset, 4, "Columns: ".bold[this.metaBoxTheme] + columnString[this.metaBoxTheme])
+	this.screen.graphics.drawText(this.sideWidth + xoffset, 4, "Columns: ".bold[this.metaBoxTheme] + columnString[this.metaBoxTheme])
 }
 
 StudioFormatter.prototype.fullPageAlert = function(err, colour, shouldClear, isFullScreen) {
@@ -430,11 +416,11 @@ StudioFormatter.prototype.fullPageAlert = function(err, colour, shouldClear, isF
 		xpos = parseInt((this.width / 2) - (width / 2));
 	}
 
-	this.drawBox(xpos - 1, ypos + 1, width, height, " " ["bgBlack"]);
-	this.drawBox(xpos, ypos, width, height, " " [colour]);
+	this.screen.graphics.drawBox(xpos - 1, ypos + 1, width, height, " " ["bgBlack"]);
+	this.screen.graphics.drawBox(xpos, ypos, width, height, " " [colour]);
 
 	for (var i = stringCutdown.length - 1; i >= 0; i--) {
-		this.drawText(xpos + 2, ypos + 1 + i, stringCutdown[i][colour].bold);
+		this.screen.graphics.drawText(xpos + 2, ypos + 1 + i, stringCutdown[i][colour].bold);
 	}
 
 }
