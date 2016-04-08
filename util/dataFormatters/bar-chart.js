@@ -38,9 +38,17 @@ module.exports = function(command, data, title, settings) {
 
             var width = Math.floor(process.stdout.columns * data[k][keys[1]] / sum);
 
+            if(sum == 0){
+                width = 0;
+            }
+
             dataLine += colors[ccolours[1]](new Array(width).join(barTypes[0]));
 
             width = Math.floor(process.stdout.columns * data[k][keys[2]] / sum);
+
+            if(sum == 0){
+                width = process.stdout.columns;
+            }
 
             dataLine += colors[ccolours[0]](new Array(width).join(barTypes[1]));
 
