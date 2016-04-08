@@ -143,6 +143,11 @@ StudioSession.prototype.onKeyPress = function(ch, key) {
 						this.formatter.scrollDataPaneDebounced(0, -3)
 					}
 				}.bind(this),
+				"backspace": function() {
+					if (this.formatter.focus == "sql-console") {
+						this.sqlConsole.backspace();
+					}
+				}.bind(this),
 				"pagedown": function() {
 					this.formatter.scrollDataPaneDebounced(0, Math.abs(this.formatter.height - 10))
 				}.bind(this),

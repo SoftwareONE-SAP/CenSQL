@@ -5,6 +5,8 @@ var StudioSqlConsole = function(screen, dbHandler) {
 	this.screen = screen;
 	this.dbHandler = dbHandler;
 
+	this.fillChar = "."
+
 	this.fg = "white";
 	this.bg = "bgBlack";
 
@@ -59,7 +61,7 @@ StudioSqlConsole.prototype.type = function(c) {
 
 	} else {
 
-		if(!this.content[this.cursor.y]){
+		if (!this.content[this.cursor.y]) {
 			this.content[this.cursor.y] = "";
 		}
 
@@ -72,6 +74,18 @@ StudioSqlConsole.prototype.type = function(c) {
 	this.draw(false);
 }
 
+StudioSqlConsole.prototype.backspace = function() {
+
+	this.screen.goto((this.content[this.cursor.y].length - 1 || 0) + this.region.x, this.cursor.y + this.region.y)
+	this.screen.print(this.fillChar[this.bg][this.unfocusedFg]);
+
+	this.content[this.cursor.y] = this.content[this.cursor.y].slice(0, this.cursor.x - 1) + this.content[this.cursor.y].slice(this.cursor.x)
+
+	this.moveCursor(-1, 0)
+
+	this.draw(false)
+}
+
 StudioSqlConsole.prototype.setContent = function(value) {
 	this.content = value;
 	this.draw(true);
@@ -81,7 +95,7 @@ StudioSqlConsole.prototype.draw = function(forceBackground) {
 	var output = []
 
 	for (var i = 0; i < this.content.length; i++) {
-		if(!this.content[i]){
+		if (!this.content[i]) {
 			output.push("");
 			continue;
 		}
@@ -92,7 +106,7 @@ StudioSqlConsole.prototype.draw = function(forceBackground) {
 	}
 
 	if (forceBackground || this.contentHeight !== output.length) {
-		this.screen.graphics.drawBox(this.region.x, this.region.y, this.region.w, this.region.h - 1, "." [this.unfocusedFg][this.bg]);
+		this.screen.graphics.drawBox(this.region.x, this.region.y, this.region.w, this.region.h - 1, this.fillChar[this.unfocusedFg][this.bg]);
 	}
 
 	for (var i = 0; i < output.length; i++) {
@@ -134,7 +148,7 @@ StudioSqlConsole.prototype.moveCursor = function(dx, dy) {
 		if (this.cursor.x > this.content[this.cursor.y].length) {
 			this.cursor.x = this.content[this.cursor.y].length || 0
 		}
-	}else{
+	} else {
 		this.cursor.x = 0;
 	}
 
