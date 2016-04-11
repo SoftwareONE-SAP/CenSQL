@@ -75,15 +75,16 @@ StudioSqlConsole.prototype.type = function(c) {
 }
 
 StudioSqlConsole.prototype.backspace = function() {
+	if (this.cursor.x > 0) {
+		this.screen.goto((this.content[this.cursor.y].length - 1 > 0 ? this.content[this.cursor.y].length - 1 : 0) + this.region.x, this.cursor.y + this.region.y)
+		this.screen.print(this.fillChar[this.bg][this.unfocusedFg]);
 
-	this.screen.goto((this.content[this.cursor.y].length - 1 || 0) + this.region.x, this.cursor.y + this.region.y)
-	this.screen.print(this.fillChar[this.bg][this.unfocusedFg]);
+		this.content[this.cursor.y] = this.content[this.cursor.y].slice(0, this.cursor.x - 1) + this.content[this.cursor.y].slice(this.cursor.x)
 
-	this.content[this.cursor.y] = this.content[this.cursor.y].slice(0, this.cursor.x - 1) + this.content[this.cursor.y].slice(this.cursor.x)
+		this.moveCursor(-1, 0)
 
-	this.moveCursor(-1, 0)
-
-	this.draw(false)
+		this.draw(false)
+	}
 }
 
 StudioSqlConsole.prototype.setContent = function(value) {

@@ -85,6 +85,7 @@ StudioFormatter.prototype.checkRefresh = function() {
 StudioFormatter.prototype.redraw = function() {
 	this.screen.clear();
 	this.drawBorder();
+	this.drawHelpText();
 	this.drawSchemaList()
 	this.drawTableList();
 	this.redrawDataPane();
@@ -256,11 +257,6 @@ StudioFormatter.prototype.drawBorder = function() {
 	 * Draw active borders
 	 */
 	this.drawActiveBorders();
-
-	/**
-	 * Draw bottom help bar
-	 */
-	this.drawHelpText();
 }
 
 StudioFormatter.prototype.clearMainPanel = function() {
