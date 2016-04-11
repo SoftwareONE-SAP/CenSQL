@@ -55,9 +55,9 @@ StudioSqlConsole.prototype.type = function(c) {
 
 		this.content.splice(this.cursor.y + 1, 0, "");
 
-		var endLine = this.content[this.cursor.y].substring(this.cursor.x);
+		var endLine = (this.content[this.cursor.y] ? this.content[this.cursor.y].substring(this.cursor.x) : "");
 
-		this.content[this.cursor.y] = this.content[this.cursor.y].substring(0, this.cursor.x);
+		this.content[this.cursor.y] = (this.content[this.cursor.y] ? this.content[this.cursor.y].substring(0, this.cursor.x) : "");
 
 		this.cursor.y++;
 
@@ -98,9 +98,9 @@ StudioSqlConsole.prototype.backspace = function() {
 	 */
 	if(this.cursor.y > 0){
 
-		this.cursor.x = this.content[this.cursor.y - 1].length
+		this.cursor.x = (this.content[this.cursor.y - 1] ? this.content[this.cursor.y - 1].length : 0);
 
-		this.content[this.cursor.y - 1] += this.content[this.cursor.y];
+		this.content[this.cursor.y - 1] =  (this.content[this.cursor.y - 1] ? this.content[this.cursor.y - 1] : "") + (this.content[this.cursor.y] ? this.content[this.cursor.y] : "");
 		this.content.splice(this.cursor.y, 1);
 
 		this.cursor.y --;
