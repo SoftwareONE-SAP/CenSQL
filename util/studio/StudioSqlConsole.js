@@ -55,7 +55,13 @@ StudioSqlConsole.prototype.type = function(c) {
 
 		this.content.splice(this.cursor.y + 1, 0, "");
 
+		var endLine = this.content[this.cursor.y].substring(this.cursor.x);
+
+		this.content[this.cursor.y] = this.content[this.cursor.y].substring(0, this.cursor.x);
+
 		this.cursor.y++;
+
+		this.content[this.cursor.y] = endLine;
 
 		this.cursor.x = 0;
 
@@ -84,7 +90,24 @@ StudioSqlConsole.prototype.backspace = function() {
 		this.moveCursor(-1, 0)
 
 		this.draw(false)
+		return;
 	}
+
+	/**
+	 * Back up a line
+	 */
+	if(this.cursor.y > 0){
+
+		this.cursor.x = this.content[this.cursor.y - 1].length
+
+		this.content[this.cursor.y - 1] += this.content[this.cursor.y];
+		this.content.splice(this.cursor.y, 1);
+
+		this.cursor.y --;
+
+		this.draw(true);
+	}
+
 }
 
 StudioSqlConsole.prototype.setContent = function(value) {
