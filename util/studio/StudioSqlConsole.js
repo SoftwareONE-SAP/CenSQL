@@ -36,6 +36,20 @@ StudioSqlConsole.prototype.init = function() {
 		h: 1
 	}
 
+	this.setContent([
+		"Wiffle",
+		"Woffle",
+		"Wiffle",
+		"Woffle",
+		"Wiffle",
+		"Woffle",
+		"Wiffle",
+		"Woffle",
+		"Wiffle",
+		"Woffle",
+		"Oh no! D:"
+	])
+
 }
 
 StudioSqlConsole.prototype.setRegion = function(x, y, w, h) {
@@ -96,14 +110,14 @@ StudioSqlConsole.prototype.backspace = function() {
 	/**
 	 * Back up a line
 	 */
-	if(this.cursor.y > 0){
+	if (this.cursor.y > 0) {
 
 		this.cursor.x = (this.content[this.cursor.y - 1] ? this.content[this.cursor.y - 1].length : 0);
 
-		this.content[this.cursor.y - 1] =  (this.content[this.cursor.y - 1] ? this.content[this.cursor.y - 1] : "") + (this.content[this.cursor.y] ? this.content[this.cursor.y] : "");
+		this.content[this.cursor.y - 1] = (this.content[this.cursor.y - 1] ? this.content[this.cursor.y - 1] : "") + (this.content[this.cursor.y] ? this.content[this.cursor.y] : "");
 		this.content.splice(this.cursor.y, 1);
 
-		this.cursor.y --;
+		this.cursor.y--;
 
 		this.draw(true);
 	}
@@ -129,14 +143,16 @@ StudioSqlConsole.prototype.draw = function(forceBackground) {
 		output = output.concat(lines);
 	}
 
+	this.checkScroll(false);
+
 	if (forceBackground || this.contentHeight !== output.length) {
 		this.screen.graphics.drawBox(this.region.x, this.region.y, this.region.w, this.region.h - 1, this.fillChar[this.unfocusedFg][this.bg]);
 	}
 
-	for (var i = 0; i < output.length; i++) {
+	for (var i = 0; i < this.region.h - 2; i++) {
 		this.screen.goto(this.region.x, this.region.y + i);
 
-		var line = output[i];
+		var line = (output[i + this.scroll] ? output[i + this.scroll] : "");
 
 		if (line == null) {
 			line = ""
@@ -151,7 +167,7 @@ StudioSqlConsole.prototype.draw = function(forceBackground) {
 }
 
 StudioSqlConsole.prototype.gotoCursor = function() {
-	this.screen.goto(this.region.x + this.cursor.x, this.region.y + this.cursor.y);
+	this.screen.goto(this.region.x + this.cursor.x, this.region.y + this.cursor.y - this.scroll);
 }
 
 StudioSqlConsole.prototype.moveCursor = function(dx, dy) {
@@ -176,7 +192,23 @@ StudioSqlConsole.prototype.moveCursor = function(dx, dy) {
 		this.cursor.x = 0;
 	}
 
+	this.checkScroll(true);
+
 	this.gotoCursor();
+}
+
+StudioSqlConsole.prototype.checkScroll = function(shouldDraw){
+	if (this.cursor.y - this.scroll > this.region.h - 3) {
+		this.scroll = this.cursor.y - this.region.h + 3;
+		
+		shouldDraw ? this.draw(true) : false;
+	}
+
+	if (this.cursor.y - this.scroll <= -1) {
+		this.scroll = (this.cursor.y >= 0 ? this.cursor.y : 0);
+		
+		shouldDraw ? this.draw(true) : false;
+	}
 }
 
 module.exports = StudioSqlConsole;
