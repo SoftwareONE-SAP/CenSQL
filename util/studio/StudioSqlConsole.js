@@ -35,21 +35,6 @@ StudioSqlConsole.prototype.init = function() {
 		w: 1,
 		h: 1
 	}
-
-	this.setContent([
-		"Wiffle",
-		"Woffle",
-		"Wiffle",
-		"Woffle",
-		"Wiffle",
-		"Woffle",
-		"Wiffle",
-		"Woffle",
-		"Wiffle",
-		"Woffle",
-		"Oh no! D:"
-	])
-
 }
 
 StudioSqlConsole.prototype.setRegion = function(x, y, w, h) {
