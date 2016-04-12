@@ -6,7 +6,8 @@ var cliTable = require('cli-table');
 var stripColorCodes = require('stripcolorcodes');
 var ansiSubstr = require('ansi-substring');
 
-var StudioFormatter = function(screen, sqlConsole) {
+var StudioFormatter = function(session, screen, sqlConsole) {
+	this.session = session;
 	this.screen = screen;
 	this.sqlConsole = sqlConsole;
 
@@ -40,7 +41,7 @@ StudioFormatter.prototype.init = function(schemas, tables) {
 		}
 	};
 
-	this.focus = "sql-console";
+	
 
 	this.calculateSize();
 
@@ -92,22 +93,14 @@ StudioFormatter.prototype.redraw = function() {
 	this.sqlConsole.draw(true);
 }
 
-StudioFormatter.prototype.toggleFocus = function(){
-	if(this.focus == "sql-console"){
-		this.focus = "data-pane";
-	}else{
-		this.focus = "sql-console";
-	}
-
-	this.drawBorder();
-}
-
 StudioFormatter.prototype.redrawDataPane = function() {
 	if (this.dataPane.mode == "tablePreview") {
 		this.drawTableMetaInfo();
 		this.drawActiveBorders();
 		this.drawDataView();
 	}
+
+	this.sqlConsole.moveCursor();
 }
 
 StudioFormatter.prototype.drawSchemaList = function() {
@@ -178,7 +171,6 @@ StudioFormatter.prototype.drawTableList = function() {
 		}
 	} catch (e) {
 		console.log(e);
-		// console.log(this.tables)
 	}
 }
 
@@ -190,18 +182,18 @@ StudioFormatter.prototype.drawActiveBorders = function(){
 	/**
 	 * Shared by both
 	 */
-	this.screen.graphics.drawBox(this.sideWidth + 1, this.height, this.width - this.sideWidth - 1, 1, (this.focus == "sql-console" ? focusedChar : nonfocusedChar));
+	this.screen.graphics.drawBox(this.sideWidth + 1, this.height, this.width - this.sideWidth - 1, 1, (this.session.focus == "sql-console" ? focusedChar : nonfocusedChar));
 
 	/**
 	 * Data pane
 	 */
 	
-	this.screen.graphics.drawBox(this.sideWidth + 1, 1, this.width - this.sideWidth - 1, 1, (this.focus == "data-pane" ? focusedChar : nonfocusedChar));
-	this.screen.graphics.drawBox(this.sideWidth, 1, 1, this.height - this.sqlConsoleHeight + 1, (this.focus == "data-pane" ? focusedChar : nonfocusedChar));
-	this.screen.graphics.drawBox(this.width, 1, 1, this.height - this.sqlConsoleHeight + 1, (this.focus == "data-pane" ? focusedChar : nonfocusedChar));
+	this.screen.graphics.drawBox(this.sideWidth + 1, 1, this.width - this.sideWidth - 1, 1, (this.session.focus == "data-pane" ? focusedChar : nonfocusedChar));
+	this.screen.graphics.drawBox(this.sideWidth, 1, 1, this.height - this.sqlConsoleHeight + 1, (this.session.focus == "data-pane" ? focusedChar : nonfocusedChar));
+	this.screen.graphics.drawBox(this.width, 1, 1, this.height - this.sqlConsoleHeight + 1, (this.session.focus == "data-pane" ? focusedChar : nonfocusedChar));
 
 	if(this.dataPane.mode == "tablePreview"){
-		this.screen.graphics.drawBox(this.sideWidth + 1, this.metaWindowHeight, this.width - this.sideWidth - 1, 1, (this.focus == "data-pane" ? focusedChar : nonfocusedChar));
+		this.screen.graphics.drawBox(this.sideWidth + 1, this.metaWindowHeight, this.width - this.sideWidth - 1, 1, (this.session.focus == "data-pane" ? focusedChar : nonfocusedChar));
 	}
 
 	/**
@@ -209,8 +201,8 @@ StudioFormatter.prototype.drawActiveBorders = function(){
 	 */
 	this.screen.graphics.drawBox(this.sideWidth, this.dataPaneHeight + 1, this.width - this.sideWidth + 1, 1, focusedChar);
 
-	this.screen.graphics.drawBox(this.sideWidth, this.dataPaneHeight + 2, 1, this.sqlConsoleHeight, (this.focus == "sql-console" ? focusedChar : nonfocusedChar));
-	this.screen.graphics.drawBox(this.width, this.dataPaneHeight + 2, 1, this.sqlConsoleHeight, (this.focus == "sql-console" ? focusedChar : nonfocusedChar));
+	this.screen.graphics.drawBox(this.sideWidth, this.dataPaneHeight + 2, 1, this.sqlConsoleHeight, (this.session.focus == "sql-console" ? focusedChar : nonfocusedChar));
+	this.screen.graphics.drawBox(this.width, this.dataPaneHeight + 2, 1, this.sqlConsoleHeight, (this.session.focus == "sql-console" ? focusedChar : nonfocusedChar));
 }
 
 StudioFormatter.prototype.drawHelpText = function() {

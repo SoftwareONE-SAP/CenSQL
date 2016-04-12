@@ -12,7 +12,7 @@ var StudioSession = function(screen, hdb) {
 
 	this.studioDbHandler = new StudioDbHandler(hdb);
 	this.sqlConsole = new StudioSqlConsole(screen, this.studioDbHandler);
-	this.formatter = new StudioFormatter(screen, this.sqlConsole);
+	this.formatter = new StudioFormatter(this, screen, this.sqlConsole);
 
 	this.dataPreviewRows = 5000;
 
@@ -37,6 +37,12 @@ var StudioSession = function(screen, hdb) {
 }
 
 StudioSession.prototype.init = function() {
+
+	/**
+	 * Current focus
+	 * @type {String}
+	 */
+	this.focus = "sql-console";
 
 	/**
 	 * Copy the keypress function
@@ -104,7 +110,7 @@ StudioSession.prototype.setControlKeys = function() {
 
 	this.loadUiControls();
 
-	switch (this.formatter.focus) {
+	switch (this.focus) {
 		case "sql-console":
 			this.loadSqlControls();
 			break;
@@ -121,19 +127,19 @@ StudioSession.prototype.loadSqlControls = function() {
 	 * Move console cursor
 	 */
 	this.controlKeys.false.false.right = function() {
-		this.sqlConsole.moveCursor(1, 0);
+		this.sqlConsole.moveCursor(1, 0, true);
 	}.bind(this);
 
 	this.controlKeys.false.false.left = function() {
-		this.sqlConsole.moveCursor(-1, 0);
+		this.sqlConsole.moveCursor(-1, 0, true);
 	}.bind(this);
 
 	this.controlKeys.false.false.down = function() {
-		this.sqlConsole.moveCursor(0, 1)
+		this.sqlConsole.moveCursor(0, 1, true)
 	}.bind(this);
 
 	this.controlKeys.false.false.up = function() {
-		this.sqlConsole.moveCursor(0, -1)
+		this.sqlConsole.moveCursor(0, -1, true)
 	}.bind(this);
 
 	/**
@@ -144,11 +150,11 @@ StudioSession.prototype.loadSqlControls = function() {
 	}.bind(this);
 
 	this.controlKeys.false.false.home = function() {
-		this.sqlConsole.moveCursor(-Infinity, 0)
+		this.sqlConsole.moveCursor(-Infinity, 0, true)
 	}.bind(this);
 
 	this.controlKeys.false.false.end = function() {
-		this.sqlConsole.moveCursor(Infinity, 0)
+		this.sqlConsole.moveCursor(Infinity, 0, true)
 	}.bind(this);
 
 	this.controlKeys.false.false.pageup = function() {
@@ -216,8 +222,9 @@ StudioSession.prototype.loadUiControls = function() {
 	 * Toggle between datapane and sql console
 	 */
 	this.controlKeys.false.false.tab = function() {
-		this.formatter.toggleFocus();
+		this.toggleFocus();
 		this.setControlKeys();
+		this.sqlConsole.moveCursor();
 	}.bind(this);
 
 	/**
@@ -288,6 +295,16 @@ StudioSession.prototype.loadDatapaneControls = function() {
 	}.bind(this);
 }
 
+StudioSession.prototype.toggleFocus = function(){
+	if(this.focus == "sql-console"){
+		this.focus = "data-pane";
+	}else{
+		this.focus = "sql-console";
+	}
+
+	this.formatter.drawBorder();
+}
+
 StudioSession.prototype.onKeyPress = function(ch, key) {
 
 	var pressed = false;
@@ -306,7 +323,7 @@ StudioSession.prototype.onKeyPress = function(ch, key) {
 	/**
 	 * Type into SQL console
 	 */
-	if (!pressed && this.formatter.focus == "sql-console" && ch) {
+	if (!pressed && this.focus == "sql-console" && ch) {
 		this.sqlConsole.type(ch);
 	}
 }

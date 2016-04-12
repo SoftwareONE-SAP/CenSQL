@@ -18,7 +18,7 @@ StudioGraphics.prototype.drawBox = function(x, y, w, h, c) {
 		this.screen.goto(x, y + dy);
 	}
 
-	// this.screen.goto(1, 1);
+	this.screen.goto(0, 0);
 }
 
 module.exports = StudioGraphics;

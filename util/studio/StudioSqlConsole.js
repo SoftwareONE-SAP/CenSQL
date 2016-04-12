@@ -87,7 +87,7 @@ StudioSqlConsole.prototype.backspace = function() {
 
 		this.content[this.cursor.y] = this.content[this.cursor.y].slice(0, this.cursor.x - 1) + this.content[this.cursor.y].slice(this.cursor.x)
 
-		this.moveCursor(-1, 0)
+		this.moveCursor(-1, 0, true)
 
 		this.draw(false)
 		return;
@@ -162,7 +162,15 @@ StudioSqlConsole.prototype.gotoCursor = function() {
 	this.screen.goto(this.region.x + this.cursor.x, this.region.y + this.cursor.y - this.scroll + this.overlappedLinesCount);
 }
 
-StudioSqlConsole.prototype.moveCursor = function(dx, dy) {
+StudioSqlConsole.prototype.moveCursor = function(dx, dy, shouldDraw) {
+
+	if(dx == null){
+		dx = 0;
+	}
+
+	if(dy == null){
+		dy = 0;
+	}
 
 	this.cursor.x += dx;
 	this.cursor.y += dy;
@@ -184,7 +192,7 @@ StudioSqlConsole.prototype.moveCursor = function(dx, dy) {
 		this.cursor.x = 0;
 	}
 
-	this.checkScroll(true);
+	this.checkScroll(shouldDraw);
 
 	this.gotoCursor();
 }
@@ -206,7 +214,11 @@ StudioSqlConsole.prototype.checkScroll = function(shouldDraw) {
 StudioSqlConsole.prototype.moveScroll = function(dy){
 	this.scroll += dy;
 	
-	this.moveCursor(0, dy);
+	this.moveCursor(0, dy, false);
+
+	if(this.scroll < 0){
+		this.scroll = 0;
+	}
 
 	this.draw(true);
 }
