@@ -44,9 +44,9 @@ StudioSqlConsole.prototype.setRegion = function(x, y, w, h) {
 		y: y,
 		w: w,
 		h: h
-	}
+	};
 
-	this.draw();
+	this.moveCursor(-Infinity, -Infinity);
 }
 
 StudioSqlConsole.prototype.type = function(c) {

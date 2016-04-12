@@ -15,8 +15,6 @@ var StudioFormatter = function(screen, sqlConsole) {
 
 	this.refreshCheckDelay = 150;
 
-	this.calculateSize();
-
 	this.tableListMode = "Tables";
 
 	this.borderTheme = "bgWhite"
@@ -43,6 +41,8 @@ StudioFormatter.prototype.init = function(schemas, tables) {
 	};
 
 	this.focus = "sql-console";
+
+	this.calculateSize();
 
 	this.redraw();
 
