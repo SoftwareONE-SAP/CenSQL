@@ -203,4 +203,12 @@ StudioSqlConsole.prototype.checkScroll = function(shouldDraw) {
 	}
 }
 
+StudioSqlConsole.prototype.moveScroll = function(dy){
+	this.scroll += dy;
+	
+	this.moveCursor(0, dy);
+
+	this.draw(true);
+}
+
 module.exports = StudioSqlConsole;

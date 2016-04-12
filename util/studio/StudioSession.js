@@ -39,21 +39,16 @@ var StudioSession = function(screen, hdb) {
 StudioSession.prototype.init = function() {
 
 	/**
-	 * Load control keys
-	 */
-	this.setControlKeys();
-
-	/**
 	 * Copy the keypress function
 	 * @type [Function]
 	 */
 	this.oldKeyPress = process.stdin._events.keypress;
 
 	/**
-	 * Bind keypresses to out listener
+	 * Disable keyboard input
 	 * @type [Function]
 	 */
-	process.stdin._events.keypress = this.onKeyPress.bind(this);
+	process.stdin._events.keypress = function(){}
 
 	this.studioDbHandler.getSchemas(function(err, schemas) {
 
@@ -71,7 +66,21 @@ StudioSession.prototype.init = function() {
 				return
 			}
 
+			/**
+			 * Draw
+			 */
 			this.formatter.init(schemas, tables);
+
+			/**
+			 * Load control keys
+			 */
+			this.setControlKeys();
+
+			/**
+			 * Bind keypresses to out listener
+			 * @type [Function]
+			 */
+			process.stdin._events.keypress = this.onKeyPress.bind(this);
 
 		}.bind(this));
 	}.bind(this));
@@ -107,6 +116,10 @@ StudioSession.prototype.setControlKeys = function() {
 }
 
 StudioSession.prototype.loadSqlControls = function() {
+
+	/**
+	 * Move console cursor
+	 */
 	this.controlKeys.false.false.right = function() {
 		this.sqlConsole.moveCursor(1, 0);
 	}.bind(this);
@@ -123,12 +136,37 @@ StudioSession.prototype.loadSqlControls = function() {
 		this.sqlConsole.moveCursor(0, -1)
 	}.bind(this);
 
+	/**
+	 * Backspace
+	 */
 	this.controlKeys.false.false.backspace = function() {
 		this.sqlConsole.backspace();
 	}.bind(this);
+
+	this.controlKeys.false.false.home = function() {
+		this.sqlConsole.moveCursor(-Infinity, 0)
+	}.bind(this);
+
+	this.controlKeys.false.false.end = function() {
+		this.sqlConsole.moveCursor(Infinity, 0)
+	}.bind(this);
+
+	this.controlKeys.false.false.pageup = function() {
+		this.sqlConsole.moveScroll(-this.sqlConsole.region.h);
+	}.bind(this);
+
+
+	this.controlKeys.false.false.pagedown = function() {
+		this.sqlConsole.moveScroll(this.sqlConsole.region.h);
+	}.bind(this);
+
 }
 
 StudioSession.prototype.loadUiControls = function() {
+
+	/**
+	 * Rotate schemas
+	 */
 	this.controlKeys.false.true.down = function() {
 		this.formatter.rotateSchemas(1);
 	}.bind(this);
@@ -137,6 +175,9 @@ StudioSession.prototype.loadUiControls = function() {
 		this.formatter.rotateSchemas(-1);
 	}.bind(this);
 
+	/**
+	 * Select schema
+	 */
 	this.controlKeys.false.true.right = function() {
 		if (this.formatter.tableListMode == "Views") {
 
@@ -164,19 +205,31 @@ StudioSession.prototype.loadUiControls = function() {
 		}
 	}.bind(this);
 
+	/**
+	 * Switch between tables and views
+	 */
 	this.controlKeys.false.true.tab = function() {
 		this.toggleTableBoxView();
 	}.bind(this);
 
+	/**
+	 * Toggle between datapane and sql console
+	 */
 	this.controlKeys.false.false.tab = function() {
 		this.formatter.toggleFocus();
 		this.setControlKeys();
 	}.bind(this);
 
+	/**
+	 * Exit studio
+	 */
 	this.controlKeys.true.false.c = function() {
 		this.exitStudio();
 	}.bind(this);
 
+	/**
+	 * Rotate tables
+	 */
 	this.controlKeys.true.false.down = function() {
 		this.formatter.rotateTables(1);
 	}.bind(this);
@@ -185,6 +238,9 @@ StudioSession.prototype.loadUiControls = function() {
 		this.formatter.rotateTables(-1);
 	}.bind(this);
 
+	/**
+	 * Load table/view into datapane
+	 */
 	this.controlKeys.true.false.right = function() {
 		if (this.formatter.schemas[0] && this.formatter.tables[0]) {
 			this.loadTableView(this.formatter.schemas[0].SCHEMA_NAME, this.formatter.tables[0].NAME, this.formatter.tableListMode == "Views");
@@ -193,6 +249,10 @@ StudioSession.prototype.loadUiControls = function() {
 }
 
 StudioSession.prototype.loadDatapaneControls = function() {
+
+	/**
+	 * Scroll datapane
+	 */
 	this.controlKeys.false.false.right = function() {
 		this.formatter.scrollDataPaneDebounced(10, 0)
 	}.bind(this);
@@ -209,6 +269,9 @@ StudioSession.prototype.loadDatapaneControls = function() {
 		this.formatter.scrollDataPaneDebounced(0, -3)
 	}.bind(this)
 
+	/**
+	 * Scroll entire page
+	 */
 	this.controlKeys.false.false.pagedown = function() {
 		this.formatter.scrollDataPaneDebounced(0, Math.abs(this.formatter.height - 10))
 	}.bind(this);
@@ -217,6 +280,9 @@ StudioSession.prototype.loadDatapaneControls = function() {
 		this.formatter.scrollDataPaneDebounced(0, -Math.abs(this.formatter.height - 10))
 	}.bind(this);
 
+	/**
+	 * Goto top left of table
+	 */
 	this.controlKeys.false.false.home = function() {
 		this.formatter.scrollDataPaneDebounced(-Infinity, -Infinity)
 	}.bind(this);
@@ -226,6 +292,9 @@ StudioSession.prototype.onKeyPress = function(ch, key) {
 
 	var pressed = false;
 
+	/**
+	 * If we have a control key for this input run it, if not type it
+	 */
 	if (key) {
 		if (_.has(this.controlKeys, key.ctrl + "." + key.shift + "." + key.name)) {
 			_.get(this.controlKeys, key.ctrl + "." + key.shift + "." + key.name)();
@@ -234,6 +303,9 @@ StudioSession.prototype.onKeyPress = function(ch, key) {
 
 	}
 
+	/**
+	 * Type into SQL console
+	 */
 	if (!pressed && this.formatter.focus == "sql-console" && ch) {
 		this.sqlConsole.type(ch);
 	}
