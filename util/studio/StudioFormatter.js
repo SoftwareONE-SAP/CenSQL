@@ -13,6 +13,7 @@ var StudioFormatter = function(session, screen, sqlConsole) {
 
 	this.maxSideWidth = 45;
 	this.maxSqlConsoleHeight = 15;
+	this.metaBoxHeight = 4;
 
 	this.refreshCheckDelay = 150;
 
@@ -27,7 +28,9 @@ var StudioFormatter = function(session, screen, sqlConsole) {
 		"Views": "bgMagenta"
 	};
 
-	this.scrollDataPaneDebounced = _.throttle(this.scrollDataPane.bind(this), 70, {trailing: true});
+	this.scrollDataPaneDebounced = _.throttle(this.scrollDataPane.bind(this), 70, {
+		trailing: true
+	});
 }
 
 StudioFormatter.prototype.init = function(schemas, tables) {
@@ -40,8 +43,6 @@ StudioFormatter.prototype.init = function(schemas, tables) {
 			y: 0
 		}
 	};
-
-	
 
 	this.calculateSize();
 
@@ -100,7 +101,23 @@ StudioFormatter.prototype.redrawDataPane = function() {
 		this.drawDataView();
 	}
 
+	if (this.dataPane.mode == "queryOutput") {
+		this.clearMainPanel();
+		this.drawQueryHeader();
+		this.drawActiveBorders();
+		this.drawDataView();
+	}
+
 	this.sqlConsole.moveCursor();
+}
+
+StudioFormatter.prototype.drawQueryHeader = function(){
+	/**
+	 * Draw meta box
+	 */
+	this.screen.graphics.drawBox(this.sideWidth + 1, 2, this.width - this.sideWidth - 1, this.metaBoxHeight + 1, " " [this.metaBoxTheme]);
+
+	// this.screen.graphics.drawText(this.sideWidth + 2, 3, this.dataPane.meta.query.bold[this.metaBoxTheme])
 }
 
 StudioFormatter.prototype.drawSchemaList = function() {
@@ -174,10 +191,10 @@ StudioFormatter.prototype.drawTableList = function() {
 	}
 }
 
-StudioFormatter.prototype.drawActiveBorders = function(){
-		
+StudioFormatter.prototype.drawActiveBorders = function() {
+
 	var focusedChar = " ".bgYellow
-	var nonfocusedChar = " "[this.borderTheme]
+	var nonfocusedChar = " " [this.borderTheme]
 
 	/**
 	 * Shared by both
@@ -187,12 +204,12 @@ StudioFormatter.prototype.drawActiveBorders = function(){
 	/**
 	 * Data pane
 	 */
-	
+
 	this.screen.graphics.drawBox(this.sideWidth + 1, 1, this.width - this.sideWidth - 1, 1, (this.session.focus == "data-pane" ? focusedChar : nonfocusedChar));
 	this.screen.graphics.drawBox(this.sideWidth, 1, 1, this.height - this.sqlConsoleHeight + 1, (this.session.focus == "data-pane" ? focusedChar : nonfocusedChar));
 	this.screen.graphics.drawBox(this.width, 1, 1, this.height - this.sqlConsoleHeight + 1, (this.session.focus == "data-pane" ? focusedChar : nonfocusedChar));
 
-	if(this.dataPane.mode == "tablePreview"){
+	if (this.dataPane.mode == "tablePreview" || this.dataPane.mode == "queryOutput") {
 		this.screen.graphics.drawBox(this.sideWidth + 1, this.metaWindowHeight, this.width - this.sideWidth - 1, 1, (this.session.focus == "data-pane" ? focusedChar : nonfocusedChar));
 	}
 
@@ -306,12 +323,61 @@ StudioFormatter.prototype.drawTableView = function(schema, table, columns, dataP
 	this.redrawDataPane();
 }
 
+StudioFormatter.prototype.drawOueryOutputView = function(query, data) {
+
+	/**
+	 * Save this state
+	 */
+	this.dataPane.mode = "queryOutput"
+
+	this.dataPane.meta = {
+		query: query
+	}
+
+	this.dataPane.rawData = data;
+
+	this.dataPane.scroll = {
+		x: 0,
+		y: 0
+	}
+
+	var colNames = [];
+
+	if (data.length > 0) {
+
+		var columns = Object.keys(data[0]);
+
+		var table = new cliTable({
+			head: columns
+		});
+
+		for (var k = 0; k < this.dataPane.rawData.length; k++) {
+			var rows = [];
+
+			for (var j = 0; j < columns.length; j++) {
+
+				var value = this.dataPane.rawData[k][columns[j]];
+
+				if (value == null) value = "NULL";
+
+				rows.push(value)
+			};
+
+			table.push(rows);
+		};
+
+		this.dataPane.data = table.toString().split("\n");
+	}
+
+	this.redrawDataPane();
+}
+
 StudioFormatter.prototype.drawDataView = function() {
 	if (!this.dataPane.rawData || this.dataPane.rawData.length == 0) {
 		this.fullPageAlert("Nothing to show", "bgBlue", true);
 		return;
 	}
-	
+
 	var yPadding = 7;
 
 	var x = 0;
@@ -320,7 +386,7 @@ StudioFormatter.prototype.drawDataView = function() {
 	var awidth = this.width - this.sideWidth - 1;
 	var aheight = this.dataPaneHeight - this.metaWindowHeight;
 
-	var count =- 0;
+	var count = -0;
 
 	/**
 	 * Draw table
@@ -335,7 +401,10 @@ StudioFormatter.prototype.drawDataView = function() {
 
 		var line = ansiSubstr(this.dataPane.data[i], x + this.dataPane.scroll.x, x + awidth + this.dataPane.scroll.x);
 
-		line = pad(line, awidth, {colors: true, char: " "});
+		line = pad(line, awidth, {
+			colors: true,
+			char: " "
+		});
 
 		this.screen.graphics.drawText(this.sideWidth + 1, yPadding + i - this.dataPane.scroll.y, line)
 	}
@@ -349,7 +418,6 @@ StudioFormatter.prototype.drawTableMetaInfo = function() {
 
 	this.clearMainPanel();
 
-	var height = 4;
 	var xoffset = 2;
 
 	var columnString = this.dataPane.meta.columns.join(", ");
@@ -360,11 +428,10 @@ StudioFormatter.prototype.drawTableMetaInfo = function() {
 		columnString = columnString.substring(0, maxColumnStringWidth - 3) + "..."
 	}
 
-
 	/**
 	 * Draw meta box
 	 */
-	this.screen.graphics.drawBox(this.sideWidth + 1, 2, this.width - this.sideWidth - 1, height + 1, " "[this.metaBoxTheme]);
+	this.screen.graphics.drawBox(this.sideWidth + 1, 2, this.width - this.sideWidth - 1, this.metaBoxHeight + 1, " " [this.metaBoxTheme]);
 
 	this.screen.graphics.drawText(this.sideWidth + xoffset, 3, "Schema Name: ".bold[this.metaBoxTheme] + this.dataPane.meta.schema.substring(0, 23)[this.metaBoxTheme])
 
@@ -400,7 +467,7 @@ StudioFormatter.prototype.fullPageAlert = function(err, colour, shouldClear, isF
 	var ypos = this.metaWindowHeight + (this.dataPaneHeight / 2) - (this.dataPaneHeight / (this.dataPaneHeight / height));
 	var xpos = parseInt(this.sideWidth + (((this.width - this.sideWidth) / 2) - (width / 2)));
 
-	if(isFullScreen){
+	if (isFullScreen) {
 		xpos = parseInt((this.width / 2) - (width / 2));
 	}
 
@@ -410,7 +477,6 @@ StudioFormatter.prototype.fullPageAlert = function(err, colour, shouldClear, isF
 	for (var i = stringCutdown.length - 1; i >= 0; i--) {
 		this.screen.graphics.drawText(xpos + 2, ypos + 1 + i, stringCutdown[i][colour].bold);
 	}
-
 }
 
 StudioFormatter.prototype.byebye = function() {
@@ -427,15 +493,15 @@ StudioFormatter.prototype.scrollDataPane = function(dx, dy) {
 	this.dataPane.scroll.x += dx;
 	this.dataPane.scroll.y += dy;
 
-	if(this.dataPane.scroll.x < 0){
+	if (this.dataPane.scroll.x < 0) {
 		this.dataPane.scroll.x = 0;
 	}
 
-	if(this.dataPane.scroll.y < 0){
+	if (this.dataPane.scroll.y < 0) {
 		this.dataPane.scroll.y = 0;
 	}
 
-	if(oldx != this.dataPane.scroll.x || oldy != this.dataPane.scroll.y){
+	if (oldx != this.dataPane.scroll.x || oldy != this.dataPane.scroll.y) {
 		this.drawDataView();
 	}
 }

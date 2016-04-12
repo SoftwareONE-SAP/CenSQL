@@ -54,7 +54,7 @@ StudioSession.prototype.init = function() {
 	 * Disable keyboard input
 	 * @type [Function]
 	 */
-	process.stdin._events.keypress = function(){}
+	process.stdin._events.keypress = function() {}
 
 	this.studioDbHandler.getSchemas(function(err, schemas) {
 
@@ -149,23 +149,54 @@ StudioSession.prototype.loadSqlControls = function() {
 		this.sqlConsole.backspace();
 	}.bind(this);
 
+	/**
+	 * Goto start of line
+	 */
 	this.controlKeys.false.false.home = function() {
 		this.sqlConsole.moveCursor(-Infinity, 0, true)
 	}.bind(this);
 
+	/**
+	 * Goto end of line
+	 */
 	this.controlKeys.false.false.end = function() {
 		this.sqlConsole.moveCursor(Infinity, 0, true)
 	}.bind(this);
 
+	/**
+	 * Pageup and down height of console
+	 */
 	this.controlKeys.false.false.pageup = function() {
 		this.sqlConsole.moveScroll(-this.sqlConsole.region.h);
 	}.bind(this);
-
 
 	this.controlKeys.false.false.pagedown = function() {
 		this.sqlConsole.moveScroll(this.sqlConsole.region.h);
 	}.bind(this);
 
+	/**
+	 * Run query
+	 */
+	this.controlKeys.false.false.enter = function() {
+
+		var query = this.sqlConsole.getQuery();
+
+		this.studioDbHandler.exec(query, function(err, data) {
+
+			if (err) {
+				this.formatter.fullPageAlert(err);
+				return;
+			}
+
+			this.formatter.drawOueryOutputView(query, data);
+		}.bind(this));
+
+
+	}.bind(this);
+
+	this.controlKeys.true.false.delete = function() {
+		this.sqlConsole.clear();
+	}.bind(this)
 }
 
 StudioSession.prototype.loadUiControls = function() {
@@ -295,10 +326,10 @@ StudioSession.prototype.loadDatapaneControls = function() {
 	}.bind(this);
 }
 
-StudioSession.prototype.toggleFocus = function(){
-	if(this.focus == "sql-console"){
+StudioSession.prototype.toggleFocus = function() {
+	if (this.focus == "sql-console") {
 		this.focus = "data-pane";
-	}else{
+	} else {
 		this.focus = "sql-console";
 	}
 
@@ -317,7 +348,6 @@ StudioSession.prototype.onKeyPress = function(ch, key) {
 			_.get(this.controlKeys, key.ctrl + "." + key.shift + "." + key.name)();
 			pressed = true;
 		}
-
 	}
 
 	/**

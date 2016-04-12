@@ -27,4 +27,8 @@ StudioDbHandler.prototype.selectAllLimit = function(schema, table, limit, callba
 	this.hdb.exec("studioConn", 'SELECT * FROM "' + schema + '"."' + table + '" LIMIT ' + limit, callback);
 }
 
+StudioDbHandler.prototype.exec = function(query, callback){
+	this.hdb.exec("studioConn", query, callback);
+}
+
 module.exports = StudioDbHandler;

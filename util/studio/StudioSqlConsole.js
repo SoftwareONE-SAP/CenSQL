@@ -19,7 +19,7 @@ var StudioSqlConsole = function(screen, dbHandler) {
 }
 
 StudioSqlConsole.prototype.init = function() {
-	this.content = [""];
+	this.content = ["SELECT 1,2,3,4 FROM DUMMY"];
 	this.contentHeight = -1;
 	this.overlappedLinesCount = 0;
 
@@ -36,6 +36,8 @@ StudioSqlConsole.prototype.init = function() {
 		w: 1,
 		h: 1
 	}
+
+	this.debouncedDraw = _.throttle(this.draw.bind(this), 50);
 }
 
 StudioSqlConsole.prototype.setRegion = function(x, y, w, h) {
@@ -76,8 +78,8 @@ StudioSqlConsole.prototype.type = function(c) {
 		this.cursor.x++;
 	}
 
-
-	this.draw(false);
+	this.checkScroll(false);
+	this.debouncedDraw(false);
 }
 
 StudioSqlConsole.prototype.backspace = function() {
@@ -221,6 +223,18 @@ StudioSqlConsole.prototype.moveScroll = function(dy){
 	}
 
 	this.draw(true);
+}
+
+StudioSqlConsole.prototype.clear = function(){
+	this.content = [""];
+	this.cursor.x = 0;
+	this.cursor.y = 0;
+
+	this.draw(true);
+}
+
+StudioSqlConsole.prototype.getQuery = function(){
+	return this.content.join(" ");
 }
 
 module.exports = StudioSqlConsole;
