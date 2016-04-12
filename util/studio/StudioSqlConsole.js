@@ -21,6 +21,7 @@ var StudioSqlConsole = function(screen, dbHandler) {
 StudioSqlConsole.prototype.init = function() {
 	this.content = [""];
 	this.contentHeight = -1;
+	this.overlappedLinesCount = 0;
 
 	this.scroll = 0;
 
@@ -117,6 +118,8 @@ StudioSqlConsole.prototype.setContent = function(value) {
 StudioSqlConsole.prototype.draw = function(forceBackground) {
 	var output = []
 
+	this.overlappedLinesCount = 0;
+
 	for (var i = 0; i < this.content.length; i++) {
 		if (!this.content[i]) {
 			output.push("");
@@ -124,6 +127,10 @@ StudioSqlConsole.prototype.draw = function(forceBackground) {
 		}
 
 		var lines = this.content[i].match(new RegExp('.{1,' + this.region.w + '}', 'g'));
+
+		if(lines.length > 1){
+			this.overlappedLinesCount ++;
+		}
 
 		output = output.concat(lines);
 	}
@@ -152,7 +159,7 @@ StudioSqlConsole.prototype.draw = function(forceBackground) {
 }
 
 StudioSqlConsole.prototype.gotoCursor = function() {
-	this.screen.goto(this.region.x + this.cursor.x, this.region.y + this.cursor.y - this.scroll);
+	this.screen.goto(this.region.x + this.cursor.x, this.region.y + this.cursor.y - this.scroll + this.overlappedLinesCount);
 }
 
 StudioSqlConsole.prototype.moveCursor = function(dx, dy) {
@@ -182,16 +189,16 @@ StudioSqlConsole.prototype.moveCursor = function(dx, dy) {
 	this.gotoCursor();
 }
 
-StudioSqlConsole.prototype.checkScroll = function(shouldDraw){
+StudioSqlConsole.prototype.checkScroll = function(shouldDraw) {
 	if (this.cursor.y - this.scroll > this.region.h - 3) {
 		this.scroll = this.cursor.y - this.region.h + 3;
-		
+
 		shouldDraw ? this.draw(true) : false;
 	}
 
 	if (this.cursor.y - this.scroll <= -1) {
 		this.scroll = (this.cursor.y >= 0 ? this.cursor.y : 0);
-		
+
 		shouldDraw ? this.draw(true) : false;
 	}
 }

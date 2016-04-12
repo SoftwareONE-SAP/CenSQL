@@ -37,6 +37,12 @@ var StudioSession = function(screen, hdb) {
 }
 
 StudioSession.prototype.init = function() {
+
+	/**
+	 * Load control keys
+	 */
+	this.setControlKeys();
+
 	/**
 	 * Copy the keypress function
 	 * @type [Function]
@@ -72,125 +78,163 @@ StudioSession.prototype.init = function() {
 
 }
 
-StudioSession.prototype.onKeyPress = function(ch, key) {
-
+StudioSession.prototype.setControlKeys = function() {
 	/**
 	 * Odd but allows keys[IsControllPressed][IsShiftPressed][KeyName]()
 	 */
-	var keys = {
+	this.controlKeys = {
 		false: {
-			true: {
-				"down": function() {
-					this.formatter.rotateSchemas(1);
-				}.bind(this),
-				"up": function() {
-					this.formatter.rotateSchemas(-1);
-				}.bind(this),
-				"right": function() {
-					if (this.formatter.tableListMode == "Views") {
-
-						this.studioDbHandler.getViews(this.formatter.schemas[0].SCHEMA_NAME, function(err, data) {
-							if (err) {
-								this.formatter.fullPageAlert(err);
-								process.exit(1);
-							}
-
-							this.formatter.setTables(data);
-
-						}.bind(this))
-					} else {
-
-						this.studioDbHandler.getTables(this.formatter.schemas[0].SCHEMA_NAME, function(err, data) {
-							if (err) {
-								this.formatter.fullPageAlert(err);
-								process.exit(1);
-							}
-
-							this.formatter.setTables(data);
-
-						}.bind(this))
-
-					}
-				}.bind(this),
-				"tab": this.toggleTableBoxView.bind(this),
-			},
-			false: {
-				"right": function() {
-					if (this.formatter.focus == "sql-console") {
-						this.sqlConsole.moveCursor(1, 0)
-					} else {
-						this.formatter.scrollDataPaneDebounced(10, 0)
-					}
-				}.bind(this),
-				"left": function() {
-					if (this.formatter.focus == "sql-console") {
-						this.sqlConsole.moveCursor(-1, 0)
-					} else {
-						this.formatter.scrollDataPaneDebounced(-10, 0)
-					}
-				}.bind(this),
-				"down": function() {
-					if (this.formatter.focus == "sql-console") {
-						this.sqlConsole.moveCursor(0, 1)
-					} else {
-						this.formatter.scrollDataPaneDebounced(0, 3)
-					}
-				}.bind(this),
-				"up": function() {
-					if (this.formatter.focus == "sql-console") {
-						this.sqlConsole.moveCursor(0, -1)
-					} else {
-						this.formatter.scrollDataPaneDebounced(0, -3)
-					}
-				}.bind(this),
-				"backspace": function() {
-					if (this.formatter.focus == "sql-console") {
-						this.sqlConsole.backspace();
-					}
-				}.bind(this),
-				"pagedown": function() {
-					this.formatter.scrollDataPaneDebounced(0, Math.abs(this.formatter.height - 10))
-				}.bind(this),
-				"pageup": function() {
-					this.formatter.scrollDataPaneDebounced(0, -Math.abs(this.formatter.height - 10))
-				}.bind(this),
-				"home": function() {
-					this.formatter.scrollDataPaneDebounced(-Infinity, -Infinity)
-				}.bind(this),
-				"tab": function() {
-					this.formatter.toggleFocus();
-				}.bind(this),
-			}
+			false: {},
+			true: {}
 		},
 		true: {
-			false: {
-				"c": this.exitStudio.bind(this),
-				"down": function() {
-					this.formatter.rotateTables(1);
-				}.bind(this),
-				"up": function() {
-					this.formatter.rotateTables(-1);
-				}.bind(this),
-				"right": function() {
-					if (this.formatter.schemas[0] && this.formatter.tables[0]) {
-						this.loadTableView(this.formatter.schemas[0].SCHEMA_NAME, this.formatter.tables[0].NAME, this.formatter.tableListMode == "Views");
-					}
-				}.bind(this)
-			}
+			false: {},
+			true: {}
 		}
+	};
+
+	this.loadUiControls();
+
+	switch (this.formatter.focus) {
+		case "sql-console":
+			this.loadSqlControls();
+			break;
+		case "data-pane":
+			this.loadDatapaneControls();
+			break;
 	}
+
+}
+
+StudioSession.prototype.loadSqlControls = function() {
+	this.controlKeys.false.false.right = function() {
+		this.sqlConsole.moveCursor(1, 0);
+	}.bind(this);
+
+	this.controlKeys.false.false.left = function() {
+		this.sqlConsole.moveCursor(-1, 0);
+	}.bind(this);
+
+	this.controlKeys.false.false.down = function() {
+		this.sqlConsole.moveCursor(0, 1)
+	}.bind(this);
+
+	this.controlKeys.false.false.up = function() {
+		this.sqlConsole.moveCursor(0, -1)
+	}.bind(this);
+
+	this.controlKeys.false.false.backspace = function() {
+		this.sqlConsole.backspace();
+	}.bind(this);
+}
+
+StudioSession.prototype.loadUiControls = function() {
+	this.controlKeys.false.true.down = function() {
+		this.formatter.rotateSchemas(1);
+	}.bind(this);
+
+	this.controlKeys.false.true.up = function() {
+		this.formatter.rotateSchemas(-1);
+	}.bind(this);
+
+	this.controlKeys.false.true.right = function() {
+		if (this.formatter.tableListMode == "Views") {
+
+			this.studioDbHandler.getViews(this.formatter.schemas[0].SCHEMA_NAME, function(err, data) {
+				if (err) {
+					this.formatter.fullPageAlert(err);
+					process.exit(1);
+				}
+
+				this.formatter.setTables(data);
+
+			}.bind(this))
+		} else {
+
+			this.studioDbHandler.getTables(this.formatter.schemas[0].SCHEMA_NAME, function(err, data) {
+				if (err) {
+					this.formatter.fullPageAlert(err);
+					process.exit(1);
+				}
+
+				this.formatter.setTables(data);
+
+			}.bind(this))
+
+		}
+	}.bind(this);
+
+	this.controlKeys.false.true.tab = function() {
+		this.toggleTableBoxView();
+	}.bind(this);
+
+	this.controlKeys.false.false.tab = function() {
+		this.formatter.toggleFocus();
+		this.setControlKeys();
+	}.bind(this);
+
+	this.controlKeys.true.false.c = function() {
+		this.exitStudio();
+	}.bind(this);
+
+	this.controlKeys.true.false.down = function() {
+		this.formatter.rotateTables(1);
+	}.bind(this);
+
+	this.controlKeys.true.false.up = function() {
+		this.formatter.rotateTables(-1);
+	}.bind(this);
+
+	this.controlKeys.true.false.right = function() {
+		if (this.formatter.schemas[0] && this.formatter.tables[0]) {
+			this.loadTableView(this.formatter.schemas[0].SCHEMA_NAME, this.formatter.tables[0].NAME, this.formatter.tableListMode == "Views");
+		}
+	}.bind(this);
+}
+
+StudioSession.prototype.loadDatapaneControls = function() {
+	this.controlKeys.false.false.right = function() {
+		this.formatter.scrollDataPaneDebounced(10, 0)
+	}.bind(this);
+
+	this.controlKeys.false.false.left = function() {
+		this.formatter.scrollDataPaneDebounced(-10, 0)
+	}.bind(this);
+
+	this.controlKeys.false.false.down = function() {
+		this.formatter.scrollDataPaneDebounced(0, 3)
+	}.bind(this);
+
+	this.controlKeys.false.false.up = function() {
+		this.formatter.scrollDataPaneDebounced(0, -3)
+	}.bind(this)
+
+	this.controlKeys.false.false.pagedown = function() {
+		this.formatter.scrollDataPaneDebounced(0, Math.abs(this.formatter.height - 10))
+	}.bind(this);
+
+	this.controlKeys.false.false.pageup = function() {
+		this.formatter.scrollDataPaneDebounced(0, -Math.abs(this.formatter.height - 10))
+	}.bind(this);
+
+	this.controlKeys.false.false.home = function() {
+		this.formatter.scrollDataPaneDebounced(-Infinity, -Infinity)
+	}.bind(this);
+}
+
+StudioSession.prototype.onKeyPress = function(ch, key) {
 
 	var pressed = false;
 
 	if (key) {
-		if (_.has(keys, key.ctrl + "." + key.shift + "." + key.name)) {
-			_.get(keys, key.ctrl + "." + key.shift + "." + key.name)();
+		if (_.has(this.controlKeys, key.ctrl + "." + key.shift + "." + key.name)) {
+			_.get(this.controlKeys, key.ctrl + "." + key.shift + "." + key.name)();
 			pressed = true;
 		}
 
 	}
 
-	if (!pressed && ch) {
+	if (!pressed && this.formatter.focus == "sql-console" && ch) {
 		this.sqlConsole.type(ch);
 	}
 }
