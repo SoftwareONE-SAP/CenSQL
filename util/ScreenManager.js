@@ -249,8 +249,6 @@ ScreenManager.prototype.ready = function(hdb) {
 ScreenManager.prototype.printCommandOutput = function(command, outputs, callback) {
     this.renderCommandOutput(command, outputs, function(err, lines) {
 
-        // this.renderLines(pipedLines, callback);
-
         this.renderLines([].concat.apply([], lines), function() {
 
             /**
