@@ -1,4 +1,4 @@
 
 module.exports = function(command, data){
-	return data.split("\n");
+	return [data]
 }
