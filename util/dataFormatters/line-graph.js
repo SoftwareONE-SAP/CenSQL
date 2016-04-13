@@ -1,5 +1,4 @@
 var colors = require("colors");
-var moment = require("moment");
 
 module.exports = function(command, data, title, settings, amountOfHours) {
 
