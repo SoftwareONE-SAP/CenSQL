@@ -1,6 +1,6 @@
 {
   "name": "censql",
-  "version": "1.6.0",
+  "version": "1.6.1",
   "description": "A CLI client for SAP HANA",
   "main": "./app.js",
   "scripts": {
@@ -10,7 +10,7 @@
   "license": "MIT",
   "preferGlobal": "true",
   "dependencies": {
-    "ansi-substring": "^1.0.0",
+    "ansi-substring": "git+https://github.com/woverton/ansi-substring.git",
     "async": "^0.9.2",
     "charm": "^1.0.0",
     "cli-table": "^0.3.1",
