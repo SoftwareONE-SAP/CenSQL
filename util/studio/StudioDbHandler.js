@@ -1,5 +1,6 @@
-var StudioDbHandler = function(hdb) {
+var StudioDbHandler = function(hdb, commandHandler) {
 	this.hdb = hdb;
+	this.commandHandler = commandHandler;
 }
 
 StudioDbHandler.prototype.init = function(callback) {
@@ -28,7 +29,9 @@ StudioDbHandler.prototype.selectAllLimit = function(schema, table, limit, callba
 }
 
 StudioDbHandler.prototype.exec = function(query, callback){
-	this.hdb.exec("studioConn", query, callback);
+	this.commandHandler.handleCommand(query, function(err, output){
+		callback(err, output);
+	})
 }
 
 module.exports = StudioDbHandler;

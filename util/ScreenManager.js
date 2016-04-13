@@ -132,7 +132,7 @@ ScreenManager.prototype.setupInput = function() {
                 /**
                  * Send the user command to the command handler
                  */
-                this.commandHandler.handleCommand(line, function(output) {
+                this.commandHandler.handleCommand(line, function(err, output) {
 
                     /**
                      * Print the command to the screen however the command handler thinks is best
@@ -230,9 +230,15 @@ ScreenManager.prototype.ready = function(hdb) {
      * Should we enter the cli or studio mode?
      */
     if (this.settings.studio) {
+
+        GLOBAL.graphWidth = process.stdout.columns / 1.8;
+
         this.graphics = new StudioGraphics(this);
-        this.studio = new StudioSession(this, hdb);
+        this.studio = new StudioSession(this, hdb, this.commandHandler);
     } else {
+
+        GLOBAL.graphWidth = process.stdout.columns;
+
         this.print(colors.cyan(colors.bold("For help type \\h\n-----------------------------------------------------\n\n")));
         this.print(colors.cyan("> "));
         process.stdin.resume();
@@ -240,12 +246,27 @@ ScreenManager.prototype.ready = function(hdb) {
 
 }
 
+ScreenManager.prototype.printCommandOutput = function(command, outputs, callback) {
+    this.renderCommandOutput(command, outputs, function() {
+
+        /**
+         * Dont display a prompt for batch requests
+         */
+        if (!this.isBatch) {
+            this.print("\n" + colors.cyan("> "));
+        }
+
+        callback();
+
+    });
+}
+
 /**
  * Print the output to a command entered by the user
  * @param  {String} command The command the user ran
  * @param  {Array} outputs  the data and how to display it
  */
-ScreenManager.prototype.printCommandOutput = function(command, outputs, callback) {
+ScreenManager.prototype.renderCommandOutput = function(command, outputs, callback) {
 
     var cSegs = command.split("||");
 
@@ -293,28 +314,17 @@ ScreenManager.prototype.printCommandOutput = function(command, outputs, callback
 
     cParts.unshift(initialCommand);
 
-    // console.log(initialCommand);
-    // console.log(cParts);
-
-
     async.mapSeries(outputs, function(output, callback) {
+
         /**
          * Pass the data to the chosen formatter
          */
         var lines = this.formatters[output[3]](output[0], output[2], output[4], this.settings, output[5], output[6], output[7]);
-        var pipedLines = this.processPipes(lines, cParts, this.settings);
-        this.renderLines(pipedLines, callback);
-    }.bind(this), function() {
-        /**
-         * Dont display a prompt for batch requests
-         */
-        if (!this.isBatch) {
-            this.print("\n" + colors.cyan("> "));
-        }
+        callback(null, this.processPipes(lines, cParts, this.settings));
 
-        if (callback) {
-            callback();
-        }
+    }.bind(this), function(err, lines) {
+
+        callback(err, lines);
 
     }.bind(this))
 

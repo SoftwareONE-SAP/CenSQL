@@ -151,7 +151,7 @@ CommandHandler.prototype.onCommand = function(enteredCommand, allCallback) {
         })
 
     }.bind(this), function(err, data) {
-        allCallback(data, enteredCommand);
+        allCallback(err, data, enteredCommand);
     })
 }
 
@@ -199,7 +199,7 @@ CommandHandler.prototype.splitStringBySemicolon = function(s) {
         /**
          * Put string back into order and return string chunk
          */
-        return s.split('').reverse().join('');
+        return s.split('').reverse().join('').trim();
     });
 
     for (var i = 0; i < commands.length; i++) {

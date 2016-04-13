@@ -19,7 +19,7 @@ var StudioSqlConsole = function(screen, dbHandler) {
 }
 
 StudioSqlConsole.prototype.init = function() {
-	this.content = ["SELECT 1,2,3,4 FROM DUMMY"];
+	this.content = ["\\mem"];
 	this.contentHeight = -1;
 	this.overlappedLinesCount = 0;
 

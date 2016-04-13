@@ -6,11 +6,12 @@ var StudioFormatter = require('./StudioFormatter.js');
 var StudioDbHandler = require('./StudioDbHandler.js');
 var StudioSqlConsole = require('./StudioSqlConsole.js');
 
-var StudioSession = function(screen, hdb) {
+var StudioSession = function(screen, hdb, commandHandler) {
 	this.screen = screen;
 	this.hdb = hdb;
+	this.commandHandler = commandHandler;
 
-	this.studioDbHandler = new StudioDbHandler(hdb);
+	this.studioDbHandler = new StudioDbHandler(hdb, this.commandHandler);
 	this.sqlConsole = new StudioSqlConsole(screen, this.studioDbHandler);
 	this.formatter = new StudioFormatter(this, screen, this.sqlConsole);
 
@@ -90,7 +91,6 @@ StudioSession.prototype.init = function() {
 
 		}.bind(this));
 	}.bind(this));
-
 }
 
 StudioSession.prototype.setControlKeys = function() {
@@ -179,24 +179,27 @@ StudioSession.prototype.loadSqlControls = function() {
 	 */
 	this.controlKeys.false.false.enter = function() {
 
-		var query = this.sqlConsole.getQuery();
-
-		this.studioDbHandler.exec(query, function(err, data) {
-
-			if (err) {
-				this.formatter.fullPageAlert(err);
-				return;
-			}
-
-			this.formatter.drawOueryOutputView(query, data);
-		}.bind(this));
-
+		this.runUserQuery();
 
 	}.bind(this);
 
 	this.controlKeys.true.false.delete = function() {
 		this.sqlConsole.clear();
 	}.bind(this)
+}
+
+StudioSession.prototype.runUserQuery = function() {
+	var query = this.sqlConsole.getQuery();
+
+	this.studioDbHandler.exec(query, function(err, data) {
+
+		if (err) {
+			this.formatter.fullPageAlert(err);
+			return;
+		}
+
+		this.formatter.drawOueryOutputView(query, data);
+	}.bind(this));
 }
 
 StudioSession.prototype.loadUiControls = function() {

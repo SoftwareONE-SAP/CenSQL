@@ -5,6 +5,7 @@ var pad = require('pad');
 var cliTable = require('cli-table');
 var stripColorCodes = require('stripcolorcodes');
 var ansiSubstr = require('ansi-substring');
+var async = require('async');
 
 var StudioFormatter = function(session, screen, sqlConsole) {
 	this.session = session;
@@ -341,35 +342,12 @@ StudioFormatter.prototype.drawOueryOutputView = function(query, data) {
 		y: 0
 	}
 
-	var colNames = [];
+	this.screen.renderCommandOutput(query, data, function(err, lines){
+		this.dataPane.data = [].concat.apply([], lines);
 
-	if (data.length > 0) {
+		this.redrawDataPane();
+	}.bind(this))
 
-		var columns = Object.keys(data[0]);
-
-		var table = new cliTable({
-			head: columns
-		});
-
-		for (var k = 0; k < this.dataPane.rawData.length; k++) {
-			var rows = [];
-
-			for (var j = 0; j < columns.length; j++) {
-
-				var value = this.dataPane.rawData[k][columns[j]];
-
-				if (value == null) value = "NULL";
-
-				rows.push(value)
-			};
-
-			table.push(rows);
-		};
-
-		this.dataPane.data = table.toString().split("\n");
-	}
-
-	this.redrawDataPane();
 }
 
 StudioFormatter.prototype.drawDataView = function() {
