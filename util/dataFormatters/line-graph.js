@@ -215,7 +215,7 @@ module.exports = function(command, data, title, settings, amountOfHours) {
 
         var xPadding = 2 + Math.ceil(((plot[0].length * widthRatio) - description.length) / 2);
 
-        lines.push(new Array(xPadding).join(" ") + description);
+        lines.push(colors.white(new Array(xPadding).join(" ") + description));
 
     }
 
