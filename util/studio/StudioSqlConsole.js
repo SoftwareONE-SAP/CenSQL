@@ -19,7 +19,7 @@ var StudioSqlConsole = function(screen, dbHandler) {
 }
 
 StudioSqlConsole.prototype.init = function() {
-	this.content = ["\\mem"];
+	this.content = [""];
 	this.contentHeight = -1;
 	this.overlappedLinesCount = 0;
 

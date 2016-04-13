@@ -1,9 +1,9 @@
 var async = require("async");
 var path = require("path");
 
-var CommandHandler = function(screen, conn, command) {
+var CommandHandler = function(screen, hdb, command) {
     this.screen = screen;
-    this.conn = conn;
+    this.hdb = hdb;
 
     this.loadCommandHandlers();
 
@@ -141,7 +141,7 @@ CommandHandler.prototype.onCommand = function(enteredCommand, allCallback) {
         /**
          * Run the initialCommand as a string of SQL and send it to HANA
          */
-        this.conn.exec("conn", sql, function(err, hanaData) {
+        this.hdb.exec("conn", sql, function(err, hanaData) {
             callback(null, [initialCommand, err == null ? 0 : 1, err == null ? hanaData : {
                     error: err,
                     sql: initialCommand
@@ -176,7 +176,7 @@ CommandHandler.prototype.runInternalCommand = function(command, cParts, callback
         return;
     }
 
-    this.handlers[aParts[0]].run(command, aParts, this.conn, this.screen, function(data) {
+    this.handlers[aParts[0]].run(command, aParts, this.hdb, this.screen, function(data) {
         data.unshift(command);
         callback(null, data)
     });

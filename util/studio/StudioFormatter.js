@@ -68,6 +68,8 @@ StudioFormatter.prototype.calculateSize = function() {
 		this.width - this.sideWidth - 1,
 		this.sqlConsoleHeight
 	)
+
+	GLOBAL.graphWidth = process.stdout.columns / 1.5;
 }
 
 StudioFormatter.prototype.checkRefresh = function() {
@@ -377,7 +379,11 @@ StudioFormatter.prototype.drawDataView = function() {
 
 		count++;
 
-		var line = ansiSubstr(this.dataPane.data[i], x + this.dataPane.scroll.x, x + awidth + this.dataPane.scroll.x);
+		var line = this.dataPane.data[i]
+
+		line = line.replace(new RegExp("\\t", 'g'), "    ").trim();
+
+		line = ansiSubstr(line, x + this.dataPane.scroll.x, x + awidth + this.dataPane.scroll.x);
 
 		line = pad(line, awidth, {
 			colors: true,

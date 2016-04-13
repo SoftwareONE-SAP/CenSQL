@@ -231,7 +231,7 @@ ScreenManager.prototype.ready = function(hdb) {
      */
     if (this.settings.studio) {
 
-        GLOBAL.graphWidth = process.stdout.columns / 1.8;
+        GLOBAL.graphWidth = process.stdout.columns / 1.5;
 
         this.graphics = new StudioGraphics(this);
         this.studio = new StudioSession(this, hdb, this.commandHandler);
