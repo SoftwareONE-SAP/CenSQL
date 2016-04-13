@@ -189,10 +189,9 @@ module.exports = function(command, data, title, settings, amountOfHours) {
                     } else {
                         plot[y][o] = colors.magenta(plot[y][o])
                     }
-
+                    
                     line += plot[y][o];
 
-                    // plot[y][o] = colors.green(plot[y][o])
                 }
             };
 

@@ -247,18 +247,24 @@ ScreenManager.prototype.ready = function(hdb) {
 }
 
 ScreenManager.prototype.printCommandOutput = function(command, outputs, callback) {
-    this.renderCommandOutput(command, outputs, function() {
+    this.renderCommandOutput(command, outputs, function(err, lines) {
 
-        /**
-         * Dont display a prompt for batch requests
-         */
-        if (!this.isBatch) {
-            this.print("\n" + colors.cyan("> "));
-        }
+        // this.renderLines(pipedLines, callback);
 
-        callback();
+        this.renderLines([].concat.apply([], lines), function() {
 
-    });
+            /**
+             * Dont display a prompt for batch requests
+             */
+            if (!this.isBatch) {
+                this.print("\n" + colors.cyan("> "));
+            }
+
+            callback();
+
+        }.bind(this))
+
+    }.bind(this));
 }
 
 /**
