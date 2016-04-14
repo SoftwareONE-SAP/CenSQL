@@ -120,7 +120,7 @@ StudioFormatter.prototype.drawQueryHeader = function(){
 	 */
 	this.screen.graphics.drawBox(this.sideWidth + 1, 2, this.width - this.sideWidth - 1, this.metaBoxHeight + 1, " " [this.metaBoxTheme]);
 
-	// this.screen.graphics.drawText(this.sideWidth + 2, 3, this.dataPane.meta.query.bold[this.metaBoxTheme])
+	this.screen.graphics.drawText(this.sideWidth + 2, 3, "SQL: "[this.metaBoxTheme].bold + this.dataPane.meta.query.substring(0, this.width - this.sideWidth - 8)[this.metaBoxTheme])
 }
 
 StudioFormatter.prototype.drawSchemaList = function() {
