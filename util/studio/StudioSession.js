@@ -337,6 +337,7 @@ StudioSession.prototype.toggleFocus = function() {
 	}
 
 	this.formatter.drawBorder();
+	this.formatter.drawHelpText();
 }
 
 StudioSession.prototype.onKeyPress = function(ch, key) {
