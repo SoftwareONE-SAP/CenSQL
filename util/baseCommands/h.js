@@ -57,6 +57,7 @@ HelpCommandHandler.prototype.run = function(command, cParts, conn, screen, callb
                 "\t\\ips " + colors.grey("{SCHEMA_NAME} [-f | --forever] {OPTIONAL_SLEEP}") + "\t- Show the current inserts per second",
                 "",
                 colors.bold("\tHelper Commands:"),
+                "\t\\tp " + colors.grey("{SCHEMA.TABLE} {OPTIONAL_LIMIT}") + "\t - Preview a table",
                 "\t\\sgh\t\t\t\t\t - Set the height to draw graphs",
                 "\t\\sbh\t\t\t\t\t - Set the height to draw bar charts",
                 "\t\\watch -i {DELAY_IN_SECONDS} {COMMAND}\t - Run a command over and over again with a delay",
