@@ -8,7 +8,7 @@ var CommandHandler = function(screen, hdb, command) {
     this.loadCommandHandlers();
 
     if (command) {
-        this.onCommand(command, function(output) {
+        this.onCommand(command, function(err, output) {
             this.screen.printCommandOutput(command, output, function(){
                 process.exit(0)
             });
