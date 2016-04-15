@@ -90,8 +90,6 @@ StudioSqlConsole.prototype.backspace = function() {
 		this.content[this.cursor.y] = this.content[this.cursor.y].slice(0, this.cursor.x - 1) + this.content[this.cursor.y].slice(this.cursor.x)
 
 		this.moveCursor(-1, 0, true)
-
-		this.draw(false)
 		return;
 	}
 
@@ -112,6 +110,26 @@ StudioSqlConsole.prototype.backspace = function() {
 
 }
 
+StudioSqlConsole.prototype.deleteChar = function() {
+
+	if (this.content[this.cursor.y].length > 0) {
+
+		this.screen.goto((this.content[this.cursor.y].length - 1 > 0 ? this.content[this.cursor.y].length - 1 : 0) + this.region.x, this.cursor.y + this.region.y)
+
+		this.screen.print(this.fillChar[this.bg][this.unfocusedFg]);
+
+		this.gotoCursor();
+
+		this.content[this.cursor.y] = this.content[this.cursor.y].slice(0, this.cursor.x) + this.content[this.cursor.y].slice(this.cursor.x + 1)
+
+		this.draw(false);
+
+	} else if(this.cursor.y !== this.content.length - 1){
+		this.content.splice(this.cursor.y, 1);
+		this.draw(true);
+	}
+}
+
 StudioSqlConsole.prototype.setContent = function(value) {
 	this.content = value;
 	this.draw(true);
@@ -130,8 +148,8 @@ StudioSqlConsole.prototype.draw = function(forceBackground) {
 
 		var lines = this.content[i].match(new RegExp('.{1,' + this.region.w + '}', 'g'));
 
-		if(lines.length > 1){
-			this.overlappedLinesCount ++;
+		if (lines.length > 1) {
+			this.overlappedLinesCount++;
 		}
 
 		output = output.concat(lines);
@@ -166,11 +184,11 @@ StudioSqlConsole.prototype.gotoCursor = function() {
 
 StudioSqlConsole.prototype.moveCursor = function(dx, dy, shouldDraw) {
 
-	if(dx == null){
+	if (dx == null) {
 		dx = 0;
 	}
 
-	if(dy == null){
+	if (dy == null) {
 		dy = 0;
 	}
 
@@ -213,19 +231,19 @@ StudioSqlConsole.prototype.checkScroll = function(shouldDraw) {
 	}
 }
 
-StudioSqlConsole.prototype.moveScroll = function(dy){
+StudioSqlConsole.prototype.moveScroll = function(dy) {
 	this.scroll += dy;
-	
+
 	this.moveCursor(0, dy, false);
 
-	if(this.scroll < 0){
+	if (this.scroll < 0) {
 		this.scroll = 0;
 	}
 
 	this.draw(true);
 }
 
-StudioSqlConsole.prototype.clear = function(){
+StudioSqlConsole.prototype.clear = function() {
 	this.content = [""];
 	this.cursor.x = 0;
 	this.cursor.y = 0;
@@ -233,7 +251,7 @@ StudioSqlConsole.prototype.clear = function(){
 	this.draw(true);
 }
 
-StudioSqlConsole.prototype.getQuery = function(){
+StudioSqlConsole.prototype.getQuery = function() {
 	return this.content.join(" ");
 }
 

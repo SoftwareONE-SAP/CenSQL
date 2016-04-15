@@ -187,6 +187,10 @@ StudioSession.prototype.loadSqlControls = function() {
 	this.controlKeys.true.false.delete = function() {
 		this.sqlConsole.clear();
 	}.bind(this)
+
+	this.controlKeys.false.false.delete = function() {
+		this.sqlConsole.deleteChar();
+	}.bind(this)
 }
 
 StudioSession.prototype.runUserQuery = function() {
