@@ -358,7 +358,7 @@ StudioSession.prototype.onKeyPress = function(ch, key) {
 	/**
 	 * Type into SQL console
 	 */
-	if (!pressed && this.focus == "sql-console" && ch) {
+	if (!pressed && this.focus == "sql-console" && ch && !(key && key.ctrl)) {
 		this.sqlConsole.type(ch);
 	}
 }
