@@ -288,9 +288,17 @@ StudioSession.prototype.loadUiControls = function() {
 	 * Load table/view into datapane
 	 */
 	this.controlKeys.true.false.right = function() {
+
 		if (this.formatter.schemas[0] && this.formatter.tables[0]) {
-			this.loadTableView(this.formatter.schemas[0].SCHEMA_NAME, this.formatter.tables[0].NAME, this.formatter.tableListMode == "Views");
+
+			if (this.focus == "sql-console") {
+				this.sqlConsole.type('"' + this.formatter.schemas[0].SCHEMA_NAME + '"."' + this.formatter.tables[0].NAME + '"')
+			} else {
+				this.loadTableView(this.formatter.schemas[0].SCHEMA_NAME, this.formatter.tables[0].NAME, this.formatter.tableListMode == "Views");
+			}
+
 		}
+
 	}.bind(this);
 }
 

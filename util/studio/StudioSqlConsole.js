@@ -51,34 +51,41 @@ StudioSqlConsole.prototype.setRegion = function(x, y, w, h) {
 	this.moveCursor(-Infinity, -Infinity);
 }
 
-StudioSqlConsole.prototype.type = function(c) {
+StudioSqlConsole.prototype.type = function(s) {
 
-	if (c == "\n" || c == "\r") {
+	var cs = s.split("");
 
-		this.content.splice(this.cursor.y + 1, 0, "");
+	cs.forEach(function(c) {
 
-		var endLine = (this.content[this.cursor.y] ? this.content[this.cursor.y].substring(this.cursor.x) : "");
+		if (c == "\n" || c == "\r") {
 
-		this.content[this.cursor.y] = (this.content[this.cursor.y] ? this.content[this.cursor.y].substring(0, this.cursor.x) : "");
+			this.content.splice(this.cursor.y + 1, 0, "");
 
-		this.cursor.y++;
+			var endLine = (this.content[this.cursor.y] ? this.content[this.cursor.y].substring(this.cursor.x) : "");
 
-		this.content[this.cursor.y] = endLine;
+			this.content[this.cursor.y] = (this.content[this.cursor.y] ? this.content[this.cursor.y].substring(0, this.cursor.x) : "");
 
-		this.cursor.x = 0;
+			this.cursor.y++;
 
-	} else {
+			this.content[this.cursor.y] = endLine;
 
-		if (!this.content[this.cursor.y]) {
-			this.content[this.cursor.y] = "";
+			this.cursor.x = 0;
+
+		} else {
+
+			if (!this.content[this.cursor.y]) {
+				this.content[this.cursor.y] = "";
+			}
+
+			this.content[this.cursor.y] = this.content[this.cursor.y].slice(0, this.cursor.x) + c + this.content[this.cursor.y].slice(this.cursor.x);
+
+			this.cursor.x++;
 		}
 
-		this.content[this.cursor.y] = this.content[this.cursor.y].slice(0, this.cursor.x) + c + this.content[this.cursor.y].slice(this.cursor.x);
+		this.checkScroll(false);
 
-		this.cursor.x++;
-	}
+	}.bind(this));
 
-	this.checkScroll(false);
 	this.debouncedDraw(false);
 }
 
@@ -88,6 +95,8 @@ StudioSqlConsole.prototype.backspace = function() {
 		this.screen.print(this.fillChar[this.bg][this.unfocusedFg]);
 
 		this.content[this.cursor.y] = this.content[this.cursor.y].slice(0, this.cursor.x - 1) + this.content[this.cursor.y].slice(this.cursor.x)
+
+		this.draw(false);
 
 		this.moveCursor(-1, 0, true)
 		return;
@@ -124,7 +133,7 @@ StudioSqlConsole.prototype.deleteChar = function() {
 
 		this.draw(false);
 
-	} else if(this.cursor.y !== this.content.length - 1){
+	} else if (this.cursor.y !== this.content.length - 1) {
 		this.content.splice(this.cursor.y, 1);
 		this.draw(true);
 	}
