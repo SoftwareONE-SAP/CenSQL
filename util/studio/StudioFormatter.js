@@ -232,19 +232,19 @@ StudioFormatter.prototype.drawHelpText = function() {
 	 */
 	this.screen.graphics.drawBox(1, this.height + 1, this.width, 3, " " [this.bottomBarTheme]);
 
-	this.screen.graphics.drawText(2, this.height + 1, colors.bgBlack.bold("Shft + ⮙ ⮛") + " scroll schemas." [this.bottomBarTheme]);
-	this.screen.graphics.drawText(2, this.height + 2, colors.bgBlack.bold("Ctrl + ⮙ ⮛") + " scroll tables" [this.bottomBarTheme]);
+	this.screen.graphics.drawText(2, this.height + 1, colors.bgBlack.bold("Shft + ⮙ ⮛") + " Scroll schemas." [this.bottomBarTheme]);
+	this.screen.graphics.drawText(2, this.height + 2, colors.bgBlack.bold("Ctrl + ⮙ ⮛") + " Scroll tables" [this.bottomBarTheme]);
 
-	this.screen.graphics.drawText(29, this.height + 1, colors.bgBlack.bold("Shft + ⮚") + " select schema." [this.bottomBarTheme]);
-	this.screen.graphics.drawText(29, this.height + 2, colors.bgBlack.bold("Ctrl + ⮚") + " select table." [this.bottomBarTheme]);
+	this.screen.graphics.drawText(29, this.height + 1, colors.bgBlack.bold("Shft + ⮚") + " Select schema." [this.bottomBarTheme]);
+	this.screen.graphics.drawText(29, this.height + 2, colors.bgBlack.bold("Ctrl + ⮚") + " Select table." [this.bottomBarTheme]);
 
-	this.screen.graphics.drawText(53, this.height + 1, colors.bgBlack.bold("Shft + Tab") + "    toggle between tables/views." [this.bottomBarTheme]);
+	this.screen.graphics.drawText(53, this.height + 1, colors.bgBlack.bold("Shft + Tab") + "    Toggle between tables/views." [this.bottomBarTheme]);
 
 	/**
 	 * Draw this help for datapanes
 	 */
 	if(this.session.focus == "data-pane"){
-		this.screen.graphics.drawText(53, this.height + 2, colors.bgBlack.bold("⮘ / ⮙ / ⮚ / ⮛") + " scroll data pane" [this.bottomBarTheme]);
+		this.screen.graphics.drawText(53, this.height + 2, colors.bgBlack.bold("⮘ / ⮙ / ⮚ / ⮛") + " Scroll data pane" [this.bottomBarTheme]);
 	}
 
 	/**
