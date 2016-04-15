@@ -251,7 +251,7 @@ StudioFormatter.prototype.drawHelpText = function() {
 	 * Draw sql console help
 	 */
 	if(this.session.focus == "sql-console"){
-		this.screen.graphics.drawText(53, this.height + 2, colors.bgBlack.bold("CTRL + RETURN") + " Run query" [this.bottomBarTheme]);
+		this.screen.graphics.drawText(53, this.height + 2, colors.bgBlack.bold("Ctrl + Enter") + "  Run query" [this.bottomBarTheme]);
 	}
 }
 
