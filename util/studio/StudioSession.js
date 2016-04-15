@@ -5,6 +5,7 @@ var _ = require('lodash');
 var StudioFormatter = require('./StudioFormatter.js');
 var StudioDbHandler = require('./StudioDbHandler.js');
 var StudioSqlConsole = require('./StudioSqlConsole.js');
+var argv = require('optimist').argv;
 
 var StudioSession = function(screen, hdb, commandHandler) {
 	this.screen = screen;
@@ -15,7 +16,7 @@ var StudioSession = function(screen, hdb, commandHandler) {
 	this.sqlConsole = new StudioSqlConsole(screen, this.studioDbHandler);
 	this.formatter = new StudioFormatter(this, screen, this.sqlConsole);
 
-	this.dataPreviewRows = 5000;
+	this.dataPreviewRows = argv.preview_size || 500;
 
 	/**
 	 * Print temp loading screen
