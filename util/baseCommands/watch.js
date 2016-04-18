@@ -157,12 +157,10 @@ WatchCommandHandler.prototype.getDelay = function(wParts) {
 
 WatchCommandHandler.prototype.runCommand = function(command, screen, callback) {
 
-    this.commandHandler.onCommand(command, function(output) {
+    this.commandHandler.onCommand(command, function(err, output) {
         screen.clear();
 
-        screen.printCommandOutput(command, output);
-
-        callback();
+        screen.printCommandOutput(command, output, callback);
     });
 }
 
