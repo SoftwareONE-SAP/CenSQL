@@ -11,7 +11,7 @@
   "license": "MIT",
   "preferGlobal": "true",
   "dependencies": {
-    "ansi-substring": "1.0.2",
+    "ansi-substring": "^1.0.3",
     "async": "^1.5.2",
     "charm": "^1.0.0",
     "cli-table": "^0.3.1",
