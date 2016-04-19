@@ -14,6 +14,7 @@ var StudioSqlConsole = function(screen, dbHandler) {
 	this.keyWordColor = "cyan";
 
 	this.unfocusedFg = "grey"
+	this.commentFg = "green"
 
 	this.init();
 }
@@ -179,7 +180,28 @@ StudioSqlConsole.prototype.draw = function(forceBackground) {
 			line = ""
 		}
 
-		this.screen.print(line[this.fg][this.bg])
+		var builtLine = "";
+
+		var chars = line.split("");
+
+		var comment = false;
+
+		for (var k = 0; k < chars.length; k++) {
+
+			if(chars[k] == "-" && k < chars.length - 1 && chars[k+1] == "-"){
+				comment = true;
+			}
+
+			if(!comment){
+				builtLine += chars[k][this.fg];
+			}else{
+				builtLine += chars[k][this.commentFg];
+			}
+		}
+
+		var styledLine = builtLine[this.bg];
+
+		this.screen.print(styledLine)
 	}
 
 	this.gotoCursor();
@@ -261,7 +283,13 @@ StudioSqlConsole.prototype.clear = function() {
 }
 
 StudioSqlConsole.prototype.getQuery = function() {
-	return this.content.join(" ");
+	var query = "";
+
+	for (var i = 0; i < this.content.length; i++) {
+		query += this.content[i].substring(0, (this.content[i].indexOf("--") >= 0 ? this.content[i].indexOf("--") : Infinity))
+	}
+
+	return query;
 }
 
 module.exports = StudioSqlConsole;
