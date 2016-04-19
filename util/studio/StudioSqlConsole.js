@@ -14,7 +14,6 @@ var StudioSqlConsole = function(screen, dbHandler) {
 	this.keyWordColor = "cyan";
 
 	this.unfocusedFg = "grey"
-	this.commentFg = "green"
 
 	this.init();
 }
@@ -195,7 +194,7 @@ StudioSqlConsole.prototype.draw = function(forceBackground) {
 			if(!comment){
 				builtLine += chars[k][this.fg];
 			}else{
-				builtLine += chars[k][this.commentFg];
+				builtLine += chars[k][this.fg].dim;
 			}
 		}
 
