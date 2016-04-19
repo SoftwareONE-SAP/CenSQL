@@ -102,11 +102,9 @@ ScreenManager.prototype.setupInput = function() {
                 if (GLOBAL.censql.RUNNING_PROCESS) return;
 
                 /**
-                 * remove the user input since we will add it back again later with colour
+                 * Check terminal width
                  */
-                // charm.up(1);
-                // charm.erase("line");
-                // charm.left(99999);
+                GLOBAL.graphWidth = process.stdout.columns;
 
                 /**
                  * Stop taking user input until we complete this request
