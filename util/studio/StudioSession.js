@@ -179,9 +179,7 @@ StudioSession.prototype.loadSqlControls = function() {
 	 * Run query
 	 */
 	this.controlKeys.false.false.enter = function() {
-
 		this.runUserQuery();
-
 	}.bind(this);
 
 	this.controlKeys.true.false.delete = function() {
