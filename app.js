@@ -9,7 +9,9 @@ var path = require('path');
 var async = require("async");
 var osHomedir = require('os-homedir');
 var fs = require("fs");
+var pad = require("pad");
 var SavedConnectionManager = require("./util/SavedConnectionManager.js");
+var CliTable = require('cli-table');
 
 var CenSql = function() {
     this.setTitle();
@@ -41,20 +43,24 @@ var CenSql = function() {
 
     ], function() {
 
+        this.connManager = new SavedConnectionManager();
+
+        if (argv.l || argv.list_connections) {
+            this.listConfiguredConnectionNames();
+            return;
+        }
+
         var connDetails = argv;
 
         if (argv.use) {
-
-            var connManager = new SavedConnectionManager();
-
-            connDetails = connManager.get(argv.use);
+            connDetails = this.connManager.get(argv.use);
         }
 
-        if(connDetails){
+        if (connDetails) {
             this.screen.init();
 
             this.connectToHdb(connDetails.host, connDetails.user, connDetails.pass, connDetails.port);
-        }else{
+        } else {
             this.screen.print(name.cyan.dim + (" does not exist").red, function() {
                 console.log();
                 process.exit(1)
@@ -63,6 +69,19 @@ var CenSql = function() {
 
     }.bind(this))
 
+}
+
+CenSql.prototype.listConfiguredConnectionNames = function() {
+    var contents = this.connManager.getAll();
+    var names = Object.keys(contents);
+
+    var table = new CliTable();
+
+    for (var i = 0; i < names.length; i++) {
+        table.push([names[i].bold, contents[names[i]].user, contents[names[i]].host, contents[names[i]].port])
+    }
+
+    console.log(table.toString());
 }
 
 CenSql.prototype.setTitle = function() {
@@ -176,7 +195,7 @@ CenSql.prototype.createScreen = function(settings, callback) {
      * keep the colour var in settings just to make it easy to use, but we wont actually save it
      * @type {[type]}
      */
-    settings.colour = argv['nocolour'] || argv['nocolor'] ? false : true;
+    settings.colour = argv['no-colour'] || argv['no-color'] ? false : true;
     settings.studio = !!argv['studio'] || !!argv['s'];
 
     /**
@@ -202,7 +221,7 @@ CenSql.prototype.showHelpTextIfNeeded = function(callback) {
     /**
      * Make sure we have the arguments needed to connect to HANA
      */
-    if (((!argv.host || !argv.user || !argv.pass || !argv.port) && !argv.use) || argv.help) {
+    if (((!argv.host || !argv.user || !argv.pass || !argv.port) && !argv.use && !(argv.l || argv.list_connections)) || argv.help) {
         console.log([
             "Usage:\t censql --user <USER> --port 3<ID>15 --host <IP OR HOSTNAME> --pass <PASSWORD>",
             "\t censql --user <USER> --port 3<ID>15 --host <IP OR HOSTNAME> --pass <PASSWORD> --command '<SQL_STRING>'",
@@ -224,8 +243,8 @@ CenSql.prototype.showHelpTextIfNeeded = function(callback) {
             "-l --list_connections\tOptionally run a command/sql without entering the interective terminal",
             "--preview_size <COUNT>\tchange amount of rows shown in table preview in studio mode",
             "",
-            "--nocolour\tdisable colour output",
-            "--nocolor\talias of --no-colour",
+            "--no-colour\tdisable colour output",
+            "--no-color\talias of --no-colour",
         ].join("\n"));
 
         process.exit(0);

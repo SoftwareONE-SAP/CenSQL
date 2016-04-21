@@ -71,4 +71,10 @@ SavedConnectionManager.prototype.get = function(name){
     return connDetails;
 }
 
+SavedConnectionManager.prototype.getAll = function(){
+	this.load();
+
+	return this.contents
+}
+
 module.exports = SavedConnectionManager;
