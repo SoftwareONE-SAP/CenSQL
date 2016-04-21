@@ -2,7 +2,17 @@
   "name": "censql",
   "version": "1.6.8",
   "description": "A CLI client for SAP HANA",
-  "keywords": ["sap", "hana", "client", "cli", "hdb", "sql", "query", "util"],
+  "keywords": [
+    "sap",
+    "hana",
+    "client",
+    "cli",
+    "hdb",
+    "sql",
+    "query",
+    "util",
+    "studio"
+  ],
   "main": "./app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
