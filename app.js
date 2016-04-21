@@ -9,6 +9,7 @@ var path = require('path');
 var async = require("async");
 var osHomedir = require('os-homedir');
 var fs = require("fs");
+var SavedConnectionManager = require("./util/SavedConnectionManager.js");
 
 var CenSql = function() {
     this.setTitle();
@@ -39,14 +40,34 @@ var CenSql = function() {
         }.bind(this)
 
     ], function() {
-        this.connectToHdb();
+
+        var connDetails = argv;
+
+        if (argv.use) {
+
+            var connManager = new SavedConnectionManager();
+
+            connDetails = connManager.get(argv.use);
+        }
+
+        if(connDetails){
+            this.screen.init();
+
+            this.connectToHdb(connDetails.host, connDetails.user, connDetails.pass, connDetails.port);
+        }else{
+            this.screen.print(name.cyan.dim + (" does not exist").red, function() {
+                console.log();
+                process.exit(1)
+            })
+        }
+
     }.bind(this))
 
 }
 
 CenSql.prototype.setTitle = function() {
 
-    var title = "Censql";
+    var title = "censql";
 
     process.stdout.write(String.fromCharCode(27) + "]0;" + title + String.fromCharCode(7));
     process.title = title;
@@ -114,14 +135,14 @@ CenSql.prototype.getSettings = function() {
     return settings;
 }
 
-CenSql.prototype.connectToHdb = function() {
+CenSql.prototype.connectToHdb = function(host, user, pass, port) {
 
     this.hdb = new HDB();
 
     /**
      * Connect to HANA with the login info supplied by the user
      */
-    this.hdb.connect(argv.host, argv.user, argv.pass, argv.port, "conn", function(err, data) {
+    this.hdb.connect(host, user, pass, port, "conn", function(err, data) {
 
         if (err) {
             this.screen.error(err.message);
@@ -181,21 +202,26 @@ CenSql.prototype.showHelpTextIfNeeded = function(callback) {
     /**
      * Make sure we have the arguments needed to connect to HANA
      */
-    if (!argv.host || !argv.user || !argv.pass || !argv.port || argv.help) {
+    if (((!argv.host || !argv.user || !argv.pass || !argv.port) && !argv.use) || argv.help) {
         console.log([
             "Usage:\t censql --user <USER> --port 3<ID>15 --host <IP OR HOSTNAME> --pass <PASSWORD>",
             "\t censql --user <USER> --port 3<ID>15 --host <IP OR HOSTNAME> --pass <PASSWORD> --command '<SQL_STRING>'",
+            "\t censql --use <ALIAS>",
             "Example: censql --user SYSTEM --port 30015 --host 192.168.0.1 --pass Password123",
             "Example: censql --user SYSTEM --port 30015 --host 192.168.0.1 --pass Password123 --command 'SELECT * FROM SYS.M_SERVICES'",
+            "Example: censql --use prd",
             "",
             "CenSQL Help",
             "--user\t\tThe username for the user to connect as",
             "--pass\t\tThe password for the user connecting with",
             "--host\t\tThe host to connect to",
             "--port\t\tThe port to connect to the host with (Layout: '3<ID>15', Instance 99 would be 39915)",
-            "--command\tOptionally run a command/sql without entering the interective terminal",
+            "--use <ALIAS>\tConnect using a saved connection instead of user,pass,host,port",
             "",
+            "--command\t\tOptionally run a command/sql without entering the interective terminal",
             "-s --studio\t\tEnter studio mode",
+            "",
+            "-l --list_connections\tOptionally run a command/sql without entering the interective terminal",
             "--preview_size <COUNT>\tchange amount of rows shown in table preview in studio mode",
             "",
             "--nocolour\tdisable colour output",

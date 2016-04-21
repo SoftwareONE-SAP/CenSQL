@@ -70,6 +70,7 @@ CommandHandler.prototype.loadCommandHandlers = function() {
     this.handlers["watch"] = new (require("./baseCommands/watch.js"))(this);
     this.handlers["wl"] = new (require("./baseCommands/wl.js"))(this);
     this.handlers["tp"] = new (require("./baseCommands/tp.js"))(this);
+    this.handlers["save"] = new (require("./baseCommands/save.js"))(this);
 }
 
 CommandHandler.prototype.onCommand = function(enteredCommand, allCallback) {

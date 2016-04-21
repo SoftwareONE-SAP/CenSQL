@@ -14,8 +14,6 @@ var ScreenManager = function(isBatch, settings, commandHandler) {
     this.settings = settings;
 
     this.commandHandler = commandHandler;
-
-    this.init.call(this);
 }
 
 /**
