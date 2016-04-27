@@ -25,9 +25,9 @@ ScreenManager.prototype.init = function() {
 
     if (!this.isBatch) {
         this.printHeader
-        this.setupInput();
-        process.stdin.pause();
     }
+
+    this.setupInput();
 
 }
 
@@ -84,6 +84,8 @@ ScreenManager.prototype.setupInput = function() {
         })
         return;
     }
+
+    process.stdin.pause();
 
     readline.createInterface({
         input: process.stdin,

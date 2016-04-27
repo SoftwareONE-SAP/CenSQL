@@ -83,9 +83,9 @@ CenSql.prototype.listConfiguredConnectionNames = function() {
     console.log(table.toString());
 }
 
-CenSql.prototype.setTitle = function() {
+CenSql.prototype.setTitle = function(isStudio) {
 
-    var title = "censql";
+    var title = "CenSQL" + (isStudio ? " Studio" : "");
 
     process.stdout.write(String.fromCharCode(27) + "]0;" + title + String.fromCharCode(7));
     process.title = title;
@@ -214,7 +214,7 @@ CenSql.prototype.createScreen = function(settings, callback) {
     )
 
     if(!argv.command){
-        this.setTitle();
+        this.setTitle(settings.studio);
     }
 
     callback.call(this, null);

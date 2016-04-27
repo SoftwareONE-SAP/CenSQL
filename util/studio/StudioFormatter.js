@@ -53,8 +53,8 @@ StudioFormatter.prototype.init = function(schemas, tables) {
 }
 
 StudioFormatter.prototype.calculateSize = function() {
-	this.width = process.stdout.columns;
-	this.height = process.stdout.rows - 2;
+	this.width = process.stdout.columns || 80;
+	this.height = (process.stdout.rows || 30) - 2;
 	this.sideWidth = (Math.ceil(this.width / 4) < this.maxSideWidth ? Math.ceil(this.width / 4) : this.maxSideWidth);
 	this.schemaBoxHeight = Math.ceil(this.height / 4);
 	this.tableBoxHeight = this.height - this.schemaBoxHeight - 5
