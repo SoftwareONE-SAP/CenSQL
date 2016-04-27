@@ -26,7 +26,7 @@ module.exports = function(command, data, title, settings){
 
 		case "c":
 		case "csv":
-			return require("./csv.js")(command, data);
+			return require("./csv.js")(command, data, title, settings);
 			break;
 
 		case "m":

@@ -1,15 +1,15 @@
 
-module.exports = function(command, data) {
+module.exports = function(command, data, title, settings) {
 
+    var delim = settings.csv.delimeter;
     var lines = [];
-
     var keys = [];
 
     if (data && data.length > 0) {
 
         keys = Object.keys(data[0]);
 
-        lines.push(keys.join(","))
+        lines.push(keys.join(delim))
     } else {
         lines.push("No Results\n");
         return lines;
@@ -26,14 +26,14 @@ module.exports = function(command, data) {
 
             value = ("" + value).split('"').join('""');
 
-            if(value.indexOf(",") !== -1){
+            if(value.indexOf(delim) !== -1){
                 value = '"' + value + '"';
             }
 
             row.push(value)
         };
 
-        var rowString = row.join(",");
+        var rowString = row.join(delim);
 
         lines.push(rowString);
 

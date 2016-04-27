@@ -1,9 +1,10 @@
 var async = require("async");
 var path = require("path");
 
-var CommandHandler = function(screen, hdb, command) {
+var CommandHandler = function(screen, hdb, command, settings) {
     this.screen = screen;
     this.hdb = hdb;
+    this.settings = settings;
 
     this.loadCommandHandlers();
 

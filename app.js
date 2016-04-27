@@ -32,12 +32,18 @@ var CenSql = function() {
     */
     GLOBAL.censql.RUNNING_PROCESS = true;
 
+    /**
+     * Get settings
+     * @type {Object}
+     */
+    this.settings = this.getSettings();
+
     async.series([
 
         this.createFolderIfNeeded.bind(this),
         this.showHelpTextIfNeeded.bind(this),
         function(callback) {
-            this.createScreen(this.getSettings(), callback);
+            this.createScreen(this.settings, callback);
         }.bind(this)
 
     ], function() {
@@ -109,7 +115,7 @@ CenSql.prototype.getSettings = function() {
         delete self.load;
         delete self.colour;
 
-        fs.writeFileSync(settingsFilePath, JSON.stringify(self));
+        fs.writeFileSync(settingsFilePath, JSON.stringify(self, null, 4));
     }
 
     /**
@@ -144,6 +150,14 @@ CenSql.prototype.getSettings = function() {
     if (!settings.plotHeight) settings.plotHeight = 11;
     if (!settings.barHeight) settings.barHeight = 1;
     if (!"relativeGraphs" in settings) settings.relativeGraphs = false;
+    
+    if(!"csv" in settings){
+        settings.csv = {};
+    }
+
+    if(!"delimeter" in settings.csv){
+        settings.csv.delimeter = ",";
+    }
 
     /**
     * Save the defaults
@@ -177,7 +191,7 @@ CenSql.prototype.connectToHdb = function(host, user, pass, port) {
         /**
         * Create a new command handler
         */
-        this.commandHandler = new CommandHandler(this.screen, this.hdb, argv.command);
+        this.commandHandler = new CommandHandler(this.screen, this.hdb, argv.command, this.settings);
 
         /**
         * Allow user inpput from now on

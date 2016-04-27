@@ -3,45 +3,45 @@ var path = require('path');
 var osHomedir = require('os-homedir');
 var fs = require("fs");
 
-var SavedConnectionManager = function(){
-	this.configPath = path.join(osHomedir(), ".censql", "saved_connections");
-	this.load();
+var SavedConnectionManager = function() {
+    this.configPath = path.join(osHomedir(), ".censql", "saved_connections");
+    this.load();
 }
 
-SavedConnectionManager.prototype.save = function(){
-	/**
+SavedConnectionManager.prototype.save = function() {
+    /**
      * Write config to file
      */
-    fs.writeFileSync(this.configPath, new Buffer(JSON.stringify(this.contents)).toString("base64"));
-		fs.chmodSync(this.configPath, "600");
+    fs.writeFileSync(this.configPath, new Buffer(JSON.stringify(this.contents, null, 4)).toString("base64"));
+    fs.chmodSync(this.configPath, "600");
 }
 
-SavedConnectionManager.prototype.load = function(){
-	 try{
+SavedConnectionManager.prototype.load = function() {
+    try {
         this.contents = JSON.parse(new Buffer(fs.readFileSync(this.configPath).toString(), 'base64'));
-    }catch(e){
+    } catch (e) {
         this.contents = {};
     }
 }
 
-SavedConnectionManager.prototype.encryptPassword = function(connectionSettings){
-	/**
-	 * Encrypt password. (This is mainly to stop accidenatlly finding a password, rather than keeping passwords from attackers)
-	 */
-	var cipher = crypto.createCipher("aes256", new Buffer(connectionSettings.host + connectionSettings.user + connectionSettings.port).toString('base64'));
+SavedConnectionManager.prototype.encryptPassword = function(connectionSettings) {
+    /**
+     * Encrypt password. (This is mainly to stop accidenatlly finding a password, rather than keeping passwords from attackers)
+     */
+    var cipher = crypto.createCipher("aes256", new Buffer(connectionSettings.host + connectionSettings.user + connectionSettings.port).toString('base64'));
 
-	connectionSettings.pass = cipher.update(connectionSettings.pass, 'utf8', 'hex') + cipher.final('hex');
+    connectionSettings.pass = cipher.update(connectionSettings.pass, 'utf8', 'hex') + cipher.final('hex');
 
-	return connectionSettings;
+    return connectionSettings;
 }
 
-SavedConnectionManager.prototype.add = function(connectionSettings, name){
+SavedConnectionManager.prototype.add = function(connectionSettings, name) {
 
-	connectionSettings = this.encryptPassword(connectionSettings);
+    connectionSettings = this.encryptPassword(connectionSettings);
 
-	this.load();
+    this.load();
 
-	/**
+    /**
      * Add to config
      */
     this.contents[name] = connectionSettings;
@@ -49,8 +49,8 @@ SavedConnectionManager.prototype.add = function(connectionSettings, name){
     this.save();
 }
 
-SavedConnectionManager.prototype.get = function(name){
-	/**
+SavedConnectionManager.prototype.get = function(name) {
+    /**
      * Could not load details for name
      */
     if (Object.keys(this.contents).indexOf(name) === -1) {
@@ -72,10 +72,10 @@ SavedConnectionManager.prototype.get = function(name){
     return connDetails;
 }
 
-SavedConnectionManager.prototype.getAll = function(){
-	this.load();
+SavedConnectionManager.prototype.getAll = function() {
+    this.load();
 
-	return this.contents
+    return this.contents
 }
 
 module.exports = SavedConnectionManager;
