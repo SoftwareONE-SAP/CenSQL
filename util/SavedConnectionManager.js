@@ -19,7 +19,7 @@ SavedConnectionManager.prototype.load = function(){
 	 try{
         this.contents = JSON.parse(new Buffer(fs.readFileSync(this.configPath).toString(), 'base64'));
     }catch(e){
-        // console.log(e);
+        this.contents = {};
     }
 }
 

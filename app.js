@@ -61,7 +61,7 @@ var CenSql = function() {
 
             this.connectToHdb(connDetails.host, connDetails.user, connDetails.pass, connDetails.port);
         } else {
-            this.screen.print(name.cyan.dim + (" does not exist").red, function() {
+            this.screen.print("Connection '".red + argv.use.red.bold + ("' does not exist. Use the \\save command whilst connected to save a connection.").red, function() {
                 console.log();
                 process.exit(1)
             })
