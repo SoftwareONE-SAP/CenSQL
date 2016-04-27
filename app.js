@@ -14,23 +14,22 @@ var SavedConnectionManager = require("./util/SavedConnectionManager.js");
 var CliTable = require('cli-table');
 
 var CenSql = function() {
-    this.setTitle();
 
     /**
-     * Bodge to fix hdb module
-     * @type {Boolean}
-     */
+    * Bodge to fix hdb module
+    * @type {Boolean}
+    */
     process.browser = true;
 
     /**
-     * get a global object for storing flags in
-     */
+    * get a global object for storing flags in
+    */
     GLOBAL.censql = {};
 
     /**
-     * Dont accept user input until we're ready
-     * @type {Boolean}
-     */
+    * Dont accept user input until we're ready
+    * @type {Boolean}
+    */
     GLOBAL.censql.RUNNING_PROCESS = true;
 
     async.series([
@@ -94,15 +93,15 @@ CenSql.prototype.setTitle = function() {
 
 CenSql.prototype.getSettings = function() {
     /**
-     * Load settings
-     */
+    * Load settings
+    */
     var settings = {};
 
     var settingsFilePath = path.join(osHomedir(), ".censql", "censql_settings");
 
     /**
-     * Save settings to file
-     */
+    * Save settings to file
+    */
     settings.save = function() {
         var self = JSON.parse(JSON.stringify(this));
 
@@ -114,8 +113,8 @@ CenSql.prototype.getSettings = function() {
     }
 
     /**
-     * load settings from file
-     */
+    * load settings from file
+    */
     settings.load = function() {
 
         try {
@@ -129,8 +128,8 @@ CenSql.prototype.getSettings = function() {
 
         } catch (e) {
             /**
-             * Since we had an error, this is likely to do with the file not existing. Lets save a default file and then load that
-             */
+            * Since we had an error, this is likely to do with the file not existing. Lets save a default file and then load that
+            */
             this.save();
             this.load();
         }
@@ -140,15 +139,15 @@ CenSql.prototype.getSettings = function() {
     settings.load();
 
     /**
-     * Set defaults
-     */
+    * Set defaults
+    */
     if (!settings.plotHeight) settings.plotHeight = 11;
     if (!settings.barHeight) settings.barHeight = 1;
     if (!"relativeGraphs" in settings) settings.relativeGraphs = false;
 
     /**
-     * Save the defaults
-     */
+    * Save the defaults
+    */
     settings.save();
 
     return settings;
@@ -159,8 +158,8 @@ CenSql.prototype.connectToHdb = function(host, user, pass, port) {
     this.hdb = new HDB();
 
     /**
-     * Connect to HANA with the login info supplied by the user
-     */
+    * Connect to HANA with the login info supplied by the user
+    */
     this.hdb.connect(host, user, pass, port, "conn", function(err, data) {
 
         if (err) {
@@ -169,21 +168,21 @@ CenSql.prototype.connectToHdb = function(host, user, pass, port) {
         }
 
         /**
-         * If the user specified the command, we do not want to open an interactive session
-         */
+        * If the user specified the command, we do not want to open an interactive session
+        */
         if (!argv.command) {
             this.screen.ready.call(this.screen, this.hdb);
         }
 
         /**
-         * Create a new command handler
-         */
+        * Create a new command handler
+        */
         this.commandHandler = new CommandHandler(this.screen, this.hdb, argv.command);
 
         /**
-         * Allow user inpput from now on
-         * @type {Boolean}
-         */
+        * Allow user inpput from now on
+        * @type {Boolean}
+        */
         GLOBAL.censql.RUNNING_PROCESS = false;
 
     }.bind(this))
@@ -192,15 +191,15 @@ CenSql.prototype.connectToHdb = function(host, user, pass, port) {
 CenSql.prototype.createScreen = function(settings, callback) {
 
     /**
-     * keep the colour var in settings just to make it easy to use, but we wont actually save it
-     * @type {[type]}
-     */
+    * keep the colour var in settings just to make it easy to use, but we wont actually save it
+    * @type {[type]}
+    */
     settings.colour = argv['no-colour'] || argv['no-color'] ? false : true;
     settings.studio = !!argv['studio'] || !!argv['s'];
 
     /**
-     * Create screen object adn give it the command handler to handle user input
-     */
+    * Create screen object adn give it the command handler to handle user input
+    */
     this.screen = new ScreenManager(
         // Command if given
         !!argv.command,
@@ -214,13 +213,17 @@ CenSql.prototype.createScreen = function(settings, callback) {
         }
     )
 
+    if(!argv.command){
+        this.setTitle();
+    }
+
     callback.call(this, null);
 }
 
 CenSql.prototype.showHelpTextIfNeeded = function(callback) {
     /**
-     * Make sure we have the arguments needed to connect to HANA
-     */
+    * Make sure we have the arguments needed to connect to HANA
+    */
     if (((!argv.host || !argv.user || !argv.pass || !argv.port) && !argv.use && !(argv.l || argv.list_connections)) || argv.help) {
         console.log([
             "Usage:\t censql --user <USER> --port 3<ID>15 --host <IP OR HOSTNAME> --pass <PASSWORD>",
