@@ -13,6 +13,7 @@ SavedConnectionManager.prototype.save = function(){
      * Write config to file
      */
     fs.writeFileSync(this.configPath, new Buffer(JSON.stringify(this.contents)).toString("base64"));
+		fs.chmodSync(this.configPath, "600");
 }
 
 SavedConnectionManager.prototype.load = function(){
@@ -27,7 +28,7 @@ SavedConnectionManager.prototype.encryptPassword = function(connectionSettings){
 	/**
 	 * Encrypt password. (This is mainly to stop accidenatlly finding a password, rather than keeping passwords from attackers)
 	 */
-	var cipher = crypto.createCipher("aes256", new Buffer(connectionSettings.host + connectionSettings.user + connectionSettings.port).toString('base64')); 
+	var cipher = crypto.createCipher("aes256", new Buffer(connectionSettings.host + connectionSettings.user + connectionSettings.port).toString('base64'));
 
 	connectionSettings.pass = cipher.update(connectionSettings.pass, 'utf8', 'hex') + cipher.final('hex');
 
