@@ -1,6 +1,6 @@
 {
   "name": "censql",
-  "version": "1.7.2",
+  "version": "1.7.3",
   "description": "A NodeJS command line client for SAP HANA",
   "keywords": [
     "sap",
