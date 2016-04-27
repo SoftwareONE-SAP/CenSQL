@@ -11,7 +11,7 @@ InsertsPerSecondHandler.prototype.run = function(command, cParts, conn, screen, 
 	 * Get command arguments
 	 */
 	var isForever = cParts[2] == "-f" || cParts[2] == "--forever";
-	this.schemaName = cParts[1] || "%";
+	this.schemaName = (cParts[1] ? "'" + cParts[1] + "'" : "CURRENT_SCHEMA");
 	this.delay = (cParts[(isForever ? 3 : 2)] && parseFloat(cParts[(isForever ? 3 : 2)]) > 0 ? parseFloat(cParts[(isForever ? 3 : 2)]) * 1000 : 2000);
 
 	this.lastAmountOfRows = -1;
@@ -167,7 +167,7 @@ InsertsPerSecondHandler.prototype.listenForExit = function() {
 
 InsertsPerSecondHandler.prototype.getInsertsPerSecond = function(callback) {
 
-	this.conn.exec("conn", "SELECT SUM(RECORD_COUNT) AS ROW_COUNT FROM SYS.M_CS_TABLES WHERE SCHEMA_NAME LIKE '" + this.schemaName + "'", function(err, data) {
+	this.conn.exec("conn", "SELECT SUM(RECORD_COUNT) AS ROW_COUNT FROM SYS.M_CS_TABLES WHERE SCHEMA_NAME LIKE " + this.schemaName, function(err, data) {
 		if (err) throw err;
 
 		var ips = parseInt((data[0]['ROW_COUNT'] - this.lastAmountOfRows) / ((new Date().getTime() - this.lastCheckTime) / 1000));
@@ -186,7 +186,7 @@ InsertsPerSecondHandler.prototype.getInsertsPerSecond = function(callback) {
 }
 
 InsertsPerSecondHandler.prototype.init = function(callback) {
-	this.conn.exec("conn", "SELECT SUM(RECORD_COUNT) AS ROW_COUNT FROM SYS.M_CS_TABLES WHERE SCHEMA_NAME LIKE '" + this.schemaName + "'", function(err, data) {
+	this.conn.exec("conn", "SELECT SUM(RECORD_COUNT) AS ROW_COUNT FROM SYS.M_CS_TABLES WHERE SCHEMA_NAME LIKE " + this.schemaName, function(err, data) {
 		if (err) throw err;
 
 		this.lastAmountOfRows = data[0]['ROW_COUNT'];
