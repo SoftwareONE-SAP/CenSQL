@@ -17,7 +17,7 @@ InsertsPerSecondHandler.prototype.run = function(command, cParts, conn, screen, 
 	this.lastAmountOfRows = -1;
 	this.lastCheckTime = null;
 
-	this.init(function() {
+	this.init(function(err) {
 
 		/**
 		 * Is the command being ran in in constant mode
@@ -56,7 +56,7 @@ InsertsPerSecondHandler.prototype.run = function(command, cParts, conn, screen, 
 
 			setTimeout(function() {
 
-				this.getInsertsPerSecond(function(data) {
+				this.getInsertsPerSecond(function(err, data) {
 
 					callback([0, [data], "default"]);
 
@@ -88,10 +88,10 @@ InsertsPerSecondHandler.prototype.loop = function(callback) {
 		/**
 		 * Run ping
 		 */
-		this.getInsertsPerSecond(function(data) {
+		this.getInsertsPerSecond(function(err, data) {
 
 			if (this.running) {
-				console.log("Current count: " + data.Count + ". Inserts per second: " + data.InsertsPerSecond)
+				console.log("Current count: " + (data && typeof data.Count == "number" ? data.Count : "???") + ". Inserts per second: " + (data && typeof data.InsertsPerSecond == "number" ? data.InsertsPerSecond : "???"))
 
 				/** 
 				 * Store all ping times so we can generate an average
@@ -168,7 +168,10 @@ InsertsPerSecondHandler.prototype.listenForExit = function() {
 InsertsPerSecondHandler.prototype.getInsertsPerSecond = function(callback) {
 
 	this.conn.exec("conn", "SELECT SUM(RECORD_COUNT) AS ROW_COUNT FROM SYS.M_CS_TABLES WHERE SCHEMA_NAME LIKE " + this.schemaName, function(err, data) {
-		if (err) throw err;
+		if (err) {
+			callback(err);
+			return
+		}
 
 		var ips = parseInt((data[0]['ROW_COUNT'] - this.lastAmountOfRows) / ((new Date().getTime() - this.lastCheckTime) / 1000));
 
@@ -176,7 +179,7 @@ InsertsPerSecondHandler.prototype.getInsertsPerSecond = function(callback) {
 
 		this.lastCheckTime = new Date().getTime()
 
-		callback({
+		callback(null, {
 			Count: this.lastAmountOfRows,
 			InsertsPerSecond: ips
 		});
@@ -187,7 +190,10 @@ InsertsPerSecondHandler.prototype.getInsertsPerSecond = function(callback) {
 
 InsertsPerSecondHandler.prototype.init = function(callback) {
 	this.conn.exec("conn", "SELECT SUM(RECORD_COUNT) AS ROW_COUNT FROM SYS.M_CS_TABLES WHERE SCHEMA_NAME LIKE " + this.schemaName, function(err, data) {
-		if (err) throw err;
+		if (err) {
+			callback(err);
+			return
+		}
 
 		this.lastAmountOfRows = data[0]['ROW_COUNT'];
 
