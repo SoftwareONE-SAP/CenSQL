@@ -1,9 +1,9 @@
 
-var SchemaViewCommandHandler = function(){
+var BackupViewCommandHandler = function(){
 	this.description = "";
 }
 
-SchemaViewCommandHandler.prototype.run = function(command, cParts, conn, screen, callback){
+BackupViewCommandHandler.prototype.run = function(command, cParts, conn, screen, callback){
 
 	conn.exec("conn", 
 		"SELECT BACKUP_ID, UTC_START_TIME, UTC_END_TIME, STATE_NAME, MESSAGE FROM sys.m_backup_catalog\
@@ -15,4 +15,4 @@ SchemaViewCommandHandler.prototype.run = function(command, cParts, conn, screen,
 	})
 }
 
-module.exports = SchemaViewCommandHandler;
+module.exports = BackupViewCommandHandler;

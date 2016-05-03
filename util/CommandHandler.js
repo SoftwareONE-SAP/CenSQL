@@ -47,6 +47,7 @@ CommandHandler.prototype.loadCommandHandlers = function() {
     this.handlers["ips"] = new (require("./baseCommands/ips.js"))(this);
     this.handlers["li"] = new (require("./baseCommands/li.js"))(this);
     this.handlers["logs"] = new (require("./baseCommands/logs.js"))(this);
+    this.handlers["logb"] = new (require("./baseCommands/logb.js"))(this);
     this.handlers["mem"] = new (require("./baseCommands/mem.js"))(this);
     this.handlers["ping"] = new (require("./baseCommands/ping.js"))(this);
     this.handlers["pwl"] = new (require("./baseCommands/pwl.js"))(this);

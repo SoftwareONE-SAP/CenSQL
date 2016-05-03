@@ -177,8 +177,11 @@ CenSql.prototype.connectToHdb = function(host, user, pass, port) {
     this.hdb.connect(host, user, pass, port, "conn", function(err, data) {
 
         if (err) {
-            this.screen.error(err.message);
-            process.exit(1);
+            this.screen.error(err.message + "\n", function(){
+                process.exit(1);
+            });
+            
+            return;
         }
 
         /**

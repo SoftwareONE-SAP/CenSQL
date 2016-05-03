@@ -366,8 +366,8 @@ ScreenManager.prototype.renderLines = function(lines, callback) {
     }.bind(this), callback ? callback : null);
 }
 
-ScreenManager.prototype.error = function(message) {
-    this.print(colors.red(message));
+ScreenManager.prototype.error = function(message, callback) {
+    this.print(colors.red(message), callback);
 }
 
 ScreenManager.prototype.print = function(message, callback) {
