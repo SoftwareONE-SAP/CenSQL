@@ -149,13 +149,13 @@ CenSql.prototype.getSettings = function() {
     */
     if (!settings.plotHeight) settings.plotHeight = 11;
     if (!settings.barHeight) settings.barHeight = 1;
-    if (!"relativeGraphs" in settings) settings.relativeGraphs = false;
+    if (!("relativeGraphs" in settings)) settings.relativeGraphs = false;
     
-    if(!"csv" in settings){
+    if(!("csv" in settings)){
         settings.csv = {};
     }
 
-    if(!"delimeter" in settings.csv){
+    if(!("delimeter" in settings.csv)){
         settings.csv.delimeter = ",";
     }
 
