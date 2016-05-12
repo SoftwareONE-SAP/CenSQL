@@ -91,7 +91,7 @@ InsertsPerSecondHandler.prototype.loop = function(callback) {
 		this.getInsertsPerSecond(function(err, data) {
 
 			if (this.running) {
-				console.log("Current count: " + (data && typeof data.Count == "number" ? data.Count : "???") + ". Inserts per second: " + (data && typeof data.InsertsPerSecond == "number" ? data.InsertsPerSecond : "???"))
+				console.log("Current count: " + (data && typeof data.Count == "number" ? data.Count : 0) + ". Inserts per second: " + (data && typeof data.InsertsPerSecond == "number" ? data.InsertsPerSecond : 0))
 
 				/** 
 				 * Store all ping times so we can generate an average
