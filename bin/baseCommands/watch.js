@@ -54,11 +54,6 @@ WatchCommandHandler.prototype.loop = function(command, screen, callback) {
     }.bind(this), function(next) {
 
         /**
-         * We shall need to call this exsternally to finally end this when the user exits
-         */
-        this.mainLoopCallback = next;
-
-        /**
          * Run the command and get the output
          */
         this.runCommand(command, screen, function() {
@@ -104,22 +99,6 @@ WatchCommandHandler.prototype.listenForExit = function() {
          */
         this.running = false;
 
-        /**
-         * Kill the current delay
-         */
-        if(this.delayTimeout){
-
-            /**
-             * Get rid of the wait for the enxt loop
-             */
-            clearTimeout(this.delayTimeout);
-
-            /**
-             * End the main loop's last call
-             */
-            setTimeout(this.mainLoopCallback, 0);
-        }
-
     }.bind(this))
 }
 
@@ -160,7 +139,7 @@ WatchCommandHandler.prototype.runCommand = function(command, screen, callback) {
     this.commandHandler.onCommand(command, function(err, output) {
         screen.clear();
 
-        screen.printCommandOutput(command, output, callback);
+        screen.printCommandOutput(command, output, callback, true);
     });
 }
 

@@ -245,7 +245,7 @@ ScreenManager.prototype.ready = function(hdb) {
 
 }
 
-ScreenManager.prototype.printCommandOutput = function(command, outputs, callback) {
+ScreenManager.prototype.printCommandOutput = function(command, outputs, callback, dontPrintPrompt) {
     this.renderCommandOutput(command, outputs, function(err, lines) {
 
         this.renderLines([].concat.apply([], lines), function() {
@@ -253,7 +253,7 @@ ScreenManager.prototype.printCommandOutput = function(command, outputs, callback
             /**
             * Dont display a prompt for batch requests
             */
-            if (!this.isBatch) {
+            if (!this.isBatch && !dontPrintPrompt) {
                 this.print("\n" + colors.cyan("> "));
             }
 
