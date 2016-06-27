@@ -69,7 +69,7 @@ StudioFormatter.prototype.calculateSize = function() {
 		this.sqlConsoleHeight
 	)
 
-	GLOBAL.graphWidth = process.stdout.columns / 1.5;
+	global.graphWidth = process.stdout.columns / 1.5;
 }
 
 StudioFormatter.prototype.checkRefresh = function() {

@@ -36,7 +36,7 @@ module.exports = function(command, data, title, settings) {
 
             var dataLine = "";
 
-            var width = Math.floor(GLOBAL.graphWidth * data[k][keys[1]] / sum);
+            var width = Math.floor(global.graphWidth * data[k][keys[1]] / sum);
 
             if(sum == 0){
                 width = 0;
@@ -44,10 +44,10 @@ module.exports = function(command, data, title, settings) {
 
             dataLine += colors[ccolours[1]](new Array(width).join(barTypes[0]));
 
-            width = Math.floor(GLOBAL.graphWidth * data[k][keys[2]] / sum);
+            width = Math.floor(global.graphWidth * data[k][keys[2]] / sum);
 
             if(sum == 0){
-                width = GLOBAL.graphWidth;
+                width = global.graphWidth;
             }
 
             dataLine += colors[ccolours[0]](new Array(width).join(barTypes[1]));

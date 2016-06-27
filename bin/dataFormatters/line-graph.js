@@ -145,7 +145,7 @@ module.exports = function(command, data, title, settings, amountOfHours) {
         /**
          * Display plot
          */
-        var widthRatio = Math.floor((GLOBAL.graphWidth - 3) / (amountOfHours - 1));
+        var widthRatio = Math.floor((global.graphWidth - 3) / (amountOfHours - 1));
 
         /**
          * Build the header line for the graph

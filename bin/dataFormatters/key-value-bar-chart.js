@@ -65,7 +65,7 @@ module.exports = function(command, data, title, settings) {
 
                 if (data[k][keys[0]] !== sections[s]) continue;
 
-                var width = Math.floor(GLOBAL.graphWidth * data[k][keys[2]] / sum);
+                var width = Math.floor(global.graphWidth * data[k][keys[2]] / sum);
 
                 dataLine += colors[ccolours[parts.indexOf(data[k][keys[1]])]](new Array(width).join(barTypes[parts.indexOf(data[k][keys[1]]) % 4]));
 

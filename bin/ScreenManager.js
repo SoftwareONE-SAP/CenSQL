@@ -98,12 +98,12 @@ ScreenManager.prototype.setupInput = function() {
 
             this.rl.on('line', function(line) {
 
-                if (GLOBAL.censql.RUNNING_PROCESS) return;
+                if (global.censql.RUNNING_PROCESS) return;
 
                 /**
                 * Check terminal width
                 */
-                GLOBAL.graphWidth = process.stdout.columns;
+                global.graphWidth = process.stdout.columns;
 
                 /**
                 * Stop taking user input until we complete this request
@@ -114,7 +114,7 @@ ScreenManager.prototype.setupInput = function() {
                 * Save that we already have a running process
                 * @type {Boolean}
                 */
-                GLOBAL.censql.RUNNING_PROCESS = true;
+                global.censql.RUNNING_PROCESS = true;
 
                 /**
                 * Hide user input whilst a command is running (simply pausing stdin still allows scrolling through history)
@@ -122,7 +122,7 @@ ScreenManager.prototype.setupInput = function() {
                 process.stdin._events._keypress_full = process.stdin._events.keypress;
                 process.stdin._events.keypress = function(ch, key) {
                     if (key && key.ctrl && key.name == 'c') {
-                        GLOBAL.SHOULD_EXIT = true;
+                        global.SHOULD_EXIT = true;
                     }
                 };
 
@@ -145,13 +145,13 @@ ScreenManager.prototype.setupInput = function() {
                         * Reset running app state
                         * @type {Boolean}
                         */
-                        GLOBAL.censql.RUNNING_PROCESS = false;
+                        global.censql.RUNNING_PROCESS = false;
 
                         /**
                         * Should the running process exit?
                         * @type {Boolean}
                         */
-                        GLOBAL.SHOULD_EXIT = false;
+                        global.SHOULD_EXIT = false;
 
                         /**
                         * Reset the keypress function for stdin
@@ -180,8 +180,8 @@ ScreenManager.prototype.setupInput = function() {
             */
             this.rl.on('SIGINT', function() {
 
-                if (GLOBAL.censql.RUNNING_PROCESS) {
-                    GLOBAL.SHOULD_EXIT = true;
+                if (global.censql.RUNNING_PROCESS) {
+                    global.SHOULD_EXIT = true;
                     return;
                 }
 
@@ -230,13 +230,13 @@ ScreenManager.prototype.ready = function(hdb) {
     */
     if (this.settings.studio) {
 
-        GLOBAL.graphWidth = process.stdout.columns / 1.5;
+        global.graphWidth = process.stdout.columns / 1.5;
 
         this.graphics = new StudioGraphics(this);
         this.studio = new StudioSession(this, hdb, this.commandHandler);
     } else {
 
-        GLOBAL.graphWidth = process.stdout.columns;
+        global.graphWidth = process.stdout.columns;
 
         this.print(colors.cyan(colors.bold("For help type \\h\n-----------------------------------------------------\n\n")));
         this.print(colors.cyan("> "));

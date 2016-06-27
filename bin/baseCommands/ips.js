@@ -125,7 +125,7 @@ InsertsPerSecondHandler.prototype.listenForExit = function() {
 	 * Constantly check if we should exit. (This should probably be replaced with an event system one day)
 	 */
 	async.whilst(function() {
-		return !GLOBAL.SHOULD_EXIT
+		return !global.SHOULD_EXIT
 	}, function(next) {
 
 		/**

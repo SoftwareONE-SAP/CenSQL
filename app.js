@@ -24,13 +24,13 @@ var CenSql = function() {
     /**
      * get a global object for storing flags in
      */
-    GLOBAL.censql = {};
+    global.censql = {};
 
     /**
      * Dont accept user input until we're ready
      * @type {Boolean}
      */
-    GLOBAL.censql.RUNNING_PROCESS = true;
+    global.censql.RUNNING_PROCESS = true;
 
     /**
      * Get settings
@@ -119,6 +119,12 @@ CenSql.prototype.getSettings = function() {
         delete self.load;
         delete self.colour;
 
+        var folderLocation = path.dirname(settingsFilePath);
+
+        if (!fs.existsSync(folderLocation)){
+            fs.mkdirSync(folderLocation);
+        }
+
         fs.writeFileSync(settingsFilePath, JSON.stringify(self, null, 4));
     }
 
@@ -204,7 +210,7 @@ CenSql.prototype.connectToHdb = function(host, user, pass, port) {
          * Allow user inpput from now on
          * @type {Boolean}
          */
-        GLOBAL.censql.RUNNING_PROCESS = false;
+        global.censql.RUNNING_PROCESS = false;
 
     }.bind(this))
 }
