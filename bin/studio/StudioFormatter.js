@@ -144,7 +144,7 @@ StudioFormatter.prototype.drawSchemaList = function() {
 		}
 
 		for (var i = Math.floor(this.schemaBoxHeight / 2); i > 0; i--) {
-			var name = pad(this.schemas[this.schemas.length - (i % this.schemas.length)].SCHEMA_NAME.substring(0, this.sideWidth - 4), this.sideWidth - 3);
+			var name = pad(this.schemas[this.schemas.length - ((i - 1) % this.schemas.length) - 1].SCHEMA_NAME.substring(0, this.sideWidth - 4), this.sideWidth - 3);
 
 			if (i == 0) {
 				this.screen.graphics.drawText(2, yoffset + parseInt(this.schemaBoxHeight / 2) - i, (" " + name)[this.sideBackgroundTheme].bold)
