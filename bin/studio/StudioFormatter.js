@@ -12,7 +12,7 @@ var StudioFormatter = function(session, screen, sqlConsole) {
 	this.screen = screen;
 	this.sqlConsole = sqlConsole;
 
-	this.maxSideWidth = 45;
+	this.maxSideWidth = 60;
 	this.maxSqlConsoleHeight = 15;
 	this.metaBoxHeight = 4;
 
