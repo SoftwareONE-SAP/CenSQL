@@ -11,7 +11,7 @@ TracefileContentCommandHandler.prototype.run = function(command, cParts, conn, s
 	}
 
 	conn.exec("conn", 
-		"SELECT CONTENT FROM M_TRACEFILE_CONTENTS WHERE HOST = '" + cParts[1] + "' AND FILE_NAME = '" + cParts[2] + "' AND OFFSET > -" + parseInt(cParts[3] && !isNaN(cParts[3]) ? cParts[3] : 10) + "  ORDER BY OFFSET DESC",
+		"SELECT CONTENT FROM M_TRACEFILE_CONTENTS WHERE HOST = '" + cParts[1] + "' AND FILE_NAME = '" + cParts[2] + "' AND OFFSET > -" + (parseInt(cParts[3] && !isNaN(cParts[3]) ? cParts[3] : 10) * 1000) + "  ORDER BY OFFSET DESC",
 	function(err, data) {
 	    if(err){
 	    	callback([1, err, "json"]);

@@ -76,6 +76,7 @@ CommandHandler.prototype.loadCommandHandlers = function() {
     this.handlers["tp"] = new (require("./baseCommands/tp.js"))(this);
     this.handlers["tf"] = new (require("./baseCommands/tf.js"))(this);
     this.handlers["tfc"] = new (require("./baseCommands/tfc.js"))(this);
+    this.handlers["history"] = new (require("./baseCommands/history.js"))(this);
     this.handlers["save"] = new (require("./baseCommands/save.js"))(this);
 }
 

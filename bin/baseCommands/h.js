@@ -63,6 +63,7 @@ HelpCommandHandler.prototype.run = function(command, cParts, conn, screen, callb
                 "\t\\tfc {HOST} {FILENAME} " + colors.grey("{OPTIONAL_LIMIT}") + "\t - View recent updates in a trace file",
                 "",
                 colors.bold("\tHelper Commands:"),
+                "\t\\history " + colors.grey("{OPTIONAL_LIMIT}") + "\t\t - View censql command history",
                 "\t\\tp " + colors.grey("{SCHEMA.TABLE} {OPTIONAL_LIMIT}") + "\t - Preview a table",
                 "\t\\watch -i {DELAY_IN_SECONDS} {COMMAND}\t - Run a command over and over again with a delay",
                 "",
