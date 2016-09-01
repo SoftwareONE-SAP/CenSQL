@@ -11,9 +11,22 @@ TracefileContentCommandHandler.prototype.run = function(command, cParts, conn, s
 	}
 
 	conn.exec("conn", 
-		"SELECT * FROM M_TRACEFILE_CONTENTS WHERE HOST = '" + cParts[1] + "' AND FILE_NAME = '" + cParts[2] + "'  ORDER BY OFFSET DESC LIMIT " + parseInt(cParts[3] && !isNaN(cParts[3]) ? cParts[3] : 10),
+		"SELECT CONTENT FROM M_TRACEFILE_CONTENTS WHERE HOST = '" + cParts[1] + "' AND FILE_NAME = '" + cParts[2] + "' AND OFFSET > -" + parseInt(cParts[3] && !isNaN(cParts[3]) ? cParts[3] : 10) + "  ORDER BY OFFSET DESC",
 	function(err, data) {
-	    callback([err == null ? 0 : 1, err == null ? data : err, err == null ? "default" : "json"]);
+	    if(err){
+	    	callback([1, err, "json"]);
+	    	return;
+	    }
+
+	    var output = "";
+
+	    // data.reverse();
+
+	    for (var i = data.length - 1; i >= 0; i--) {
+	    	output += data[i]['CONTENT'];
+	    }
+
+	    callback([0, output.substring(output.indexOf("\n") + 1), "message"])
 	})
 }
 
