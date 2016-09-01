@@ -26,6 +26,8 @@ CommandHandler.prototype.loadCommandHandlers = function() {
     this.handlers = {};
 
     this.handlers["al"] = new (require("./baseCommands/al.js"))(this);
+    this.handlers["ag"] = new (require("./baseCommands/ag.js"))(this);
+    this.handlers["ad"] = new (require("./baseCommands/ad.js"))(this);
     this.handlers["ba"] = new (require("./baseCommands/ba.js"))(this);
     this.handlers["con"] = new (require("./baseCommands/con.js"))(this);
     this.handlers["cpu"] = new (require("./baseCommands/cpu.js"))(this);

@@ -55,6 +55,8 @@ HelpCommandHandler.prototype.run = function(command, cParts, conn, screen, callb
                 "\t\\logs\t\t\t- List all log files",
                 "\t\\li\t\t\t- Show the license status and expirary time",
                 "\t\\ips " + colors.grey("{SCHEMA_NAME} [-f | --forever] {OPTIONAL_SLEEP}") + "\t- Show the current inserts per second",
+                "\t\\ag\t\t\t- List all connected SDI agents",
+                "\t\\ad\t\t\t- List all registered SDI adapters",
                 "",
                 colors.bold("\tHelper Commands:"),
                 "\t\\tp " + colors.grey("{SCHEMA.TABLE} {OPTIONAL_LIMIT}") + "\t - Preview a table",
