@@ -209,7 +209,17 @@ StudioSqlConsole.prototype.draw = function(forceBackground) {
 }
 
 StudioSqlConsole.prototype.gotoCursor = function() {
-	this.screen.goto(this.region.x + this.cursor.x, this.region.y + this.cursor.y - this.scroll + this.overlappedLinesCount);
+	
+	var heightPadding = 0;
+
+	for (var i = 0; i <= Math.min(this.cursor.y, this.content.length - 1); i++) {
+
+		if(typeof this.content[i] === "undefined") continue;
+
+		heightPadding += Math.floor(this.content[i].length / this.region.w);
+	}
+
+	this.screen.goto(this.region.x + ((Math.max((!!this.content[this.cursor.y] ? this.content[this.cursor.y].length : 0) - this.region.w, this.cursor.x) % (this.region.w))), this.region.y + this.cursor.y - this.scroll + heightPadding);
 }
 
 StudioSqlConsole.prototype.moveCursor = function(dx, dy, shouldDraw) {
