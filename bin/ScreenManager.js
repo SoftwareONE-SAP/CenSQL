@@ -40,6 +40,7 @@ ScreenManager.prototype.loadPipeHandlers = function() {
     this.pipeHandlers["head"] = require("./pipeCommands/head.js");
     this.pipeHandlers["tail"] = require("./pipeCommands/tail.js");
     this.pipeHandlers["wc"] = require("./pipeCommands/wc.js");
+    this.pipeHandlers["tac"] = require("./pipeCommands/tac.js");
 
     this.pipeHandlersNames = Object.keys(this.pipeHandlers);
 
