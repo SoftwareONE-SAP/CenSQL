@@ -67,7 +67,7 @@ SavedConnectionManager.prototype.get = function(name) {
      */
     var decipher = crypto.createDecipher('aes256', new Buffer(connDetails.host + connDetails.user + connDetails.port).toString('base64'));
 
-    connDetails.pass = decipher.update(connDetails.pass, 'hex', 'utf8') + decipher.final('utf8');;
+    connDetails.pass = decipher.update(connDetails.pass, 'hex', 'utf8') + decipher.final('utf8');
 
     return connDetails;
 }
@@ -75,7 +75,20 @@ SavedConnectionManager.prototype.get = function(name) {
 SavedConnectionManager.prototype.getAll = function() {
     this.load();
 
-    return this.contents
+    var output = {};
+    var keys = Object.keys(this.contents);
+
+    for (var i = keys.length - 1; i >= 0; i--) {
+        var entry = this.contents[keys[i]];
+
+        var decipher = crypto.createDecipher('aes256', new Buffer(entry.host + entry.user + entry.port).toString('base64'));
+
+        entry.pass = decipher.update(entry.pass, 'hex', 'utf8') + decipher.final('utf8');
+
+        output[keys[i]] = entry;
+    }
+
+    return output;
 }
 
 module.exports = SavedConnectionManager;

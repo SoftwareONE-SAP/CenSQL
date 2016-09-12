@@ -50,8 +50,19 @@ var CenSql = function() {
 
         this.connManager = new SavedConnectionManager();
 
+        /**
+         * Should list connections
+         */
         if (argv.l || argv.list_connections) {
             this.listConfiguredConnectionNames();
+            return;
+        }
+
+        /**
+         * Should check all connections
+         */
+        if (argv.t || argv.connection_test) {
+            this.testSavedConnections();
             return;
         }
 
@@ -77,6 +88,57 @@ var CenSql = function() {
         }
 
     }.bind(this))
+
+}
+
+CenSql.prototype.testSavedConnections = function() {
+    var contents = this.connManager.getAll();
+    var keys = Object.keys(contents);
+
+    async.mapLimit(keys, 50, function(key, callback) {
+
+        var entry = contents[key];
+
+        var db = new HDB();
+
+        /**
+         * Connect to HANA with the login info supplied by the user
+         */
+        db.connect(entry["host"], entry["user"], entry["pass"], entry["port"], "tmp_" + key, function(err, data) {
+
+            if(err){
+                callback(null, {status: 1, key: key, message: "Error connecting: " + err});
+                return;
+            }
+
+            db.close();
+
+            callback(null, {status: 0, key: key, message: "Connected Successfully"});
+
+        }.bind(this))
+
+    }, function(err, output) {
+        if(err){
+            console.log(err);
+            return;
+        }
+
+        output = output.sort(function(a, b){
+            return a.key.localeCompare(b.key);
+        })
+
+        var table = new CliTable();
+
+        table.push(["Name".bold, "Status".bold, "Details".bold])
+
+        for (var i = 0; i < output.length; i++) {
+            table.push([output[i].key.bold, (output[i].status == 0 ? "OK".green.bold : "ERROR".red.bold), output[i].message])
+        }
+
+        console.log(table.toString());
+
+        process.exit(0);
+    })
 
 }
 
@@ -121,7 +183,7 @@ CenSql.prototype.getSettings = function() {
 
         var folderLocation = path.dirname(settingsFilePath);
 
-        if (!fs.existsSync(folderLocation)){
+        if (!fs.existsSync(folderLocation)) {
             fs.mkdirSync(folderLocation);
         }
 
@@ -251,7 +313,7 @@ CenSql.prototype.showHelpTextIfNeeded = function(callback) {
     /**
      * Make sure we have the arguments needed to connect to HANA
      */
-    if (((!argv.host || !argv.user || !argv.pass || !argv.port) && (!argv.use || argv.use.length == 0) && !(argv.l || argv.list_connections)) || argv.help) {
+    if (((!argv.host || !argv.user || !argv.pass || !argv.port) && (!argv.use || argv.use.length == 0) && !(argv.l || argv.list_connections) && !(argv.t || argv.connection_test)) || argv.help) {
         this.showHelp();
     }
 
@@ -277,9 +339,10 @@ CenSql.prototype.showHelp = function() {
         "--command\t\tOptionally run a command/sql without entering the interective terminal",
         "-s --studio\t\tEnter studio mode",
         "",
-        "-l --list_connections\tOptionally run a command/sql without entering the interective terminal",
-        "--preview_size <COUNT>\tchange amount of rows shown in table preview in studio mode",
+        "-l --list_connections\tList saved connections",
+        "-t --connection_test\tConnect to every saved connection and check HANA's status",
         "",
+        "--preview_size <COUNT>\tchange amount of rows shown in table preview in studio mode",
         "--no-colour\tdisable colour output",
         "--no-color\talias of --no-colour",
     ].join("\n"));
