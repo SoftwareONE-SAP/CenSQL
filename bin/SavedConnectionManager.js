@@ -49,6 +49,17 @@ SavedConnectionManager.prototype.add = function(connectionSettings, name) {
     this.save();
 }
 
+SavedConnectionManager.prototype.delete = function(name) {
+    this.load();
+
+    /**
+     * Delete from config
+     */
+    delete this.contents[name];
+
+    this.save();
+}
+
 SavedConnectionManager.prototype.get = function(name) {
     /**
      * Could not load details for name

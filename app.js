@@ -66,6 +66,15 @@ var CenSql = function() {
             return;
         }
 
+        /**
+         * Should forget a connection
+         */
+        if (argv.forget) {
+            this.connManager.delete(argv.forget);
+            console.log(("Forgot " + argv.forget + "!").green);
+            return;
+        }
+
         var connDetails = argv;
 
         if (argv.use) {
@@ -313,7 +322,7 @@ CenSql.prototype.showHelpTextIfNeeded = function(callback) {
     /**
      * Make sure we have the arguments needed to connect to HANA
      */
-    if (((!argv.host || !argv.user || !argv.pass || !argv.port) && (!argv.use || argv.use.length == 0) && !(argv.l || argv.list_connections) && !(argv.t || argv.connection_test)) || argv.help) {
+    if (((!argv.host || !argv.user || !argv.pass || !argv.port) && (!argv.use || argv.use.length == 0) && !(argv.l || argv.list_connections) && !(argv.t || argv.connection_test) && !argv.forget) || argv.help) {
         this.showHelp();
     }
 
@@ -327,7 +336,7 @@ CenSql.prototype.showHelp = function() {
         "\t censql --use <ALIAS>",
         "Example: censql --user SYSTEM --port 30015 --host 192.168.0.1 --pass Password123",
         "Example: censql --user SYSTEM --port 30015 --host 192.168.0.1 --pass Password123 --command 'SELECT * FROM SYS.M_SERVICES'",
-        "Example: censql --use prd",
+        "Example: censql --use DEV1",
         "",
         "CenSQL Help",
         "--user\t\tThe username for the user to connect as",
@@ -341,10 +350,11 @@ CenSql.prototype.showHelp = function() {
         "",
         "-l --list_connections\tList saved connections",
         "-t --connection_test\tConnect to every saved connection and check HANA's status",
+        "--forget <NAME>\t\tForget a saved connection",
         "",
-        "--preview_size <COUNT>\tchange amount of rows shown in table preview in studio mode",
-        "--no-colour\tdisable colour output",
-        "--no-color\talias of --no-colour",
+        "--preview_size <COUNT>\tChange amount of rows shown in table preview in studio mode",
+        "--no-colour\t\tDisable colour output",
+        "--no-color\t\tAlias of --no-colour",
     ].join("\n"));
 
     process.exit(0);
