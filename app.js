@@ -9,7 +9,6 @@ var path = require('path');
 var async = require("async");
 var osHomedir = require('os-homedir');
 var fs = require("fs");
-var pad = require("pad");
 var SavedConnectionManager = require("./bin/SavedConnectionManager.js");
 var CliTable = require('cli-table');
 
