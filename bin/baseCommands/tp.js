@@ -6,6 +6,11 @@ var TablePreviewCommandHandler = function(){
 
 TablePreviewCommandHandler.prototype.run = function(command, cParts, conn, screen, callback){
 
+	if(cParts.length < 2){
+		callback([1, "Invalid syntax! Try: '\\h' for help.", "message"])
+        return;
+	}
+
 	var limit = parseInt(cParts[2] && !isNaN(cParts[2]) ? cParts[2] : (argv.preview_size || 10))
 
 	conn.exec("conn", "SELECT * FROM " + cParts[1] + " LIMIT " + limit, function(err, data) {
