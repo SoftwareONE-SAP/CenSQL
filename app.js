@@ -50,6 +50,14 @@ var CenSql = function() {
         this.connManager = new SavedConnectionManager();
 
         /**
+         * Should version
+         */
+        if (argv.version) {
+            this.showVersion();
+            return;
+        }
+
+        /**
          * Should list connections
          */
         if (argv.l || argv.list_connections) {
@@ -96,7 +104,6 @@ var CenSql = function() {
         }
 
     }.bind(this))
-
 }
 
 CenSql.prototype.testSavedConnections = function() {
@@ -158,8 +165,16 @@ CenSql.prototype.testSavedConnections = function() {
 
         process.exit(0);
     })
-
 }
+
+CenSql.prototype.showVersion = function() {
+    var package = require("./package.json");
+
+    console.log(package.version)
+
+    process.exit(0);
+}
+
 CenSql.prototype.listConfiguredConnectionNames = function() {
     var contents = this.connManager.getAll();
     var names = Object.keys(contents);
@@ -333,7 +348,7 @@ CenSql.prototype.showHelpTextIfNeeded = function(callback) {
     /**
      * Make sure we have the arguments needed to connect to HANA
      */
-    if (((!argv.host || !argv.user || !argv.pass || !argv.port) && (!argv.use || argv.use.length == 0) && !(argv.l || argv.list_connections) && !(argv.t || argv.connection_test) && !argv.forget) || argv.help) {
+    if (((!argv.host || !argv.user || !argv.pass || !argv.port) && (!argv.use || argv.use.length == 0) && !(argv.l || argv.list_connections) && !(argv.t || argv.connection_test) && !argv.forget && !argv.version) || argv.help) {
         this.showHelp();
     }
 
