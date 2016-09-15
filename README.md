@@ -103,7 +103,7 @@ Commands:
 	\con			- List connections
 	\serv			- List services
 	\tt {OPTIONAL_LIMIT}	- List the largest column tables
-	\smem			- Show bar chart of shared memeory
+	\smem			- Show bar chart of shared memory (deprecated)
 	\hmem			- Show bar chart of heap memory usage per service
 	\tmem			- Show bar chart of total memory usage per service
 	\scpu			- Show bar chart of cpu usage per service
@@ -116,10 +116,19 @@ Commands:
 	\logs			- List all log files
 	\li			- Show the license status and expirary time
 	\ips {SCHEMA_NAME} [-f | --forever] {OPTIONAL_SLEEP}	- Show the current inserts per second
+	\ag			- List all connected SDI agents
+	\ad			- List all registered SDI adapters
+	\rs			- List all remote sources
+
+	Trace Commands:
+	\tf {OPTIONAL_LIMIT}	 - Show recent trace files
+	\tfc {HOST} {FILENAME} {OPTIONAL_LIMIT}	 - Show recent updates in a trace file
 
 	Helper Commands:
+	\history {OPTIONAL_LIMIT}		 - Show censql command history
 	\tp {SCHEMA.TABLE} {OPTIONAL_LIMIT}	 - Preview a table
 	\watch -i {DELAY_IN_SECONDS} {COMMAND}	 - Run a command over and over again with a delay
+	\tail {SCHEMA.TABLE} {ORDER_COLUMN} {OPTIONAL_LIMIT} [-f | --forever] {OPTIONAL_SLEEP} - View the last N tows of a table ordered by a column
 
 	Settings: Internal commands for censql settings and config
 	\sgh					 - Set the height to draw graphs
