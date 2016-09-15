@@ -381,6 +381,8 @@ CenSql.prototype.showHelp = function() {
         "--preview_size <COUNT>\tChange amount of rows shown in table preview in studio mode",
         "--no-colour\t\tDisable colour output",
         "--no-color\t\tAlias of --no-colour",
+        "",
+        "--version\tShow CenSQL version",
     ].join("\n"));
 
     process.exit(0);
