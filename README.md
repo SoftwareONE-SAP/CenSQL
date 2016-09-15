@@ -1,7 +1,7 @@
 
 # CenSQL
 
-<img src="http://i.imgur.com/pEkKthe.gif"></img>
+<img src="http://i.imgur.com/ueZN0t8.gif"></img>
 
 ##### A better CLI client for SAP HANA
 
