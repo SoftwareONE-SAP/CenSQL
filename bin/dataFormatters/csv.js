@@ -1,7 +1,7 @@
 
-module.exports = function(command, data, title, settings) {
+module.exports = function(command, data, title, screen) {
 
-    var delim = settings.csv.delimeter;
+    var delim = screen.settings.csv.delimeter;
     var lines = [];
     var keys = [];
 

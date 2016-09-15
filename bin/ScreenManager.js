@@ -7,11 +7,14 @@ var stripColorCodes = require('stripcolorcodes');
 var osHomedir = require('os-homedir');
 var StudioSession = require("./studio/StudioSession.js");
 var StudioGraphics = require("./studio/StudioGraphics.js");
+var CharacterCodeIndex = require("../lib/CharacterCodeIndex.js");
 
 var ScreenManager = function(isBatch, settings, commandHandler) {
     this.isBatch = isBatch;
 
     this.settings = settings;
+
+    this.cci = new CharacterCodeIndex();
 
     this.commandHandler = commandHandler;
 }
@@ -323,7 +326,7 @@ ScreenManager.prototype.renderCommandOutput = function(command, outputs, callbac
         /**
         * Pass the data to the chosen formatter
         */
-        var lines = this.formatters[output[3]](output[0], output[2], output[4], this.settings, output[5], output[6], output[7]);
+        var lines = this.formatters[output[3]](output[0], output[2], output[4], this, output[5], output[6], output[7]);
         callback(null, this.processPipes(lines, cParts, this.settings));
 
     }.bind(this), function(err, lines) {

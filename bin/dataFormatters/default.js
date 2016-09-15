@@ -1,5 +1,5 @@
 
-module.exports = function(command, data, title, settings){
+module.exports = function(command, data, title, screen){
 	
 	var formatterIndex = command.lastIndexOf("\\");
 	var formatterTag = "table";
@@ -26,7 +26,7 @@ module.exports = function(command, data, title, settings){
 
 		case "c":
 		case "csv":
-			return require("./csv.js")(command, data, title, settings);
+			return require("./csv.js")(command, data, title, screen);
 			break;
 
 		case "m":
@@ -36,21 +36,21 @@ module.exports = function(command, data, title, settings){
 
 		case "lg":
 		case "line-graph":
-			return require("./line-graph.js")(command, data, title, settings);
+			return require("./line-graph.js")(command, data, title, screen);
 			break;
 
 		case "bc":
 		case "bar-chart":
-			return require("./bar-chart.js")(command, data, title, settings);
+			return require("./bar-chart.js")(command, data, title, screen);
 			break;
 
 		case "kvbc":
 		case "key-value-bar-chart":
-			return require("./key-value-bar-chart.js")(command, data, title, settings);
+			return require("./key-value-bar-chart.js")(command, data, title, screen);
 			break;
 
 		default:
-			return require("./table.js")(command, data);
+			return require("./table.js")(command, data, title, screen);
 			break;
 	}
 

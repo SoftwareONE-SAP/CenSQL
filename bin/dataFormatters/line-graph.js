@@ -1,10 +1,10 @@
 var colors = require("colors");
 
-module.exports = function(command, data, title, settings, amountOfHours) {
+module.exports = function(command, data, title, screen, amountOfHours) {
 
     var lines = [];
     var emptyPointChar = "-";
-    var filledPointChar = "■";
+    var filledPointChar = screen.cci.codes.block_solid;
     // amountOfHours = amountOfHours + 1;
 
     /**
@@ -54,7 +54,7 @@ module.exports = function(command, data, title, settings, amountOfHours) {
         var maxValue = 0;
         var minValue = Number.MAX_VALUE;
 
-        if(!settings.relativeGraphs && command.indexOf("-r") == -1){
+        if(!screen.settings.relativeGraphs && command.indexOf("-r") == -1){
             minValue = 0;
         }
 
@@ -95,7 +95,7 @@ module.exports = function(command, data, title, settings, amountOfHours) {
         /**
          * Build an empty graph
          */
-        for (var y = 0; y < settings.plotHeight + 1; y++) {
+        for (var y = 0; y < screen.settings.plotHeight + 1; y++) {
 
             plot[y] = [];
 
@@ -114,7 +114,7 @@ module.exports = function(command, data, title, settings, amountOfHours) {
 
             if (data[k][keys[4]] !== sections[s]) continue;
 
-            var val = settings.plotHeight - parseInt(((data[k][keys[5]] - minValue) / (maxValue - minValue)) * settings.plotHeight);
+            var val = screen.settings.plotHeight - parseInt(((data[k][keys[5]] - minValue) / (maxValue - minValue)) * screen.settings.plotHeight);
             // var percentInGraph = parseInt(((maxTime - data[k].timeDateEpoch) / totalTimeDiff) * (amountOfHours + 1))
 
             // var percentInGraph = parseInt((((maxTime - minTime) - (data[k].timeDateEpoch - minTime)) / 100) * amountOfHours)
@@ -157,14 +157,14 @@ module.exports = function(command, data, title, settings, amountOfHours) {
 
         var headerLine = "";
 
-        headerLine += "╔" + maxValue
+        headerLine += screen.cci.codes.double_corner_top_left + maxValue
 
         // return [plot[0].length]
         for (var k = 0; k < (plot[0].length * widthRatio) - ("" + maxValue).length; k++) {
-            headerLine += "═"
+            headerLine += screen.cci.codes.double_pipe_vertical;
         };
 
-        headerLine += "╗";
+        headerLine += screen.cci.codes.double_corner_top_right;
 
         lines.push(colors.green(headerLine));
 
@@ -176,7 +176,7 @@ module.exports = function(command, data, title, settings, amountOfHours) {
 
             // plot[y].reverse();
 
-            var line = colors.green("║");
+            var line = colors.green(screen.cci.codes.double_pipe);
 
             for (var o = 0; o < plot[y].length; o++) {
                 for (var w = 0; w < widthRatio; w++) {
@@ -194,19 +194,19 @@ module.exports = function(command, data, title, settings, amountOfHours) {
                 }
             };
 
-            line += colors.green("║");
+            line += colors.green(screen.cci.codes.double_pipe);
 
             lines.push(line);
 
         };
 
-        var footerLine = "╚" + minValue;
+        var footerLine = screen.cci.codes.double_corner_bottom_left + minValue;
 
         for (var k = 0; k < (plot[0].length * widthRatio) - ("" + minValue).length; k++) {
-            footerLine += "═";
+            footerLine += screen.cci.codes.double_pipe_vertical;
         };
 
-        footerLine += "╝";
+        footerLine += screen.cci.codes.double_corner_bottom_right;
 
         lines.push(colors.green(footerLine));
 

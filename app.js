@@ -114,28 +114,39 @@ CenSql.prototype.testSavedConnections = function() {
          */
         db.connect(entry["host"], entry["user"], entry["pass"], entry["port"], "tmp_" + key, function(err, data) {
 
-            if(err){
-                callback(null, {status: 1, key: key, message: "Error connecting: " + err});
+            if (err) {
+                callback(null, {
+                    status: 1,
+                    key: key,
+                    message: "Error connecting: " + err
+                });
                 return;
             }
 
             db.close();
 
-            callback(null, {status: 0, key: key, message: "Connected Successfully"});
+            callback(null, {
+                status: 0,
+                key: key,
+                message: "Connected Successfully"
+            });
 
         }.bind(this))
 
     }, function(err, output) {
-        if(err){
+        if (err) {
             console.log(err);
             return;
         }
 
-        output = output.sort(function(a, b){
+        output = output.sort(function(a, b) {
             return a.key.localeCompare(b.key);
         })
 
-        var table = new CliTable();
+        var table = new CliTable({
+            chars: (new (require("./lib/CharacterCodeIndex.js"))).tableChars
+        });
+
 
         table.push(["Name".bold, "Status".bold, "Details".bold])
 
@@ -149,12 +160,13 @@ CenSql.prototype.testSavedConnections = function() {
     })
 
 }
-
 CenSql.prototype.listConfiguredConnectionNames = function() {
     var contents = this.connManager.getAll();
     var names = Object.keys(contents);
 
-    var table = new CliTable();
+    var table = new CliTable({
+        chars: (new (require("./lib/CharacterCodeIndex.js"))).tableChars
+    });
 
     for (var i = 0; i < names.length; i++) {
         table.push([names[i].bold, contents[names[i]].user, contents[names[i]].host, contents[names[i]].port])

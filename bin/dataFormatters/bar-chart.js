@@ -1,10 +1,10 @@
 var colors = require("colors");
 
-module.exports = function(command, data, title, settings) {
+module.exports = function(command, data, title, screen) {
 
     var lines = [];
 
-    var barTypes = ["█", "░", "▒", "▓"]
+    var barTypes = [screen.cci.codes.block_whole, screen.cci.codes.block_faded_min, screen.cci.codes.block_faded_mid, screen.cci.codes.block_faded_max]
 
     var ccolours = ['green', 'cyan', 'red', 'yellow', 'blue', 'magenta'];
 
@@ -31,7 +31,7 @@ module.exports = function(command, data, title, settings) {
 
         lines.push(colors.white(title + " - " + data[k][keys[0]]));
 
-        for (var s = 0; s < settings.barHeight; s++) {
+        for (var s = 0; s < screen.settings.barHeight; s++) {
             // console.log(s)
 
             var dataLine = "";

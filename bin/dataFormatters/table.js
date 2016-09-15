@@ -1,6 +1,6 @@
 var Table = require('cli-table');
 
-module.exports = function(command, data) {
+module.exports = function(command, data, title, screen) {
 
     var lines = [];
 
@@ -12,7 +12,8 @@ module.exports = function(command, data) {
     var keys = Object.keys(data[0]);
 
     var table = new Table({
-        head: keys
+        head: keys,
+        chars: screen.cci.tableChars
     });
 
     // table.push(data);
