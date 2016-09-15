@@ -161,7 +161,7 @@ module.exports = function(command, data, title, screen, amountOfHours) {
 
         // return [plot[0].length]
         for (var k = 0; k < (plot[0].length * widthRatio) - ("" + maxValue).length; k++) {
-            headerLine += screen.cci.codes.double_pipe_vertical;
+            headerLine += screen.cci.codes.double_pipe_h;
         };
 
         headerLine += screen.cci.codes.double_corner_top_right;
@@ -203,7 +203,7 @@ module.exports = function(command, data, title, screen, amountOfHours) {
         var footerLine = screen.cci.codes.double_corner_bottom_left + minValue;
 
         for (var k = 0; k < (plot[0].length * widthRatio) - ("" + minValue).length; k++) {
-            footerLine += screen.cci.codes.double_pipe_vertical;
+            footerLine += screen.cci.codes.double_pipe_h;
         };
 
         footerLine += screen.cci.codes.double_corner_bottom_right;

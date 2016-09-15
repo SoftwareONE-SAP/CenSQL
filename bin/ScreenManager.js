@@ -8,6 +8,7 @@ var osHomedir = require('os-homedir');
 var StudioSession = require("./studio/StudioSession.js");
 var StudioGraphics = require("./studio/StudioGraphics.js");
 var CharacterCodeIndex = require("../lib/CharacterCodeIndex.js");
+var package = require("../package.json");
 
 var ScreenManager = function(isBatch, settings, commandHandler) {
     this.isBatch = isBatch;
@@ -173,7 +174,7 @@ ScreenManager.prototype.setupInput = function() {
             */
             this.rl.on('close', function() {
 
-                this.print(colors.green('\n\nHave a great day!\n'));
+                this.print(colors.green('\n\nThanks for using CenSQL!\n'));
 
                 this.rl.close();
                 process.exit(0);
@@ -242,7 +243,8 @@ ScreenManager.prototype.ready = function(hdb) {
 
         global.graphWidth = process.stdout.columns;
 
-        this.print(colors.cyan(colors.bold("For help type \\h\n-----------------------------------------------------\n\n")));
+        this.print(colors.bold(colors.green("Censql " + package.version) + " - " + colors.cyan("For help enter \\h\n")));
+        this.print(colors.grey(new Array(process.stdout.columns + 1).join(this.cci.codes.double_pipe_h)) + "\n")
         this.print(colors.cyan("> "));
         process.stdin.resume();
     }
