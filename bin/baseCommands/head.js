@@ -1,16 +1,16 @@
 var async = require("async");
 
-var TableTailCommandHandler = function() {
+var TableHeadCommandHandler = function() {
 	this.description = "";
 }
 
-TableTailCommandHandler.prototype.run = function(command, cParts, conn, screen, callback) {
+TableHeadCommandHandler.prototype.run = function(command, cParts, conn, screen, callback) {
 
 	this.conn = conn;
 	this.screen = screen;
 
 	if (cParts.length < 3) {
-		callback([1, "Invalid syntax for \\tail! Try: '\\h' for help.", "message"])
+		callback([1, "Invalid syntax for \\head! Try: '\\h' for help.", "message"])
 		return;
 	}
 
@@ -22,7 +22,7 @@ TableTailCommandHandler.prototype.run = function(command, cParts, conn, screen, 
 
 	this.orderColumn = this.getActualColumnName(cParts[2]);
 
-	this.tailTable(function(err, data) {
+	this.headTable(function(err, data) {
 
 		if (err) {
 			callback([1, err, "json"]);
@@ -34,10 +34,10 @@ TableTailCommandHandler.prototype.run = function(command, cParts, conn, screen, 
 	});
 }
 
-TableTailCommandHandler.prototype.tailTable = function(callback) {
+TableHeadCommandHandler.prototype.headTable = function(callback) {
 
 	var sql = "SELECT * FROM " + this.tableName +
-		" ORDER BY " + this.orderColumn + " DESC " +
+		" ORDER BY " + this.orderColumn + " ASC " +
 		"LIMIT " + (this.limit);
 
 	this.conn.exec("conn", sql, function(err, data) {
@@ -53,7 +53,7 @@ TableTailCommandHandler.prototype.tailTable = function(callback) {
 }
 
 
-TableTailCommandHandler.prototype.getActualColumnName = function(column) {
+TableHeadCommandHandler.prototype.getActualColumnName = function(column) {
 	/**
 	 * Column is quoted
 	 */
@@ -64,4 +64,4 @@ TableTailCommandHandler.prototype.getActualColumnName = function(column) {
 	return column.toUpperCase();
 }
 
-module.exports = TableTailCommandHandler;
+module.exports = TableHeadCommandHandler;
