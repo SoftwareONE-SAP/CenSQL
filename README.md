@@ -20,6 +20,17 @@ Note: CenSQL has been tested on Ubuntu, Debian, SLES, SLES4SAP, Windows Server 2
 <ol>
   <li>Install NodeJS <strong>v0.10.30</strong> or higher (If not already installed)</li>
   <li><code>sudo npm install -g censql</code></li>
+  <li><code>censql --help</code></li>
+</ol>
+
+#### Statically Compile to run without NodeJS (Optional)
+<img src="http://i.giphy.com/3o7TKI8PcyvI78VmKI.gif"></img>
+<ol>
+  <li><code>sudo npm install -g nexe</code></li>
+  <li><code>git clone git@github.com:Centiq/CenSQL.git</code></li>
+  <li><code>cd CenSQL</code></li>
+  <li><code>nexe</code></li>
+  <li><code>./censql --help</code> or <code>censql.exe --help</code></li>
 </ol>
 
 ### Command Usage
