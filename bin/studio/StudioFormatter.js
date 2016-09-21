@@ -320,7 +320,9 @@ StudioFormatter.prototype.drawTableView = function(schema, table, columns, dataP
 	}
 
 	var table = new cliTable({
-		head: this.dataPane.meta.columns
+		head: this.dataPane.meta.columns,
+		chars: this.screen.cci.tableChars,
+		truncate: false
 	});
 
 	for (var k = 0; k < this.dataPane.rawData.length; k++) {

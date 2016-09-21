@@ -13,7 +13,8 @@ module.exports = function(command, data, title, screen) {
 
     var table = new Table({
         head: keys,
-        chars: screen.cci.tableChars
+        chars: screen.cci.tableChars,
+        truncate: false
     });
 
     // table.push(data);
