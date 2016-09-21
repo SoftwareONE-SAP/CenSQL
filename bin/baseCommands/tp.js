@@ -11,7 +11,7 @@ TablePreviewCommandHandler.prototype.run = function(command, cParts, conn, scree
         return;
 	}
 
-	var limit = parseInt(cParts[2] && !isNaN(cParts[2]) ? cParts[2] : (argv.preview_size || 10))
+	var limit = parseInt(cParts[2] && !isNaN(cParts[2]) ? cParts[2] : 10);
 
 	conn.exec("conn", "SELECT * FROM " + cParts[1] + " LIMIT " + limit, function(err, data) {
 	    callback([err == null ? 0 : 1, err == null ? data : err, err == null ? "default" : "json"]);

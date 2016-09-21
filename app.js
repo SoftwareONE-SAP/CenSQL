@@ -378,7 +378,6 @@ CenSql.prototype.showHelp = function() {
         "-t --connection_test\tConnect to every saved connection and check HANA's status",
         "--forget <NAME>\t\tForget a saved connection",
         "",
-        "--preview_size <COUNT>\tChange amount of rows shown in table preview in studio mode",
         "--no-colour\t\tDisable colour output",
         "--no-color\t\tAlias of --no-colour",
         "",
