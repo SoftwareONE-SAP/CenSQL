@@ -29,6 +29,7 @@ Note: CenSQL has been tested on Ubuntu, Debian, SLES, SLES4SAP, Windows Server 2
   <li><code>sudo npm install -g nexe</code></li>
   <li><code>git clone git@github.com:Centiq/CenSQL.git</code></li>
   <li><code>cd CenSQL</code></li>
+  <li><code>npm install</code></li>
   <li><code>nexe</code></li>
   <li><code>./censql --help</code> or <code>censql.exe --help</code></li>
 </ol>
