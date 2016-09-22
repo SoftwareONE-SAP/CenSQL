@@ -91,7 +91,7 @@ var CenSql = function() {
         if (connDetails) {
             this.screen.init();
 
-            this.connectToHdb(connDetails.host, connDetails.user, connDetails.pass, connDetails.port);
+            this.connectToHdb(connDetails.host, connDetails.user, connDetails.pass, connDetails.port, connDetails.tenant);
         } else {
             if (argv.use.length > 0) {
                 this.screen.print("Connection '".red + argv.use.red.bold + ("' does not exist. Use the \\save command whilst connected to save a connection.").red, function() {
@@ -274,14 +274,14 @@ CenSql.prototype.getSettings = function() {
     return settings;
 }
 
-CenSql.prototype.connectToHdb = function(host, user, pass, port) {
+CenSql.prototype.connectToHdb = function(host, user, pass, port, tenant) {
 
     this.hdb = new HDB();
 
     /**
      * Connect to HANA with the login info supplied by the user
      */
-    this.hdb.connect(host, user, pass, port, "conn", function(err, data) {
+    this.hdb.connect(host, user, pass, port, tenant, "conn", function(err, data) {
 
         if (err) {
             this.screen.error(err.message + "\n", function() {
@@ -369,6 +369,7 @@ CenSql.prototype.showHelp = function() {
         "--pass\t\tThe password for the user connecting with",
         "--host\t\tThe host to connect to",
         "--port\t\tThe port to connect to the host with (Layout: '3<ID>15', Instance 99 would be 39915)",
+        "--tenant\t\tName of the tenant database if on a multitenant system",
         "--use <ALIAS>\tConnect using a saved connection instead of user,pass,host,port",
         "",
         "--command\t\tOptionally run a command/sql without entering the interective terminal",
