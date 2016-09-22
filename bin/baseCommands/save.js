@@ -23,7 +23,8 @@ SaveConnectionCommandHandler.prototype.run = function(command, cParts, conn, scr
 		host: conn.connections.conn._settings.host,
 		user: conn.connections.conn._settings.user,
 		pass: conn.connections.conn._settings.password,
-		port: conn.connections.conn._settings.port
+		port: conn.connections.conn._settings.port,
+		tenant: conn.connections.conn._settings.databaseName
 	}
 
 	/**
