@@ -151,7 +151,7 @@ CenSql.prototype.testSavedConnections = function() {
         })
 
         var table = new CliTable({
-            chars: (new (require("./lib/CharacterCodeIndex.js"))).tableChars
+            chars: (new(require("./lib/CharacterCodeIndex.js"))).tableChars
         });
 
 
@@ -180,7 +180,7 @@ CenSql.prototype.listConfiguredConnectionNames = function() {
     var names = Object.keys(contents);
 
     var table = new CliTable({
-        chars: (new (require("./lib/CharacterCodeIndex.js"))).tableChars
+        chars: (new(require("./lib/CharacterCodeIndex.js"))).tableChars
     });
 
     for (var i = 0; i < names.length; i++) {
