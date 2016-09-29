@@ -88,7 +88,7 @@ HelpCommandHandler.prototype.run = function(command, cParts, conn, screen, callb
                 "\t\\g\t\t- Group output into each piece of data to it's own row",
                 "\t\\j\t\t- Display the data in JSON",
                 "\t\\jj\t\t- Display the data in pretty JSON",
-                "\t\\csv | \\c\t- Display the data in pretty JSON",
+                "\t\\csv | \\c\t- Display the data in a csv format",
                 "",
                 "Settings (Such as graph height) are saved to file in the current user's home folder in '.censql' not in HANA."
             ].join("\n"),
