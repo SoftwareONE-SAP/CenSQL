@@ -38,7 +38,6 @@ var CenSql = function() {
     this.settings = this.getSettings();
 
     async.series([
-
         this.createFolderIfNeeded.bind(this),
         this.showHelpTextIfNeeded.bind(this),
         function(callback) {
@@ -119,7 +118,7 @@ CenSql.prototype.testSavedConnections = function() {
         /**
          * Connect to HANA with the login info supplied by the user
          */
-        db.connect(entry["host"], entry["user"], entry["pass"], entry["port"], "tmp_" + key, function(err, data) {
+        db.connect(entry["host"], entry["user"], entry["pass"], entry["port"], entry["tenant"], "tmp_" + key, function(err, data) {
 
             if (err) {
                 callback(null, {
@@ -183,8 +182,10 @@ CenSql.prototype.listConfiguredConnectionNames = function() {
         chars: (new(require("./lib/CharacterCodeIndex.js"))).tableChars
     });
 
+    table.push(["Name".bold, "User".bold, "Host".bold, "Port".bold, "Tenant".bold]);
+
     for (var i = 0; i < names.length; i++) {
-        table.push([names[i].bold, contents[names[i]].user, contents[names[i]].host, contents[names[i]].port])
+        table.push([names[i].bold, contents[names[i]].user, contents[names[i]].host, contents[names[i]].port, contents[names[i]].tenant || "N/A"])
     }
 
     console.log(table.toString());
