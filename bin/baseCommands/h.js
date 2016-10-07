@@ -24,6 +24,7 @@ HelpCommandHandler.prototype.run = function(command, cParts, conn, screen, callb
                 colors.bold("\tHistory:"),
                 "\t\\ba " + colors.grey("{OPTIONAL_LIMIT}") + "\t- List recent backups",
                 "\t\\ul " + colors.grey("{OPTIONAL_LIMIT}") + "\t- To list recent unloads",
+                "\t\\lrs " + colors.grey("-t {OPTIONAL_TIME_THRESHOLD}") + " " + colors.grey("{OPTIONAL_LIMIT}") + " - To list recent unloads. Default time threshold is 30 seconds.",
                 "\t\\mem " + colors.grey("-r (relative)") + "\t- Graph physical memory over the last 3 days",
                 "\t\\imem " + colors.grey("-r (relative)") + "\t- Graph instance used memory over the last 3 days",
                 "\t\\cpu " + colors.grey("-r (relative)") + "\t- Graph cpu over the last 3 days",
