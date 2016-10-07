@@ -1,4 +1,3 @@
-var path = require("path");
 var colors = require("colors");
 
 var HelpCommandHandler = function() {

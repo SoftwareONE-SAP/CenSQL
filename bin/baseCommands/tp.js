@@ -1,5 +1,3 @@
-var argv = require('optimist').argv;
-
 var TablePreviewCommandHandler = function(){
 	this.description = "";
 }
