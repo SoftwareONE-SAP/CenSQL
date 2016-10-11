@@ -53,7 +53,7 @@ module.exports = function(linesIn, command) {
  		}
  	}
 
- 	var output = linesIn.join("\n");
+ 	var output = linesIn.join("\n") + "\n";
 
  	/**
  	 * Write to file
