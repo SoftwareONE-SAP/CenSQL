@@ -84,6 +84,8 @@ HelpCommandHandler.prototype.run = function(command, cParts, conn, screen, callb
                 "\ttail {AMOUNT_OF_LINES}" + "\t\t\t- Only show the amount of line from the bottom of the output",
                 "\twc " + "\t\t\t\t\t- Count the amount of lines for this output",
                 "\ttac " + "\t\t\t\t\t- Reverse output vertically",
+                "\trev " + "\t\t\t\t\t- Reverse output horizontally",
+                "\twrite {LOCATION}" + "\t\t\t- Write output to file",
                 "\tcut {AMOUNT_OF_CHARS}" + "\t\t\t- Cut off characters from one side of the output",
                 colors.grey("\t\t\t\t\t\t  eg: 'cut 3-' would cut the first 2 characters off each line"),
                 colors.grey("\t\t\t\t\t\t  and 'cut -3' would cut all characters after the first 3"),
