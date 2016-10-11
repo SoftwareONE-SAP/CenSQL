@@ -253,6 +253,9 @@ ScreenManager.prototype.ready = function(hdb) {
 
 }
 
+/**
+ * Print final output to the screen
+ */
 ScreenManager.prototype.printCommandOutput = function(command, outputs, callback, dontPrintPrompt) {
     this.renderCommandOutput(command, outputs, function(err, lines) {
 
@@ -391,6 +394,9 @@ ScreenManager.prototype.clear = function() {
     this.goto(1, 1);
 }
 
+/**
+ * Move the cursor to an x/y cord in the terminal
+ */
 ScreenManager.prototype.goto = function(x, y) {
     charm.position(x, y);
 }

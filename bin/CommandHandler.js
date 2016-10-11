@@ -8,6 +8,9 @@ var CommandHandler = function(screen, hdb, command, settings) {
 
     this.loadCommandHandlers();
 
+    /**
+     * If in batch mode, run command and exit
+     */
     if (command) {
         this.onCommand(command, function(err, output) {
             this.screen.printCommandOutput(command, output, function() {
@@ -199,7 +202,7 @@ CommandHandler.prototype.runInternalCommand = function(command, cParts, callback
 
 }
 
-// inspired from here: http://stackoverflow.com/a/12920211/3110929
+// inspired by: http://stackoverflow.com/a/12920211/3110929
 CommandHandler.prototype.splitStringBySemicolon = function(s) {
 
     /**
@@ -227,6 +230,9 @@ CommandHandler.prototype.splitStringBySemicolon = function(s) {
     return commands;
 }
 
+/**
+ * Remove format commands from the end of commands/queries such as \g or \csv
+ */
 CommandHandler.prototype.stripFormatterIdentifiers = function(string) {
 
     for (var i = 0; i < this.screen.formattersNames.length; i++) {

@@ -3,11 +3,17 @@ var path = require('path');
 var osHomedir = require('os-homedir');
 var fs = require("fs");
 
+/**
+ * Init saved connections
+ */
 var SavedConnectionManager = function() {
     this.configPath = path.join(osHomedir(), ".censql", "saved_connections");
     this.load();
 }
 
+/**
+ * Save connections to file
+ */
 SavedConnectionManager.prototype.save = function() {
     /**
      * Write config to file
@@ -16,6 +22,9 @@ SavedConnectionManager.prototype.save = function() {
     fs.chmodSync(this.configPath, "600");
 }
 
+/**
+ * Reload connections from file
+ */
 SavedConnectionManager.prototype.load = function() {
     try {
         this.contents = JSON.parse(new Buffer(fs.readFileSync(this.configPath).toString(), 'base64'));
@@ -24,6 +33,9 @@ SavedConnectionManager.prototype.load = function() {
     }
 }
 
+/**
+ * Encrypt password. NOTE: This is in no way a secure method of keeping passwords safe, it is here just add security via obscurity.
+ */
 SavedConnectionManager.prototype.encryptPassword = function(connectionSettings) {
     /**
      * Encrypt password. (This is mainly to stop accidenatlly finding a password, rather than keeping passwords from attackers)
@@ -35,6 +47,9 @@ SavedConnectionManager.prototype.encryptPassword = function(connectionSettings) 
     return connectionSettings;
 }
 
+/**
+ * Add a new connection and save it
+ */
 SavedConnectionManager.prototype.add = function(connectionSettings, name) {
 
     connectionSettings = this.encryptPassword(connectionSettings);
@@ -49,6 +64,9 @@ SavedConnectionManager.prototype.add = function(connectionSettings, name) {
     this.save();
 }
 
+/**
+ * Remove a saved connection
+ */
 SavedConnectionManager.prototype.delete = function(name) {
     this.load();
 
@@ -60,6 +78,9 @@ SavedConnectionManager.prototype.delete = function(name) {
     this.save();
 }
 
+/**
+ * Get the decrypted connection by its name
+ */
 SavedConnectionManager.prototype.get = function(name) {
     /**
      * Could not load details for name
@@ -83,6 +104,9 @@ SavedConnectionManager.prototype.get = function(name) {
     return connDetails;
 }
 
+/**
+ * Get all connections (used to test/list all connections with the censql -l and -t commands)
+ */
 SavedConnectionManager.prototype.getAll = function() {
     this.load();
 
