@@ -18,6 +18,7 @@ HelpCommandHandler.prototype.run = function(command, cParts, conn, screen, callb
                 "\t\\us, \\du\t\t\t\t- To list users",
                 "\t\\ta, \\dt {SCHEMA_NAME}" + "\t\t\t- To list tables for a schema",
                 "\t\\vs, \\dv {SCHEMA_NAME}" + "\t\t\t- To list views for a schema",
+                "\t\\col, \\di {SCHEMA_NAME}.{TABLE_NAME}" + "\t\t\t- To show columns/indexes for a table",
                 "\t\\in\t\t\t\t\t- To list instances",
                 "\t\\ping "+ colors.grey("[-f | --forever] {OPTIONAL_SLEEP}") + "\t- Test how long it takes to connect to HANA.",
                 "\t",
