@@ -13,16 +13,25 @@ module.exports = function(linesIn, command) {
 
     var fileLoc = parts[1];
 
+    /**
+ 	 * Check if a file location was supplied
+ 	 */
     if(fileLoc.length == 0){
     	return ["No file path supplied!".bold + " Example: '" + "SELECT 'HELLO', 'WORLD' FROM DUMMY | write myfile.txt".dim + "'"]
     }
 
+    /**
+ 	 * Make sure path is a valid path
+ 	 */
  	if(!isValidPath(fileLoc)){
  		return ["Invalid file path! " + fileLoc.red.bold];
  	}
 
  	var dirLoc = path.dirname(fileLoc);
 
+ 	/**
+ 	 * Check dirLoc is a directory
+ 	 */
  	try{
  		fs.lstatSync(dirLoc).isDirectory()
  	}catch(e){
@@ -31,6 +40,9 @@ module.exports = function(linesIn, command) {
  		}
  	}
 
+ 	/**
+ 	 * Check fileloc is not a directory
+ 	 */
  	try{
  		if(!fs.lstatSync(fileLoc).isFile()){
  			return [("'" + fileLoc + "' is a directory!").red.bold];
@@ -43,7 +55,14 @@ module.exports = function(linesIn, command) {
 
  	var output = linesIn.join("\n");
 
- 	fs.writeFileSync(fileLoc, output)
+ 	/**
+ 	 * Write to file
+ 	 */
+ 	try{
+ 		fs.writeFileSync(fileLoc, output)
+ 	}catch(e){
+ 		return [e.message.red.bold];
+ 	}
 
     return [("File saved to: ".bold + fileLoc).green];
 }
