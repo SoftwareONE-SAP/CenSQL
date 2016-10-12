@@ -29,7 +29,7 @@ module.exports = function(command, data, title, screen) {
         sum += data[k][keys[1]]
         sum += data[k][keys[2]]
 
-        lines.push(colors.white(title + " - " + data[k][keys[0]]));
+        lines.push(colors.white((title ? title + " - " : "") + data[k][keys[0]]));
 
         for (var s = 0; s < screen.settings.barHeight; s++) {
             // console.log(s)
@@ -59,10 +59,9 @@ module.exports = function(command, data, title, screen) {
         lines.push("");
     }
 
-    lines.push(colors.white("- ") + colors[ccolours[1]](keys[1]));
+    if(keys[1] != "hidden") lines.push(colors.white("- ") + colors[ccolours[1]](keys[1]));
 
-    lines.push(colors.white("- ") + colors[ccolours[0]](keys[2]));
-
+    if(keys[2] != "hidden") lines.push(colors.white("- ") + colors[ccolours[0]](keys[2]));
 
     return lines;
 }

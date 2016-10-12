@@ -80,6 +80,8 @@ module.exports = function(command, data, title, screen) {
 
     for (var k = 0; k < parts.length; k++) {
 
+        if(parts[k] == "hidden") continue;
+
         lines.push("- " + colors[ccolours[k]](parts[k]))
     }
 
