@@ -35,7 +35,7 @@ module.exports = function(command, data, title, screen) {
 
             var dataLine = "";
 
-            var width = Math.ceil(global.graphWidth * data[k][keys[1]] / sum);
+            var width = Math.ceil(global.censql.graphWidth * data[k][keys[1]] / sum);
 
             if(sum == 0){
                 width = 0;
@@ -43,10 +43,10 @@ module.exports = function(command, data, title, screen) {
 
             dataLine += colors[ccolours[1]](new Array(width).join(barTypes[0]));
 
-            width = Math.ceil(global.graphWidth * data[k][keys[2]] / sum);
+            width = Math.ceil(global.censql.graphWidth * data[k][keys[2]] / sum);
 
             if(sum == 0){
-                width = global.graphWidth;
+                width = global.censql.graphWidth;
             }
 
             dataLine += colors[ccolours[0]](new Array(width).join(barTypes[1]));

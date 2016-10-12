@@ -11,7 +11,7 @@ UnloadsCommandHandler.prototype.run = function(command, cParts, conn, screen, ca
         ORDER BY MONTH(UNLOAD_TIME) DESC, DAYOFMONTH(UNLOAD_TIME) DESC, HOUR(UNLOAD_TIME) DESC, HOST DESC\
         LIMIT " + parseInt(cParts[1] && !isNaN(cParts[1]) ? cParts[1] : 10), 
     function(err, data) {
-	    callback([err == null ? 0 : 1, err == null ? data : err, err == null ? "default" : "json"]);
+	    callback([err == null ? 0 : 1, err == null ? data : err, err == null ? "default" : "sql-error"]);
 	})
 }
 

@@ -24,7 +24,7 @@ ShowColumnsCommandHandler.prototype.run = function(command, cParts, conn, screen
 	}
 
 	conn.exec("conn", "SELECT POSITION, CASE WHEN INDEX_TYPE = 'NONE' THEN 'NO' WHEN INDEX_TYPE = 'FULL' THEN 'YES' ELSE INDEX_TYPE END AS IS_KEY, COLUMN_NAME, DATA_TYPE_NAME AS COLUMN_TYPE, LENGTH FROM SYS.TABLE_COLUMNS WHERE SCHEMA_NAME = " + schema + " AND TABLE_NAME = '" + table + "' ORDER BY POSITION", function(err, data) {
-	    callback([err == null ? 0 : 1, err == null ? data : err, err == null ? "default" : "json"]);
+	    callback([err == null ? 0 : 1, err == null ? data : err, err == null ? "default" : "sql-error"]);
 	})
 }
 

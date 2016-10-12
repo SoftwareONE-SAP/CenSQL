@@ -166,7 +166,7 @@ CommandHandler.prototype.onCommand = function(enteredCommand, allCallback) {
                     error: err,
                     sql: initialCommand
                 },
-                err == null ? "default" : "json"
+                err == null ? "default" : "sql-error"
             ]);
         })
 

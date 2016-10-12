@@ -74,6 +74,7 @@ ScreenManager.prototype.loadDataFormatters = function() {
     this.formatters["pretty-json"] = require("./dataFormatters/pretty-json.js");
     this.formatters["table"] = require("./dataFormatters/table.js");
     this.formatters["t"] = require("./dataFormatters/t.js");
+    this.formatters["sql-error"] = require("./dataFormatters/sql-error.js");
 
     this.formattersNames = Object.keys(this.formatters);
 }
@@ -110,7 +111,7 @@ ScreenManager.prototype.setupInput = function() {
                 /**
                  * Check terminal width
                  */
-                global.graphWidth = process.stdout.columns;
+                global.censql.graphWidth = process.stdout.columns;
 
                 /**
                  * Stop taking user input until we complete this request
@@ -235,13 +236,13 @@ ScreenManager.prototype.ready = function(hdb) {
      */
     if (this.settings.studio) {
 
-        global.graphWidth = process.stdout.columns / 1.5;
+        global.censql.graphWidth = process.stdout.columns / 1.5;
 
         this.graphics = new StudioGraphics(this);
         this.studio = new StudioSession(this, hdb, this.commandHandler);
     } else {
 
-        global.graphWidth = process.stdout.columns;
+        global.censql.graphWidth = process.stdout.columns;
 
         this.print(colors.bold(colors.green("Censql " + package.version) + " - " + colors.cyan("For help enter \\h\n")));
         this.print(colors.grey(new Array(process.stdout.columns + 1).join(this.cci.codes.double_pipe_h)) + "\n")
@@ -252,7 +253,7 @@ ScreenManager.prototype.ready = function(hdb) {
 }
 
 ScreenManager.prototype.readyBatch = function() {
-    global.graphWidth = 80;
+    global.censql.graphWidth = 80;
 }
 
 /**

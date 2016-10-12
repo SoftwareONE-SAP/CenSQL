@@ -11,7 +11,7 @@ BackupViewCommandHandler.prototype.run = function(command, cParts, conn, screen,
          ORDER BY entry_id DESC\
          LIMIT " + parseInt(cParts[1] && !isNaN(cParts[1]) ? cParts[1] : 10),
 	function(err, data) {
-	    callback([err == null ? 0 : 1, err == null ? data : err, err == null ? "default" : "json"]);
+	    callback([err == null ? 0 : 1, err == null ? data : err, err == null ? "default" : "sql-error"]);
 	})
 }
 
