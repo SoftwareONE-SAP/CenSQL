@@ -296,7 +296,9 @@ CenSql.prototype.connectToHdb = function(host, user, pass, port, tenant) {
          * If the user specified the command, we do not want to open an interactive session
          */
         if (!argv.command) {
-            this.screen.ready.call(this.screen, this.hdb);
+            this.screen.ready(this.hdb);
+        }else{
+            this.screen.readyBatch();
         }
 
         /**

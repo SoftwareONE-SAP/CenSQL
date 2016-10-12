@@ -21,8 +21,8 @@ var ScreenManager = function(isBatch, settings, commandHandler) {
 }
 
 /**
-* Initialize settings and prepare the screen manager
-*/
+ * Initialize settings and prepare the screen manager
+ */
 ScreenManager.prototype.init = function() {
     this.loadDataFormatters();
     this.loadPipeHandlers();
@@ -79,8 +79,8 @@ ScreenManager.prototype.loadDataFormatters = function() {
 }
 
 /**
-* Add an input handler to the cli and pass it to the commandHandler
-*/
+ * Add an input handler to the cli and pass it to the commandHandler
+ */
 ScreenManager.prototype.setupInput = function() {
 
     if (!process.stdout.isTTY) {
@@ -108,24 +108,24 @@ ScreenManager.prototype.setupInput = function() {
                 if (global.censql.RUNNING_PROCESS) return;
 
                 /**
-                * Check terminal width
-                */
+                 * Check terminal width
+                 */
                 global.graphWidth = process.stdout.columns;
 
                 /**
-                * Stop taking user input until we complete this request
-                */
+                 * Stop taking user input until we complete this request
+                 */
                 process.stdin.pause();
 
                 /**
-                * Save that we already have a running process
-                * @type {Boolean}
-                */
+                 * Save that we already have a running process
+                 * @type {Boolean}
+                 */
                 global.censql.RUNNING_PROCESS = true;
 
                 /**
-                * Hide user input whilst a command is running (simply pausing stdin still allows scrolling through history)
-                */
+                 * Hide user input whilst a command is running (simply pausing stdin still allows scrolling through history)
+                 */
                 process.stdin._events._keypress_full = process.stdin._events.keypress;
                 process.stdin._events.keypress = function(ch, key) {
                     if (key && key.ctrl && key.name == 'c') {
@@ -134,35 +134,35 @@ ScreenManager.prototype.setupInput = function() {
                 };
 
                 /**
-                * Send the user command to the command handler
-                */
+                 * Send the user command to the command handler
+                 */
                 this.commandHandler.handleCommand(line, function(err, output) {
 
                     /**
-                    * Print the command to the screen however the command handler thinks is best
-                    */
+                     * Print the command to the screen however the command handler thinks is best
+                     */
                     this.printCommandOutput(line, output, function() {
 
                         /**
-                        * Re-enable the command line
-                        */
+                         * Re-enable the command line
+                         */
                         process.stdin.resume();
 
                         /**
-                        * Reset running app state
-                        * @type {Boolean}
-                        */
+                         * Reset running app state
+                         * @type {Boolean}
+                         */
                         global.censql.RUNNING_PROCESS = false;
 
                         /**
-                        * Should the running process exit?
-                        * @type {Boolean}
-                        */
+                         * Should the running process exit?
+                         * @type {Boolean}
+                         */
                         global.SHOULD_EXIT = false;
 
                         /**
-                        * Reset the keypress function for stdin
-                        */
+                         * Reset the keypress function for stdin
+                         */
                         process.stdin._events.keypress = process.stdin._events._keypress_full;
 
                     }.bind(this));
@@ -172,8 +172,8 @@ ScreenManager.prototype.setupInput = function() {
             }.bind(this));
 
             /**
-            * On close, give the user a pretty message and then stop the entire program
-            */
+             * On close, give the user a pretty message and then stop the entire program
+             */
             this.rl.on('close', function() {
 
                 this.print(colors.green('\n\nThanks for using CenSQL!\n'));
@@ -183,8 +183,8 @@ ScreenManager.prototype.setupInput = function() {
             }.bind(this));
 
             /**
-            * When the user ^Cs make sure they weren't just trying to clear the command
-            */
+             * When the user ^Cs make sure they weren't just trying to clear the command
+             */
             this.rl.on('SIGINT', function() {
 
                 if (global.censql.RUNNING_PROCESS) {
@@ -197,13 +197,13 @@ ScreenManager.prototype.setupInput = function() {
                 charm.up(1);
 
                 /**
-                * Exit command promt
-                */
+                 * Exit command promt
+                 */
                 this.rl.close();
 
                 /**
-                * Exit program
-                */
+                 * Exit program
+                 */
                 process.exit(0);
 
             }.bind(this));
@@ -214,8 +214,8 @@ ScreenManager.prototype.setupInput = function() {
 }
 
 /**
-* Print a pretty header when the user enters interactive mode
-*/
+ * Print a pretty header when the user enters interactive mode
+ */
 ScreenManager.prototype.printHeader = function() {
 
     this.print(colors.cyan(colors.bold(colors.underline("Welcome to CenSQL for SAP HANA!\n\n\n"))));
@@ -224,17 +224,15 @@ ScreenManager.prototype.printHeader = function() {
 }
 
 /**
-* The rest of the program is ready for user input, start listening on stdin
-*/
+ * The rest of the program is ready for user input, start listening on stdin
+ */
 ScreenManager.prototype.ready = function(hdb) {
 
-    if (!this.isBatch) {
-        this.clear()
-    }
+    this.clear()
 
     /**
-    * Should we enter the cli or studio mode?
-    */
+     * Should we enter the cli or studio mode?
+     */
     if (this.settings.studio) {
 
         global.graphWidth = process.stdout.columns / 1.5;
@@ -253,6 +251,10 @@ ScreenManager.prototype.ready = function(hdb) {
 
 }
 
+ScreenManager.prototype.readyBatch = function() {
+    global.graphWidth = 80;
+}
+
 /**
  * Print final output to the screen
  */
@@ -262,8 +264,8 @@ ScreenManager.prototype.printCommandOutput = function(command, outputs, callback
         this.renderLines([].concat.apply([], lines), function() {
 
             /**
-            * Dont display a prompt for batch requests
-            */
+             * Dont display a prompt for batch requests
+             */
             if (!this.isBatch && !dontPrintPrompt) {
                 this.print("\n" + colors.cyan("> "));
             }
@@ -276,10 +278,10 @@ ScreenManager.prototype.printCommandOutput = function(command, outputs, callback
 }
 
 /**
-* Print the output to a command entered by the user
-* @param  {String} command The command the user ran
-* @param  {Array} outputs  the data and how to display it
-*/
+ * Print the output to a command entered by the user
+ * @param  {String} command The command the user ran
+ * @param  {Array} outputs  the data and how to display it
+ */
 ScreenManager.prototype.renderCommandOutput = function(command, outputs, callback) {
 
     var cSegs = command.split("||");
@@ -287,9 +289,9 @@ ScreenManager.prototype.renderCommandOutput = function(command, outputs, callbac
     var initialCommand = "";
 
     /**
-    * The parts of the command
-    * @type {String[]}
-    */
+     * The parts of the command
+     * @type {String[]}
+     */
     var cParts = [];
 
     var hasReachedPipe = false;
@@ -331,8 +333,8 @@ ScreenManager.prototype.renderCommandOutput = function(command, outputs, callbac
     async.mapSeries(outputs, function(output, callback) {
 
         /**
-        * Pass the data to the chosen formatter
-        */
+         * Pass the data to the chosen formatter
+         */
         var lines = this.formatters[output[3]](output[0], output[2], output[4], this, output[5], output[6], output[7]);
         callback(null, this.processPipes(lines, cParts, this.settings));
 
@@ -345,8 +347,8 @@ ScreenManager.prototype.renderCommandOutput = function(command, outputs, callbac
 }
 
 /**
-* Send the data through all the piped commands they added
-*/
+ * Send the data through all the piped commands they added
+ */
 ScreenManager.prototype.processPipes = function(linesIn, commandParts) {
 
     var linesOut = linesIn.slice(0);
@@ -369,8 +371,8 @@ ScreenManager.prototype.processPipes = function(linesIn, commandParts) {
 }
 
 /**
-* Draw the data line by line, removing colour if the user requested no colour
-*/
+ * Draw the data line by line, removing colour if the user requested no colour
+ */
 ScreenManager.prototype.renderLines = function(lines, callback) {
     async.mapSeries(lines, function(line, callback) {
         this.print(line + "\n", callback);
