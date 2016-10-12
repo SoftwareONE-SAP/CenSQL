@@ -1,4 +1,5 @@
 var colors = require("colors");
+var package = require("../../package.json");
 
 var HelpCommandHandler = function() {
     this.description = "";
@@ -9,7 +10,7 @@ HelpCommandHandler.prototype.run = function(command, cParts, conn, screen, callb
     callback(
         [
             0, [
-                colors.bold(colors.green("CenSQL") + " Help"),
+                colors.bold(colors.green("CenSQL " + package.version) + " Help"),
                 "-----------------------------------------------------",
                 colors.bold("Commands:"),
                 colors.bold("\tBasic:"),
