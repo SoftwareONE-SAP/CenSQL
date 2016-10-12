@@ -24,7 +24,7 @@ module.exports = function(command, data, title, screen) {
 
             var value = data[k][keys[j]];
 
-            value = ("" + value).split('"').join('""');
+            value = ("" + value).split('"').join('""').split("\n").join("\\n").split("\r").join("\\r");
 
             if(value.indexOf(delim) !== -1){
                 value = '"' + value + '"';
