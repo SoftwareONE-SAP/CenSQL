@@ -32,11 +32,10 @@ module.exports = function(command, data, title, screen) {
         lines.push(colors.white((title ? title + " - " : "") + data[k][keys[0]]));
 
         for (var s = 0; s < screen.settings.barHeight; s++) {
-            // console.log(s)
 
             var dataLine = "";
 
-            var width = Math.floor(global.graphWidth * data[k][keys[1]] / sum);
+            var width = Math.ceil(global.graphWidth * data[k][keys[1]] / sum);
 
             if(sum == 0){
                 width = 0;
@@ -44,13 +43,15 @@ module.exports = function(command, data, title, screen) {
 
             dataLine += colors[ccolours[1]](new Array(width).join(barTypes[0]));
 
-            width = Math.floor(global.graphWidth * data[k][keys[2]] / sum);
+            width = Math.ceil(global.graphWidth * data[k][keys[2]] / sum);
 
             if(sum == 0){
                 width = global.graphWidth;
             }
 
             dataLine += colors[ccolours[0]](new Array(width).join(barTypes[1]));
+
+            // console.log(dataLine.length);
 
             lines.push(dataLine);
 
