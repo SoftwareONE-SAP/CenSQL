@@ -8,7 +8,7 @@ TopTablesPercentCommandHandler.prototype.run = function(command, cParts, conn, s
 
 	this.rowLimit = 10;
 
-	this.argv = require('optimist')(cParts).default('s', "").default('r', false).argv;
+	this.argv = require('optimist')(cParts).default('s', "").default('r', false).default('c', false).argv;
 
 	if (this.argv._.length > 1 && !isNaN(this.argv._[1])) {
 		this.rowLimit = parseInt(this.argv._[1]);
@@ -37,7 +37,7 @@ TopTablesPercentCommandHandler.prototype.getTotalSize = function(callback) {
 	/**
 	 * Get size of schema/whole database
 	 */
-	this.conn.exec("conn", "SELECT SUM(TABLE_SIZE) / 1024 / 1024 / 1024 AS TOTAL_SIZE_GB FROM M_TABLES " + (this.argv.s.length > 0 ? "WHERE SCHEMA_NAME = '" + this.argv.s + "'" : ""), function(err, data) {
+	this.conn.exec("conn", "SELECT SUM(RECORD_COUNT) AS TOTAL_RECORD_COUNT, SUM(TABLE_SIZE) / 1024 / 1024 / 1024 AS TOTAL_SIZE_GB FROM M_TABLES " + (this.argv.s.length > 0 ? "WHERE SCHEMA_NAME = '" + this.argv.s + "'" : ""), function(err, data) {
 
 		if (err) {
 			callback(err, null);
@@ -52,7 +52,7 @@ TopTablesPercentCommandHandler.prototype.getTotalSize = function(callback) {
 			return;
 		}
 
-		callback(null, data[0].TOTAL_SIZE_GB)
+		callback(null, (this.argv.c ? data[0].TOTAL_RECORD_COUNT : data[0].TOTAL_SIZE_GB))
 	}.bind(this))
 }
 
@@ -61,9 +61,9 @@ TopTablesPercentCommandHandler.prototype.getTableSizes = function(totalSize, cal
 	 * Get size of tables
 	 */
 	this.conn.exec("conn",
-		"SELECT SCHEMA_NAME, TABLE_NAME, (TABLE_SIZE / 1024 / 1024 / 1024) AS SIZE_GB FROM M_TABLES " +
+		"SELECT SCHEMA_NAME, TABLE_NAME, RECORD_COUNT, (TABLE_SIZE / 1024 / 1024 / 1024) AS SIZE_GB FROM M_TABLES " +
 		(this.argv.s.length > 0 ? "WHERE SCHEMA_NAME = '" + this.argv.s + "'" : "") +
-		" ORDER BY TABLE_SIZE DESC LIMIT " +
+		" ORDER BY " + (this.argv.c ? "RECORD_COUNT" : "SIZE_GB") + " DESC LIMIT " +
 		this.rowLimit,
 		function(err, data) {
 
@@ -78,7 +78,7 @@ TopTablesPercentCommandHandler.prototype.getTableSizes = function(totalSize, cal
 			 * Make relative
 			 */
 			if(totalSize == null && data.length > 0){
-				totalSize = data[0].SIZE_GB;
+				totalSize = (this.argv.c ? data[0].RECORD_COUNT : data[0].SIZE_GB);
 			}
 
 			/**
@@ -86,9 +86,9 @@ TopTablesPercentCommandHandler.prototype.getTableSizes = function(totalSize, cal
 			 */
 			for (var i = 0; i < data.length; i++) {
 				output.push({
-					"Name": (this.argv.s.length == 0 ? data[i].SCHEMA_NAME + "." : "") + data[i].TABLE_NAME,
-					"Size of Table": parseFloat(data[i].SIZE_GB),
-					hidden: parseFloat(data[i].SIZE_GB == totalSize ? 0 : totalSize - data[i].SIZE_GB)
+					"Name": (this.argv.s.length == 0 ? data[i].SCHEMA_NAME + "." : "") + data[i].TABLE_NAME + " - " + (this.argv.c ? data[i].RECORD_COUNT + " rows" : parseInt(data[i].SIZE_GB) + "GB"),
+					"Size of Table": (this.argv.c ? parseInt(data[i].RECORD_COUNT) : parseFloat(data[i].SIZE_GB)),
+					hidden: parseFloat((this.argv.c ? parseInt(data[i].RECORD_COUNT) : parseFloat(data[i].SIZE_GB)) == totalSize ? 0 : totalSize - (this.argv.c ? parseInt(data[i].RECORD_COUNT) : parseFloat(data[i].SIZE_GB)))
 				})
 			}
 
