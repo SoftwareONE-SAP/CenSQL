@@ -144,7 +144,14 @@ CommandHandler.prototype.onCommand = function(enteredCommand, allCallback) {
          * Is the command an internal command? (Does it start with a '\')
          */
         if (command.charAt(0) == "\\") {
-            this.runInternalCommand(command.substring(1), cParts, callback);
+            this.runInternalCommand(command.substring(1), cParts, function(err, output){
+
+                if(output[1] == 1){
+                    output[2].command = command;
+                }
+
+                callback(err, output);
+            });
             return;
         }
 
@@ -162,10 +169,12 @@ CommandHandler.prototype.onCommand = function(enteredCommand, allCallback) {
          * Run the initialCommand as a string of SQL and send it to HANA
          */
         this.hdb.exec("conn", sql, function(err, hanaData) {
-            callback(null, [initialCommand, err == null ? 0 : 1, err == null ? hanaData : {
-                    error: err,
-                    sql: initialCommand
-                },
+
+            if(err){
+                err.sql = sql;
+            }
+
+            callback(null, [initialCommand, err == null ? 0 : 1, err == null ? hanaData : err,
                 err == null ? "default" : "sql-error"
             ]);
         })
