@@ -54,8 +54,6 @@ module.exports = function(command, data) {
 		output.push(" SQL: ".red.bold + data.sql.trim().dim);
 	}
 
-	console.log(data)
-
 	if (data.message) {
 
 		var errorMessage = data.message.substring(data.message.indexOf(":") + 2, data.message.length);
