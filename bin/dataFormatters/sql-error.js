@@ -72,10 +72,10 @@ module.exports = function(command, data) {
 			return "";
 		});
 
-		errorMessage = errorMessage.substring(0, errorMessage.length - 2)
+		if (errorMessage.substring(errorMessage.length - 2) == ": ") errorMessage = errorMessage.substring(0, errorMessage.length - 2)
 
-		output.push(" DESCRIPTION: ".bold.red + errorMessage.trim())
-		output.push(" POSITION: ".bold.red + errorPos.trim())
+		if (errorMessage.length > 0) output.push(" DESCRIPTION: ".bold.red + errorMessage.trim())
+		if (errorPos.length > 0) output.push(" POSITION: ".bold.red + errorPos.trim());
 
 	} else {
 		return JSON.stringify(data, null, 2).split("\n");
