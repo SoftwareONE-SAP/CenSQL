@@ -29,9 +29,9 @@ ScreenManager.prototype.init = function() {
 
     if (!this.isBatch) {
         this.printHeader
+        this.setupInput();
     }
 
-    this.setupInput();
 
 }
 
