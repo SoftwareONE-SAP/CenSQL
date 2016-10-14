@@ -23,7 +23,7 @@ TopTablesPercentCommandHandler.prototype.run = function(command, cParts, conn, s
 		this.getTableSizes.bind(this),
 	], function(err, data) {
 		if (err) {
-			callback([1, err, "json"]);
+			callback([1, err[1], "sql-error"]);
 			return;
 		}
 
