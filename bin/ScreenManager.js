@@ -28,7 +28,6 @@ ScreenManager.prototype.init = function() {
     this.loadPipeHandlers();
 
     if (!this.isBatch) {
-        this.printHeader
         this.setupInput();
     }
 
