@@ -132,13 +132,15 @@ CommandHandler.prototype.onCommand = function(enteredCommand, allCallback) {
                 }
             }
 
-            if (hasReachedPipe) {
-                cParts = cParts.concat(splitOnPipes);
-            }
+            // if (hasReachedPipe) {
+            //     cParts = cParts.concat(splitOnPipes);
+            // }
 
         };
 
         cParts.unshift(initialCommand);
+
+        // console.log(cParts)
 
         /**
          * Is the command an internal command? (Does it start with a '\')
