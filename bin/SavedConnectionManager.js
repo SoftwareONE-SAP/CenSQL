@@ -126,4 +126,24 @@ SavedConnectionManager.prototype.getAll = function() {
     return output;
 }
 
+SavedConnectionManager.prototype.updateAllForInstanceUser = function(host, user, port, newPass) {
+    this.load();
+
+    var keys = Object.keys(this.contents);
+
+    for (var i = keys.length - 1; i >= 0; i--) {
+        if (this.contents[keys[i]].host == host && this.contents[keys[i]].user == this.contents[keys[i]].user && this.contents[keys[i]].port == this.contents[keys[i]].port) {
+
+            var entry = this.contents[keys[i]];
+
+            entry.pass = newPass;
+
+            this.contents[keys[i]] = this.encryptPassword(entry);
+        }
+    }
+
+    this.save();
+
+}
+
 module.exports = SavedConnectionManager;

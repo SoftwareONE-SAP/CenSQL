@@ -60,6 +60,7 @@ CommandHandler.prototype.loadCommandHandlers = function() {
     this.handlers["lrq"] = new(require("./baseCommands/lrq.js"))(this);
     this.handlers["lrs"] = new(require("./baseCommands/lrs.js"))(this);
     this.handlers["mem"] = new(require("./baseCommands/mem.js"))(this);
+    this.handlers["passwd"] = new(require("./baseCommands/passwd.js"))(this);
     this.handlers["ping"] = new(require("./baseCommands/ping.js"))(this);
     this.handlers["pwl"] = new(require("./baseCommands/pwl.js"))(this);
     this.handlers["rep"] = new(require("./baseCommands/rep.js"))(this);

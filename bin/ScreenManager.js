@@ -385,9 +385,9 @@ ScreenManager.prototype.error = function(message, callback) {
 
 ScreenManager.prototype.print = function(message, callback) {
     if (!this.settings.colour) {
-        process.stdout.write(stripColorCodes(message || "NULL"), callback ? callback : null);
+        process.stdout.write(stripColorCodes(message), callback ? callback : null);
     } else {
-        process.stdout.write(message || "NULL", callback ? callback : null);
+        process.stdout.write(message, callback ? callback : null);
     }
 }
 
@@ -401,6 +401,10 @@ ScreenManager.prototype.clear = function() {
  */
 ScreenManager.prototype.goto = function(x, y) {
     charm.position(x, y);
+}
+
+ScreenManager.prototype.move = function(x, y) {
+    charm.move(x, y);
 }
 
 module.exports = ScreenManager;
