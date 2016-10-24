@@ -267,7 +267,7 @@ ScreenManager.prototype.ready = function(hdb, username, db_name, usage, schema) 
 
         global.censql.graphWidth = process.stdout.columns;
 
-        this.print(colors.bold(colors.green("Censql " + package.version) + " - " + colors.cyan("For help enter \\h\n")));
+        this.print(colors.bold(colors.green("CenSQL " + package.version) + " - " + colors.cyan("For help enter \\h\n")));
         this.print(colors.grey(new Array(process.stdout.columns + 1).join(this.cci.codes.double_pipe_h)) + "\n")
         this.print(this.getPromptText());
         process.stdin.resume();
