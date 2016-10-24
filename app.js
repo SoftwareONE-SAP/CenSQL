@@ -296,8 +296,19 @@ CenSql.prototype.connectToHdb = function(host, user, pass, port, tenant) {
          * If the user specified the command, we do not want to open an interactive session
          */
         if (!argv.command) {
-            this.screen.ready(this.hdb);
-        }else{
+
+            this.hdb.exec("conn", "SELECT (SELECT SYSTEM_ID FROM SYS.M_DATABASE) AS SYSTEM_ID, CURRENT_SCHEMA FROM DUMMY", function(err, data) {
+
+                if (err) {
+                    console.log(err);
+                    process.exit(1);
+                    return;
+                }
+
+                this.screen.ready(this.hdb, user, data[0].SYSTEM_ID, data[0].CURRENT_SCHEMA);
+            }.bind(this))
+
+        } else {
             this.screen.readyBatch();
         }
 
@@ -336,7 +347,10 @@ CenSql.prototype.createScreen = function(settings, callback) {
         {
             handleCommand: function(command, callback) {
                 this.commandHandler.onCommand(command, callback);
-            }.bind(this)
+            }.bind(this),
+            getActiveSchema: function(callback) {
+                this.commandHandler.getActiveSchema(callback);
+            }.bind(this),
         }
     )
 

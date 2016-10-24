@@ -261,4 +261,15 @@ CommandHandler.prototype.stripFormatterIdentifiers = function(string) {
     return string;
 }
 
+CommandHandler.prototype.getActiveSchema = function(callback){
+    this.hdb.exec("conn", "SELECT CURRENT_SCHEMA FROM DUMMY", function(err, data){
+        if(err){
+            callback(err, null);
+            return;
+        }
+
+        callback(null, data[0].CURRENT_SCHEMA);
+    })
+}
+
 module.exports = CommandHandler;

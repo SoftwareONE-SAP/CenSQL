@@ -17,6 +17,14 @@ var ScreenManager = function(isBatch, settings, commandHandler) {
 
     this.cci = new CharacterCodeIndex();
 
+    /**
+     * Info for the prompt
+     * @type {String}
+     */
+    this.current_schema = "UNKNOWN";
+    this.current_username = "UNKNOWN";
+    this.current_sid = "UNKNOWN";
+
     this.commandHandler = commandHandler;
 }
 
@@ -99,7 +107,7 @@ ScreenManager.prototype.setupInput = function() {
         output: process.stdout,
         path: path.join(osHomedir(), ".censql", "censql_hist"),
         maxLength: 2000,
-        prompt: colors.cyan("> "),
+        prompt: "NOT SET",
         next: function(rl) {
             this.rl = rl;
 
@@ -138,32 +146,50 @@ ScreenManager.prototype.setupInput = function() {
                  */
                 this.commandHandler.handleCommand(line, function(err, output) {
 
-                    /**
-                     * Print the command to the screen however the command handler thinks is best
-                     */
-                    this.printCommandOutput(line, output, function() {
+                    if (err) {
+                        console.log(err);
+                    }
+
+                    this.commandHandler.getActiveSchema(function(err, schema) {
+                        if (err) {
+                            console.log(err);
+                            return;
+                        }
 
                         /**
-                         * Re-enable the command line
+                         * Set the active schema
+                         * @type {String}
                          */
-                        process.stdin.resume();
+                        this.current_schema = schema;
 
                         /**
-                         * Reset running app state
-                         * @type {Boolean}
+                         * Print the command to the screen however the command handler thinks is best
                          */
-                        global.censql.RUNNING_PROCESS = false;
+                        this.printCommandOutput(line, output, function() {
 
-                        /**
-                         * Should the running process exit?
-                         * @type {Boolean}
-                         */
-                        global.SHOULD_EXIT = false;
+                            /**
+                             * Re-enable the command line
+                             */
+                            process.stdin.resume();
 
-                        /**
-                         * Reset the keypress function for stdin
-                         */
-                        process.stdin._events.keypress = process.stdin._events._keypress_full;
+                            /**
+                             * Reset running app state
+                             * @type {Boolean}
+                             */
+                            global.censql.RUNNING_PROCESS = false;
+
+                            /**
+                             * Should the running process exit?
+                             * @type {Boolean}
+                             */
+                            global.SHOULD_EXIT = false;
+
+                            /**
+                             * Reset the keypress function for stdin
+                             */
+                            process.stdin._events.keypress = process.stdin._events._keypress_full;
+
+                        }.bind(this));
 
                     }.bind(this));
 
@@ -226,9 +252,13 @@ ScreenManager.prototype.printHeader = function() {
 /**
  * The rest of the program is ready for user input, start listening on stdin
  */
-ScreenManager.prototype.ready = function(hdb) {
+ScreenManager.prototype.ready = function(hdb, username, sid, schema) {
 
     this.clear()
+
+    this.current_username = username;
+    this.current_sid = sid;
+    this.current_schema = schema;
 
     /**
      * Should we enter the cli or studio mode?
@@ -245,7 +275,7 @@ ScreenManager.prototype.ready = function(hdb) {
 
         this.print(colors.bold(colors.green("Censql " + package.version) + " - " + colors.cyan("For help enter \\h\n")));
         this.print(colors.grey(new Array(process.stdout.columns + 1).join(this.cci.codes.double_pipe_h)) + "\n")
-        this.print(colors.cyan("> "));
+        this.print(this.getPromptText());
         process.stdin.resume();
     }
 
@@ -253,6 +283,12 @@ ScreenManager.prototype.ready = function(hdb) {
 
 ScreenManager.prototype.readyBatch = function() {
     global.censql.graphWidth = 80;
+}
+
+ScreenManager.prototype.getPromptText = function() {
+    var prompt = this.current_username.cyan.bold + "@".bold.yellow + this.current_sid.bold + ":".green.bold + (this.current_schema.bold).cyan + ("$".bold + " ");
+    this.rl.setPrompt(prompt);
+    return prompt;
 }
 
 /**
@@ -267,7 +303,7 @@ ScreenManager.prototype.printCommandOutput = function(command, outputs, callback
              * Dont display a prompt for batch requests
              */
             if (!this.isBatch && !dontPrintPrompt) {
-                this.print("\n" + colors.cyan("> "));
+                this.print(this.getPromptText());
             }
 
             callback();
