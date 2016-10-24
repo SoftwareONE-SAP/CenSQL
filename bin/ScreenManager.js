@@ -23,7 +23,7 @@ var ScreenManager = function(isBatch, settings, commandHandler) {
      */
     this.current_schema = "UNKNOWN";
     this.current_username = "UNKNOWN";
-    this.current_sid = "UNKNOWN";
+    this.current_database_name = "UNKNOWN";
     this.current_instance_usage = "UNKNOWN";
 
     this.commandHandler = commandHandler;
@@ -143,7 +143,7 @@ ScreenManager.prototype.setupInput = function() {
                 process.stdin._events._keypress_full = process.stdin._events.keypress;
                 process.stdin._events.keypress = function(ch, key) {
                     if (key && key.ctrl && key.name == 'c') {
-                        global.SHOULD_EXIT = true;
+                        global.censql.SHOULD_EXIT = true;
                     }
                 };
 
@@ -188,7 +188,7 @@ ScreenManager.prototype.setupInput = function() {
                              * Should the running process exit?
                              * @type {Boolean}
                              */
-                            global.SHOULD_EXIT = false;
+                            global.censql.SHOULD_EXIT = false;
 
                             /**
                              * Reset the keypress function for stdin
@@ -220,7 +220,7 @@ ScreenManager.prototype.setupInput = function() {
             this.rl.on('SIGINT', function() {
 
                 if (global.censql.RUNNING_PROCESS) {
-                    global.SHOULD_EXIT = true;
+                    global.censql.SHOULD_EXIT = true;
                     return;
                 }
 
@@ -258,12 +258,12 @@ ScreenManager.prototype.printHeader = function() {
 /**
  * The rest of the program is ready for user input, start listening on stdin
  */
-ScreenManager.prototype.ready = function(hdb, username, sid, usage, schema) {
+ScreenManager.prototype.ready = function(hdb, username, db_name, usage, schema) {
 
     this.clear()
 
     this.current_username = username;
-    this.current_sid = sid;
+    this.current_database_name = db_name;
     this.current_schema = schema;
     this.current_instance_usage = usage;
 
@@ -293,8 +293,25 @@ ScreenManager.prototype.readyBatch = function() {
 }
 
 ScreenManager.prototype.getPromptText = function() {
-    var prompt = (this.current_username == "SYSTEM" ? this.current_username.red : this.current_username.cyan).bold + "@".bold + (this.current_instance_usage == "PRODUCTION" ? this.current_sid.red : (this.current_instance_usage == "TEST" ? this.current_sid.yellow : this.current_sid.green)).bold + ":".green + this.current_schema.cyan + ("$".bold + " ");
+    var prompt = "";
+
+    if (this.settings.promptDetail == "full") {
+        prompt = "";
+        prompt += (this.current_username == "SYSTEM" ? this.current_username.red : this.current_username.cyan).bold;
+        prompt += "@".bold;
+        prompt += (this.current_instance_usage == "PRODUCTION" ? this.current_database_name.red : (this.current_instance_usage == "TEST" ? this.current_database_name.yellow : this.current_database_name.green)).bold;
+        prompt += ":";
+        prompt += this.current_schema.cyan;
+        prompt += " > ".bold;
+
+    }else if (this.settings.promptDetail == "basic") {
+        prompt = this.current_database_name + "> ";
+    }else{
+        prompt = "> "
+    }
+
     this.rl.setPrompt(prompt);
+
     return prompt;
 }
 

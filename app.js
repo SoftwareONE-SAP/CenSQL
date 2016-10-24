@@ -216,6 +216,7 @@ CenSql.prototype.getSettings = function() {
         delete self.save;
         delete self.load;
         delete self.colour;
+        delete self.studio;
 
         var folderLocation = path.dirname(settingsFilePath);
 
@@ -267,6 +268,8 @@ CenSql.prototype.getSettings = function() {
         settings.csv.delimeter = ",";
     }
 
+    if (!settings.promptDetail) settings.promptDetail = "full";
+
     /**
      * Save the defaults
      */
@@ -297,7 +300,7 @@ CenSql.prototype.connectToHdb = function(host, user, pass, port, tenant) {
          */
         if (!argv.command) {
 
-            this.hdb.exec("conn", "SELECT (SELECT SYSTEM_ID FROM SYS.M_DATABASE) AS SYSTEM_ID, (SELECT USAGE FROM SYS.M_DATABASE) AS USAGE, CURRENT_SCHEMA FROM DUMMY", function(err, data) {
+            this.hdb.exec("conn", "SELECT (SELECT DATABASE_NAME FROM SYS.M_DATABASE) AS DATABASE_NAME, (SELECT USAGE FROM SYS.M_DATABASE) AS USAGE, CURRENT_SCHEMA FROM DUMMY", function(err, data) {
 
                 if (err) {
                     console.log(err);
@@ -305,7 +308,7 @@ CenSql.prototype.connectToHdb = function(host, user, pass, port, tenant) {
                     return;
                 }
 
-                this.screen.ready(this.hdb, user, data[0].SYSTEM_ID, data[0].USAGE, data[0].CURRENT_SCHEMA);
+                this.screen.ready(this.hdb, user, data[0].DATABASE_NAME, data[0].USAGE, data[0].CURRENT_SCHEMA);
             }.bind(this))
 
         } else {
