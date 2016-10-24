@@ -24,6 +24,7 @@ var ScreenManager = function(isBatch, settings, commandHandler) {
     this.current_schema = "UNKNOWN";
     this.current_username = "UNKNOWN";
     this.current_sid = "UNKNOWN";
+    this.current_instance_usage = "UNKNOWN";
 
     this.commandHandler = commandHandler;
 }
@@ -252,13 +253,14 @@ ScreenManager.prototype.printHeader = function() {
 /**
  * The rest of the program is ready for user input, start listening on stdin
  */
-ScreenManager.prototype.ready = function(hdb, username, sid, schema) {
+ScreenManager.prototype.ready = function(hdb, username, sid, usage, schema) {
 
     this.clear()
 
     this.current_username = username;
     this.current_sid = sid;
     this.current_schema = schema;
+    this.current_instance_usage = usage;
 
     /**
      * Should we enter the cli or studio mode?
@@ -286,7 +288,7 @@ ScreenManager.prototype.readyBatch = function() {
 }
 
 ScreenManager.prototype.getPromptText = function() {
-    var prompt = this.current_username.cyan.bold + "@".bold.yellow + this.current_sid.bold + ":".green.bold + (this.current_schema.bold).cyan + ("$".bold + " ");
+    var prompt = (this.current_username == "SYSTEM" ? this.current_username.red : this.current_username.cyan).bold + "@".bold + (this.current_instance_usage == "PRODUCTION" ? this.current_sid.red : (this.current_instance_usage == "TEST" ? this.current_sid.yellow : this.current_sid.green)).bold + ":".green.bold + (this.current_schema.bold).cyan + ("$".bold + " ");
     this.rl.setPrompt(prompt);
     return prompt;
 }
