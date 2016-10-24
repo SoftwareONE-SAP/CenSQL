@@ -243,16 +243,6 @@ ScreenManager.prototype.setupInput = function() {
 }
 
 /**
- * Print a pretty header when the user enters interactive mode
- */
-ScreenManager.prototype.printHeader = function() {
-
-    this.print(colors.cyan(colors.bold(colors.underline("Welcome to CenSQL for SAP HANA!\n\n\n"))));
-
-    this.print(colors.yellow("Connecting to HANA..."))
-}
-
-/**
  * The rest of the program is ready for user input, start listening on stdin
  */
 ScreenManager.prototype.ready = function(hdb, username, db_name, usage, schema) {
