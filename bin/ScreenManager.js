@@ -288,7 +288,7 @@ ScreenManager.prototype.readyBatch = function() {
 }
 
 ScreenManager.prototype.getPromptText = function() {
-    var prompt = (this.current_username == "SYSTEM" ? this.current_username.red : this.current_username.cyan).bold + "@".bold + (this.current_instance_usage == "PRODUCTION" ? this.current_sid.red : (this.current_instance_usage == "TEST" ? this.current_sid.yellow : this.current_sid.green)).bold + ":".green.bold + (this.current_schema.bold).cyan + ("$".bold + " ");
+    var prompt = (this.current_username == "SYSTEM" ? this.current_username.red : this.current_username.cyan).bold + "@".bold + (this.current_instance_usage == "PRODUCTION" ? this.current_sid.red : (this.current_instance_usage == "TEST" ? this.current_sid.yellow : this.current_sid.green)).bold + ":".green + this.current_schema.cyan + ("$".bold + " ");
     this.rl.setPrompt(prompt);
     return prompt;
 }

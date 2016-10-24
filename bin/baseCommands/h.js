@@ -72,6 +72,7 @@ HelpCommandHandler.prototype.run = function(command, cParts, conn, screen, callb
                 "",
                 colors.bold("\tAdministraion Commands:"),
                 "\t\\passwd " + colors.grey("{OPTIONAL_USER}") + "\t - Set a password for a user, by default the current user.",
+                "\t\\roles " + colors.grey("{OPTIONAL_USER}") + "\t - Show the active permissions assigned to a user",
                 "",
                 colors.bold("\tHelper Commands:"),
                 "\t\\history " + colors.grey("{OPTIONAL_LIMIT}") + "\t\t - Show censql command history",
