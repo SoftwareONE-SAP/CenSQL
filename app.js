@@ -109,6 +109,12 @@ CenSql.prototype.testSavedConnections = function() {
     var contents = this.connManager.getAll();
     var keys = Object.keys(contents);
 
+    keys = keys.sort(function(a, b){
+        if(a.toLowerCase() > b.toLowerCase()) return 1;
+        if(b.toLowerCase() > a.toLowerCase()) return -1;
+        return 0;
+    })
+
     async.mapLimit(keys, 50, function(key, callback) {
 
         var entry = contents[key];
@@ -177,6 +183,12 @@ CenSql.prototype.showVersion = function() {
 CenSql.prototype.listConfiguredConnectionNames = function() {
     var contents = this.connManager.getAll();
     var names = Object.keys(contents);
+
+    names = names.sort(function(a, b){
+        if(a.toLowerCase() > b.toLowerCase()) return 1;
+        if(b.toLowerCase() > a.toLowerCase()) return -1;
+        return 0;
+    })
 
     var table = new CliTable({
         chars: (new(require("./lib/CharacterCodeIndex.js"))).tableChars
