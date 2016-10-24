@@ -133,6 +133,11 @@ ScreenManager.prototype.setupInput = function() {
                 global.censql.RUNNING_PROCESS = true;
 
                 /**
+                 * hide prompt (fixes bug with resizing terminal whilst a command is running)
+                 */
+                this.rl.setPrompt("");
+
+                /**
                  * Hide user input whilst a command is running (simply pausing stdin still allows scrolling through history)
                  */
                 process.stdin._events._keypress_full = process.stdin._events.keypress;
