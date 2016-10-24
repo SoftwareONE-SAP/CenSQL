@@ -157,16 +157,13 @@ ScreenManager.prototype.setupInput = function() {
                     }
 
                     this.commandHandler.getActiveSchema(function(err, schema) {
-                        if (err) {
-                            console.log(err);
-                            return;
+                        if (!err) {
+                            /**
+                             * Set the active schema
+                             * @type {String}
+                             */
+                            this.current_schema = schema;
                         }
-
-                        /**
-                         * Set the active schema
-                         * @type {String}
-                         */
-                        this.current_schema = schema;
 
                         /**
                          * Print the command to the screen however the command handler thinks is best
@@ -295,7 +292,7 @@ ScreenManager.prototype.readyBatch = function() {
 ScreenManager.prototype.getPromptText = function() {
     var prompt = "";
 
-    if (this.settings.promptDetail == "full") {
+    if (this.settings.promptDetail == "full" && this.current_username && this.current_database_name && this.current_instance_usage) {
         prompt = "";
         prompt += (this.current_username == "SYSTEM" ? this.current_username.red : this.current_username.cyan).bold;
         prompt += "@".bold;
@@ -304,9 +301,9 @@ ScreenManager.prototype.getPromptText = function() {
         prompt += this.current_schema.cyan;
         prompt += " > ".bold;
 
-    }else if (this.settings.promptDetail == "basic") {
+    } else if (this.settings.promptDetail == "basic") {
         prompt = this.current_database_name + "> ";
-    }else{
+    } else {
         prompt = "> "
     }
 

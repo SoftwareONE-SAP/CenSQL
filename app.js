@@ -303,12 +303,12 @@ CenSql.prototype.connectToHdb = function(host, user, pass, port, tenant) {
             this.hdb.exec("conn", "SELECT (SELECT DATABASE_NAME FROM SYS.M_DATABASE) AS DATABASE_NAME, (SELECT USAGE FROM SYS.M_DATABASE) AS USAGE, CURRENT_SCHEMA FROM DUMMY", function(err, data) {
 
                 if (err) {
-                    console.log(err);
-                    process.exit(1);
+                    this.screen.ready(this.hdb, user, null, null, null);
                     return;
+                }else{                
+                    this.screen.ready(this.hdb, user, data[0].DATABASE_NAME, data[0].USAGE, data[0].CURRENT_SCHEMA);
                 }
 
-                this.screen.ready(this.hdb, user, data[0].DATABASE_NAME, data[0].USAGE, data[0].CURRENT_SCHEMA);
             }.bind(this))
 
         } else {
