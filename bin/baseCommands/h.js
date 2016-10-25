@@ -80,6 +80,7 @@ HelpCommandHandler.prototype.run = function(command, cParts, conn, screen, callb
                 "\t\\head {SCHEMA.TABLE} {ORDER_COLUMN} " + colors.grey("{OPTIONAL_LIMIT}") + "\t- View the first N tows of a table ordered by a column",
                 "\t\\tail {SCHEMA.TABLE} {ORDER_COLUMN} " + colors.grey("{OPTIONAL_LIMIT}") + "\t- View the last N tows of a table ordered by a column",
                 "\t\\watch " + colors.grey("-i {DELAY_IN_SECONDS}") + " {COMMAND}\t\t\t- Run a command over and over again with a delay",
+                "\t\\time " + "{COMMAND}\t\t\t\t\t\t- Run a command and return the time taken with the results",
                 "",
                 colors.bold("\tSettings:") + colors.grey(" Internal commands for censql settings and config"),
                 "\t\\sgh\t\t\t\t\t - Set the height to draw graphs",
