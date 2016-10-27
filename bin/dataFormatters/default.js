@@ -8,6 +8,11 @@ module.exports = function(command, data, title, screen){
 		formatterTag = command.slice(formatterIndex).substring(1);
 	}
 
+	if(typeof data == "number"){
+		return require("./affected-rows.js")(command, data);
+		return;
+	}
+
 	switch(formatterTag.toLowerCase().split(" ")[0]){
 		case "g":
 		case "group":
