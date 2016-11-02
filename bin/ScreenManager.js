@@ -8,7 +8,9 @@ var osHomedir = require('os-homedir');
 var StudioSession = require("./studio/StudioSession.js");
 var StudioGraphics = require("./studio/StudioGraphics.js");
 var CharacterCodeIndex = require("../lib/CharacterCodeIndex.js");
-var package = require("../package.json");
+var pkg = require("../package.json");
+var updateNotifier = require('update-notifier');
+var boxen = require('boxen');
 
 var ScreenManager = function(isBatch, settings, commandHandler) {
     this.isBatch = isBatch;
@@ -16,6 +18,10 @@ var ScreenManager = function(isBatch, settings, commandHandler) {
     this.settings = settings;
 
     this.cci = new CharacterCodeIndex();
+
+    this.notifier = updateNotifier({
+        pkg
+    });
 
     /**
      * Info for the prompt
@@ -267,8 +273,19 @@ ScreenManager.prototype.ready = function(hdb, username, db_name, usage, schema) 
 
         global.censql.graphWidth = process.stdout.columns;
 
-        this.print(colors.bold(colors.green("CenSQL " + package.version) + " - " + colors.cyan("For help enter \\h\n")));
+        this.print(colors.bold(colors.green("CenSQL " + pkg.version) + " - " + colors.cyan("For help enter \\h\n")));
         this.print(colors.grey(new Array(process.stdout.columns + 1).join(this.cci.codes.double_pipe_h)) + "\n")
+
+        if (this.notifier.update) {
+            this.print(
+                boxen("" + "Update Available!".bold.green + "\n" +
+                    this.notifier.update.current.green + " -> ".cyan + this.notifier.update.latest.green.bold + "\n" +
+                    "Run: ".cyan.bold + "npm install -g censql".cyan, {
+                        padding: 1,
+                        margin: 1
+                    }) + "\n");
+        }
+
         this.print(this.getPromptText());
         process.stdin.resume();
     }

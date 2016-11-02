@@ -23,6 +23,7 @@
   "dependencies": {
     "ansi-substring": "^1.0.3",
     "async": "^2.1.2",
+    "boxen": "^0.8.1",
     "charm": "^1.0.1",
     "cli-table": "^0.3.1",
     "colors": "^1.1.2",
@@ -35,7 +36,8 @@
     "optimist": "^0.6.1",
     "os-homedir": "^1.0.2",
     "pad": "^1.0.2",
-    "stripcolorcodes": "^0.1.0"
+    "stripcolorcodes": "^0.1.0",
+    "update-notifier": "^1.0.2"
   },
   "bin": {
     "censql": "./app.js"
