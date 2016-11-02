@@ -20,7 +20,8 @@ var ScreenManager = function(isBatch, settings, commandHandler) {
     this.cci = new CharacterCodeIndex();
 
     this.notifier = updateNotifier({
-        pkg
+        pkg,
+        updateCheckInterval: 1000 * 60 * 60 * 24 * 7 // Check once a week
     });
 
     /**
@@ -278,12 +279,11 @@ ScreenManager.prototype.ready = function(hdb, username, db_name, usage, schema) 
 
         if (this.notifier.update) {
             this.print(
-                boxen("" + "Update Available!".bold.green + "\n" +
-                    this.notifier.update.current.green + " -> ".cyan + this.notifier.update.latest.green.bold + "\n" +
-                    "Run: ".cyan.bold + "npm install -g censql".cyan, {
-                        padding: 1,
-                        margin: 1
-                    }) + "\n");
+                boxen("" + "Update Available:".bold.green + " " +  this.notifier.update.current.green + " -> ".cyan + this.notifier.update.latest.green.bold + "\n" + 
+                        "Run: ".cyan.bold + "npm install -g censql".cyan + " to update".cyan.bold, {
+                    padding: 1,
+                    margin: 1
+                }) + "\n");
         }
 
         this.print(this.getPromptText());
