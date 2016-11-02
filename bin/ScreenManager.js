@@ -46,8 +46,6 @@ ScreenManager.prototype.init = function() {
     if (!this.isBatch) {
         this.setupInput();
     }
-
-
 }
 
 ScreenManager.prototype.loadPipeHandlers = function() {
