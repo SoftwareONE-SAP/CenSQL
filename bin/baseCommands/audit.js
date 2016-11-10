@@ -27,13 +27,22 @@ AuditCommandHandler.prototype.run = function(command, cParts, conn, screen, call
 
     async.map(toRun, function(key, callback){
 
-    	handlers[key].run(command, cParts, conn, screen, function(output){
+    	handlers[key].run(key, [key], conn, screen, function(output){
     		
     		output.unshift(key)
 
-    		// screen.renderCommandOutput(command, [output], callback)
-    		
-    		callback(null, null);
+    		screen.renderCommandOutput(key, [output], function(err, data){
+    			if(err){
+    				callback(err, null);
+    				return;
+    			}
+
+    			if(data.length == 0){
+    				data = ["Nothing returned"]
+    			}
+
+    			callback(null, [key, data[0]])
+    		})
 
     	})
 
@@ -46,14 +55,16 @@ AuditCommandHandler.prototype.run = function(command, cParts, conn, screen, call
 		var output = "";
 
 		for (var i = 0; i < data.length; i++) {
-			for (var k = 0; k < data[i].length; k++) {
-				output += data[i][k] + "\n";
+
+			if(!data[i]){
+				continue;
 			}
+
+			output += ("\\" + data[i][0]).cyan + "\n";
+			output += data[i][1].join("\n") + "\n\n";
 		}
 
-		// console.log(output);
-
-		callback([0, "output", "message"]);
+		callback([0, output, "message"]);
     });
 
 }
