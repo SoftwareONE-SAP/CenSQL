@@ -1,6 +1,6 @@
 
 var UnloadsCommandHandler = function(){
-	this.description = "";
+	this.includeInAudit = true;
 }
 
 UnloadsCommandHandler.prototype.run = function(command, cParts, conn, screen, callback){

@@ -1,6 +1,6 @@
 
 var BackupViewCommandHandler = function(){
-	this.description = "";
+	this.includeInAudit = true;
 }
 
 BackupViewCommandHandler.prototype.run = function(command, cParts, conn, screen, callback){

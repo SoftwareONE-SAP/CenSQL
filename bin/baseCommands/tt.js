@@ -1,6 +1,6 @@
 
 var TopTablesCommandHandler = function(){
-	this.description = "";
+	this.includeInAudit = true;
 }
 
 TopTablesCommandHandler.prototype.run = function(command, cParts, conn, screen, callback){

@@ -1,6 +1,6 @@
 
 var PeakWorkloadCommandHandler = function(){
-	this.description = "";
+	this.includeInAudit = true;
 }
 
 PeakWorkloadCommandHandler.prototype.run = function(command, cParts, conn, screen, callback){

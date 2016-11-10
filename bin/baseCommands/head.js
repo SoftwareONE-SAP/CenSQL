@@ -1,7 +1,7 @@
 var async = require("async");
 
 var TableHeadCommandHandler = function() {
-	this.description = "";
+	this.includeInAudit = false
 }
 
 TableHeadCommandHandler.prototype.run = function(command, cParts, conn, screen, callback) {

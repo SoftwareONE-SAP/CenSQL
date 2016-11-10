@@ -1,5 +1,5 @@
 var LongRunningStatementsCommandHandler = function(){
-	this.description = "";
+	this.includeInAudit = false
 }
 
 LongRunningStatementsCommandHandler.prototype.run = function(command, cParts, conn, screen, callback){

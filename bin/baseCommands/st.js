@@ -1,6 +1,6 @@
 
 var StatusCommandHandler = function(){
-	this.description = "";
+	this.includeInAudit = true;
 }
 
 StatusCommandHandler.prototype.run = function(command, cParts, conn, screen, callback){

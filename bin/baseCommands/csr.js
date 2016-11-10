@@ -1,6 +1,6 @@
 
 var CsReadCountCommandHandler = function(){
-	this.description = "";
+	this.includeInAudit = false
 }
 
 CsReadCountCommandHandler.prototype.run = function(command, cParts, conn, screen, callback){

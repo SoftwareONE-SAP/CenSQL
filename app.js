@@ -11,6 +11,8 @@ var osHomedir = require('os-homedir');
 var fs = require("fs");
 var SavedConnectionManager = require("./bin/SavedConnectionManager.js");
 var CliTable = require('cli-table');
+var pkg = require("./package.json");
+var username = require('username');
 
 var CenSql = function() {
 
@@ -109,9 +111,9 @@ CenSql.prototype.testSavedConnections = function() {
     var contents = this.connManager.getAll();
     var keys = Object.keys(contents);
 
-    keys = keys.sort(function(a, b){
-        if(a.toLowerCase() > b.toLowerCase()) return 1;
-        if(b.toLowerCase() > a.toLowerCase()) return -1;
+    keys = keys.sort(function(a, b) {
+        if (a.toLowerCase() > b.toLowerCase()) return 1;
+        if (b.toLowerCase() > a.toLowerCase()) return -1;
         return 0;
     })
 
@@ -173,9 +175,7 @@ CenSql.prototype.testSavedConnections = function() {
 }
 
 CenSql.prototype.showVersion = function() {
-    var package = require("./package.json");
-
-    console.log(package.version)
+    console.log(pkg.version)
 
     process.exit(0);
 }
@@ -184,9 +184,9 @@ CenSql.prototype.listConfiguredConnectionNames = function() {
     var contents = this.connManager.getAll();
     var names = Object.keys(contents);
 
-    names = names.sort(function(a, b){
-        if(a.toLowerCase() > b.toLowerCase()) return 1;
-        if(b.toLowerCase() > a.toLowerCase()) return -1;
+    names = names.sort(function(a, b) {
+        if (a.toLowerCase() > b.toLowerCase()) return 1;
+        if (b.toLowerCase() > a.toLowerCase()) return -1;
         return 0;
     })
 
@@ -307,38 +307,70 @@ CenSql.prototype.connectToHdb = function(host, user, pass, port, tenant) {
             return;
         }
 
-        /**
-         * If the user specified the command, we do not want to open an interactive session
-         */
-        if (!argv.command) {
+        this.setConnectionMetaData("conn", function(err) {
 
-            this.hdb.exec("conn", "SELECT (SELECT DATABASE_NAME FROM SYS.M_DATABASE) AS DATABASE_NAME, (SELECT USAGE FROM SYS.M_DATABASE) AS USAGE, CURRENT_SCHEMA FROM DUMMY", function(err, data) {
+            if (err) {
+                this.screen.error(err.message + "\n", function() {
+                    process.exit(1);
+                });
 
-                if (err) {
-                    this.screen.ready(this.hdb, user, null, null, null);
-                    return;
-                }else{                
-                    this.screen.ready(this.hdb, user, data[0].DATABASE_NAME, data[0].USAGE, data[0].CURRENT_SCHEMA);
-                }
+                return;
+            }
 
-            }.bind(this))
+            /**
+             * If the user specified the command, we do not want to open an interactive session
+             */
+            if (!argv.command) {
 
-        } else {
-            this.screen.readyBatch();
-        }
+                this.hdb.exec("conn", "SELECT (SELECT DATABASE_NAME FROM SYS.M_DATABASE) AS DATABASE_NAME, (SELECT USAGE FROM SYS.M_DATABASE) AS USAGE, CURRENT_SCHEMA FROM DUMMY", function(err, data) {
 
-        /**
-         * Create a new command handler
-         */
-        this.commandHandler = new CommandHandler(this.screen, this.hdb, argv.command, this.settings);
+                    if (err) {
+                        this.screen.ready(this.hdb, user, null, null, null);
+                        return;
+                    } else {
+                        this.screen.ready(this.hdb, user, data[0].DATABASE_NAME, data[0].USAGE, data[0].CURRENT_SCHEMA);
+                    }
 
-        /**
-         * Allow user inpput from now on
-         * @type {Boolean}
-         */
-        global.censql.RUNNING_PROCESS = false;
+                }.bind(this))
+
+            } else {
+                this.screen.readyBatch();
+            }
+
+            /**
+             * Create a new command handler
+             */
+            this.commandHandler = new CommandHandler(this.screen, this.hdb, argv.command, this.settings);
+
+            /**
+             * Allow user inpput from now on
+             * @type {Boolean}
+             */
+            global.censql.RUNNING_PROCESS = false;
+
+        }.bind(this))
 
     }.bind(this))
+}
+
+CenSql.prototype.setConnectionMetaData = function(connId, callback) {
+    async.parallel([
+
+        function(callback) {
+            this.hdb.exec("conn", "SET 'APPLICATION' = 'CenSQL'", callback)
+        }.bind(this),
+
+        function(callback) {
+            this.hdb.exec("conn", "SET 'APPLICATIONVERSION' = '" + pkg.version + "'", callback)
+        }.bind(this),
+
+        function(callback) {
+            this.hdb.exec("conn", "SET 'APPLICATIONUSER' = '" + username.sync() + "'", callback)
+        }.bind(this)
+
+    ], function(err, res) {
+        callback(err, null);
+    })
 }
 
 CenSql.prototype.createScreen = function(settings, callback) {
@@ -366,6 +398,9 @@ CenSql.prototype.createScreen = function(settings, callback) {
             getActiveSchema: function(callback) {
                 this.commandHandler.getActiveSchema(callback);
             }.bind(this),
+            getHandlers: function() {
+                return this.commandHandler.handlers
+            }.bind(this)
         }
     )
 

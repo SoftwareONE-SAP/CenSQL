@@ -1,6 +1,6 @@
 
 var SharedMemoryCommandHandler = function(){
-	this.description = "";
+	this.includeInAudit = false
 }
 
 SharedMemoryCommandHandler.prototype.run = function(command, cParts, conn, screen, callback){

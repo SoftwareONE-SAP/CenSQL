@@ -1,6 +1,6 @@
 
 var TableViewCommandHandler = function(){
-	this.description = "";
+	this.includeInAudit = false
 }
 
 TableViewCommandHandler.prototype.run = function(command, cParts, conn, screen, callback){

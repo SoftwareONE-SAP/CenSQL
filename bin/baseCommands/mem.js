@@ -1,6 +1,6 @@
 
 var MemUsageCommandHandler = function(){
-	this.description = "";
+	this.includeInAudit = false
 }
 
 MemUsageCommandHandler.prototype.run = function(command, cParts, conn, screen, callback){

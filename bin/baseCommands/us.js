@@ -1,6 +1,6 @@
 
 var UserViewCommandHandler = function(){
-	this.description = "";
+	this.includeInAudit = false;
 }
 
 UserViewCommandHandler.prototype.run = function(command, cParts, conn, screen, callback){

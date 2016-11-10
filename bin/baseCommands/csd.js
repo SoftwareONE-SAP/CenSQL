@@ -1,6 +1,6 @@
 
 var CsMemDeltaCommandHandler = function(){
-	this.description = "";
+	this.includeInAudit = false
 }
 
 CsMemDeltaCommandHandler.prototype.run = function(command, cParts, conn, screen, callback){

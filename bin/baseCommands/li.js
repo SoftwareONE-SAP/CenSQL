@@ -1,6 +1,6 @@
 
 var LicenseCommandHandler = function(){
-	this.description = "";
+	this.includeInAudit = true;
 }
 
 LicenseCommandHandler.prototype.run = function(command, cParts, conn, screen, callback){

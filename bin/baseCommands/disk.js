@@ -1,6 +1,6 @@
 
 var DiskViewCommandHandler = function(){
-	this.description = "";
+	this.includeInAudit = true;
 }
 
 DiskViewCommandHandler.prototype.run = function(command, cParts, conn, screen, callback){

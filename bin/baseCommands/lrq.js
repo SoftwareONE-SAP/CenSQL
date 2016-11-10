@@ -1,5 +1,5 @@
 var LongRunningQueriesCommandHandler = function(){
-	this.description = "";
+	this.includeInAudit = false
 }
 
 LongRunningQueriesCommandHandler.prototype.run = function(command, cParts, conn, screen, callback){

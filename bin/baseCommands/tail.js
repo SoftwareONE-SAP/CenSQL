@@ -1,7 +1,7 @@
 var async = require("async");
 
 var TableTailCommandHandler = function() {
-	this.description = "";
+	this.includeInAudit = false
 }
 
 TableTailCommandHandler.prototype.run = function(command, cParts, conn, screen, callback) {

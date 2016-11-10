@@ -1,6 +1,6 @@
 
 var ConnectionsCommandHandler = function(){
-	this.description = "";
+	this.includeInAudit = true;
 }
 
 ConnectionsCommandHandler.prototype.run = function(command, cParts, conn, screen, callback){

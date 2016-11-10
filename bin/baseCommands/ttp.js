@@ -1,7 +1,7 @@
 var async = require("async");
 
 var TopTablesPercentCommandHandler = function() {
-	this.description = "";
+	this.includeInAudit = false
 }
 
 TopTablesPercentCommandHandler.prototype.run = function(command, cParts, conn, screen, callback) {

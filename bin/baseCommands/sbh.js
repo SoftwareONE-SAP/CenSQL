@@ -1,6 +1,6 @@
 
 var SetBarHeightCommandHandler = function(){
-	this.description = "";
+	this.includeInAudit = false
 }
 
 SetBarHeightCommandHandler.prototype.run = function(command, cParts, conn, screen, callback){

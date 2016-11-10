@@ -1,6 +1,6 @@
 
 var LogBackupViewCommandHandler = function(){
-	this.description = "";
+	this.includeInAudit = true;
 }
 
 LogBackupViewCommandHandler.prototype.run = function(command, cParts, conn, screen, callback){

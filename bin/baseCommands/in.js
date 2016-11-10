@@ -1,6 +1,6 @@
 
 var InstancesCommandHandler = function(){
-	this.description = "";
+	this.includeInAudit = true;
 }
 
 InstancesCommandHandler.prototype.run = function(command, cParts, conn, screen, callback){

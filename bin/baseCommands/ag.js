@@ -1,6 +1,6 @@
 
 var AgentsCommandHandler = function(){
-	this.description = "";
+	this.includeInAudit = true;
 }
 
 AgentsCommandHandler.prototype.run = function(command, cParts, conn, screen, callback){

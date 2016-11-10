@@ -1,7 +1,7 @@
 var async = require("async")
 
 var PingCommandHandler = function() {
-    this.description = "Ping the HANA instance by making a new connection";
+    this.includeInAudit = true;
 }
 
 PingCommandHandler.prototype.run = function(command, cParts, conn, screen, callback) {

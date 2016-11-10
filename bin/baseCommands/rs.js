@@ -1,6 +1,6 @@
 
 var RemoteSourcesCommandHandler = function(){
-	this.description = "";
+	this.includeInAudit = true;
 }
 
 RemoteSourcesCommandHandler.prototype.run = function(command, cParts, conn, screen, callback){

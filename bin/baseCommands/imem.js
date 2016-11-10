@@ -1,6 +1,6 @@
 
 var InstanceMemoryCommandHandler = function(){
-	this.description = "";
+	this.includeInAudit = false
 }
 
 InstanceMemoryCommandHandler.prototype.run = function(command, cParts, conn, screen, callback){

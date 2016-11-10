@@ -1,6 +1,6 @@
 
 var AdaptersCommandHandler = function(){
-	this.description = "";
+	this.includeInAudit = true;
 }
 
 AdaptersCommandHandler.prototype.run = function(command, cParts, conn, screen, callback){

@@ -1,7 +1,7 @@
 var SavedConnectionManager = require("../SavedConnectionManager.js");
 
 var SaveConnectionCommandHandler = function(){
-	this.description = "";
+	this.includeInAudit = false;
 
 	this.connManager = new SavedConnectionManager();
 }

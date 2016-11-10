@@ -1,6 +1,6 @@
 
 var HistoryCommandHandler = function(){
-	this.description = "";
+	this.includeInAudit = false
 }
 
 HistoryCommandHandler.prototype.run = function(command, cParts, conn, screen, callback){

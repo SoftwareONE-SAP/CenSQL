@@ -1,6 +1,6 @@
 
 var RowStorageCommandHandler = function(){
-	this.description = "";
+	this.includeInAudit = false;
 }
 
 RowStorageCommandHandler.prototype.run = function(command, cParts, conn, screen, callback){

@@ -1,5 +1,5 @@
 var TablePreviewCommandHandler = function(){
-	this.description = "";
+	this.includeInAudit = false
 }
 
 TablePreviewCommandHandler.prototype.run = function(command, cParts, conn, screen, callback){

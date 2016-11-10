@@ -1,6 +1,6 @@
 
 var AlertsCommandHandler = function(){
-	this.description = "";
+	this.includeInAudit = true;
 }
 
 AlertsCommandHandler.prototype.run = function(command, cParts, conn, screen, callback){

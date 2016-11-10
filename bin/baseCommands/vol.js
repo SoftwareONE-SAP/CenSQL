@@ -1,6 +1,6 @@
 
 var VolumeCommandHandler = function(){
-	this.description = "";
+	this.includeInAudit = true;
 }
 
 VolumeCommandHandler.prototype.run = function(command, cParts, conn, screen, callback){

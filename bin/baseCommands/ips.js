@@ -1,7 +1,7 @@
 var async = require("async")
 
 var InsertsPerSecondHandler = function() {
-	this.description = "";
+	this.includeInAudit = false
 }
 
 InsertsPerSecondHandler.prototype.run = function(command, cParts, conn, screen, callback) {

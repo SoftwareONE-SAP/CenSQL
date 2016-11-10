@@ -1,6 +1,6 @@
 
 var CsMemoryCommandHandler = function(){
-	this.description = "";
+	this.includeInAudit = false
 }
 
 CsMemoryCommandHandler.prototype.run = function(command, cParts, conn, screen, callback){

@@ -1,6 +1,6 @@
 
 var LogsSizeCommandHandler = function(){
-	this.description = "";
+	this.includeInAudit = true;
 }
 
 LogsSizeCommandHandler.prototype.run = function(command, cParts, conn, screen, callback){

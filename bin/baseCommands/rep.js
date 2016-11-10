@@ -1,6 +1,6 @@
 
 var ReplicationCommandHandler = function(){
-	this.description = "";
+	this.includeInAudit = true;
 }
 
 ReplicationCommandHandler.prototype.run = function(command, cParts, conn, screen, callback){

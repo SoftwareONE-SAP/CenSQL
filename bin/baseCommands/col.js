@@ -1,5 +1,5 @@
 var ShowColumnsCommandHandler = function(){
-	this.description = "";
+	this.includeInAudit = false
 }
 
 ShowColumnsCommandHandler.prototype.run = function(command, cParts, conn, screen, callback){

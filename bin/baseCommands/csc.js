@@ -1,6 +1,6 @@
 
 var CsRecordCountCommandHandler = function(){
-	this.description = "";
+	this.includeInAudit = false
 }
 
 CsRecordCountCommandHandler.prototype.run = function(command, cParts, conn, screen, callback){

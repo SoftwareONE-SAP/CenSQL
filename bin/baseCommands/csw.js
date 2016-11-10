@@ -1,6 +1,6 @@
 
 var CsWriteCountCommandHandler = function(){
-	this.description = "";
+	this.includeInAudit = false
 }
 
 CsWriteCountCommandHandler.prototype.run = function(command, cParts, conn, screen, callback){

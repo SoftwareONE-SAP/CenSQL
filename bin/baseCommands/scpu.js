@@ -1,6 +1,6 @@
 
 var ServiceCpuCommandHandler = function(){
-	this.description = "";
+	this.includeInAudit = false
 }
 
 ServiceCpuCommandHandler.prototype.run = function(command, cParts, conn, screen, callback){

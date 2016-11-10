@@ -1,6 +1,6 @@
 
 var ServicesCommandHandler = function(){
-	this.description = "";
+	this.includeInAudit = true;
 }
 
 ServicesCommandHandler.prototype.run = function(command, cParts, conn, screen, callback){

@@ -1,6 +1,6 @@
 
 var TracefileContentCommandHandler = function(){
-	this.description = "";
+	this.includeInAudit = false
 }
 
 TracefileContentCommandHandler.prototype.run = function(command, cParts, conn, screen, callback){

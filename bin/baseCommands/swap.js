@@ -1,6 +1,6 @@
 
 var SwapUsageCommandHandler = function(){
-	this.description = "";
+	this.includeInAudit = false
 }
 
 SwapUsageCommandHandler.prototype.run = function(command, cParts, conn, screen, callback){

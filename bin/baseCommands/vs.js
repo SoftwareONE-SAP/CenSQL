@@ -1,6 +1,6 @@
 
 var ViewsViewCommandHandler = function(){
-	this.description = "";
+	this.includeInAudit = false
 }
 
 ViewsViewCommandHandler.prototype.run = function(command, cParts, conn, screen, callback){

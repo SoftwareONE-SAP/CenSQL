@@ -1,6 +1,6 @@
 
 var WorkloadCommandHandler = function(){
-	this.description = "";
+	this.includeInAudit = true;
 }
 
 WorkloadCommandHandler.prototype.run = function(command, cParts, conn, screen, callback){

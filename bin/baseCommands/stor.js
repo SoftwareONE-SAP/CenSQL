@@ -1,6 +1,6 @@
 
 var StorageChartCommandHandler = function(){
-	this.description = "";
+	this.includeInAudit = false
 }
 
 StorageChartCommandHandler.prototype.run = function(command, cParts, conn, screen, callback){

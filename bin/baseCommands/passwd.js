@@ -1,7 +1,7 @@
 var SavedConnectionManager = require("../SavedConnectionManager.js");
 
 var PasswordCommandHandler = function() {
-	this.description = "";
+	this.includeInAudit = false
 }
 
 PasswordCommandHandler.prototype.run = function(command, cParts, conn, screen, callback) {

@@ -1,6 +1,6 @@
 
 var SetGraphHeightCommandHandler = function(){
-	this.description = "";
+	this.includeInAudit = false
 }
 
 SetGraphHeightCommandHandler.prototype.run = function(command, cParts, conn, screen, callback){

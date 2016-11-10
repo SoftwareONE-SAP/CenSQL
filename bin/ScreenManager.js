@@ -270,11 +270,20 @@ ScreenManager.prototype.ready = function(hdb, username, db_name, usage, schema) 
         this.studio = new StudioSession(this, hdb, this.commandHandler);
     } else {
 
+        /**
+         * Get width of terminal
+         */
         global.censql.graphWidth = process.stdout.columns;
 
+        /**
+         * Print header
+         */
         this.print(colors.bold(colors.green("CenSQL " + pkg.version) + " - " + colors.cyan("For help enter \\h\n")));
         this.print(colors.grey(new Array(process.stdout.columns + 1).join(this.cci.codes.double_pipe_h)) + "\n")
 
+        /**
+         * Print update notification if there is a new version of censql
+         */
         if (this.notifier.update) {
             this.print(
                 boxen("" + "Update Available:".bold.green + " " +  this.notifier.update.current.green + " -> ".cyan + this.notifier.update.latest.green.bold + "\n" + 
@@ -284,6 +293,9 @@ ScreenManager.prototype.ready = function(hdb, username, db_name, usage, schema) 
                 }) + "\n");
         }
 
+        /**
+         * Start prompt
+         */
         this.print(this.getPromptText());
         process.stdin.resume();
     }
@@ -393,7 +405,6 @@ ScreenManager.prototype.renderCommandOutput = function(command, outputs, callbac
     cParts.unshift(initialCommand);
 
     async.mapSeries(outputs, function(output, callback) {
-
         /**
          * Pass the data to the chosen formatter
          */

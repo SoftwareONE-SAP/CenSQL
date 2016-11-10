@@ -1,6 +1,6 @@
 
 var TotalMemoryCommandHandler = function(){
-	this.description = "";
+	this.includeInAudit = false
 }
 
 TotalMemoryCommandHandler.prototype.run = function(command, cParts, conn, screen, callback){

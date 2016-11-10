@@ -1,6 +1,6 @@
 
 var SchemaViewCommandHandler = function(){
-	this.description = "";
+	this.includeInAudit = false;
 }
 
 SchemaViewCommandHandler.prototype.run = function(command, cParts, conn, screen, callback){

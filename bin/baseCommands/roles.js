@@ -1,5 +1,5 @@
 var RolesCommandHandler = function(){
-	this.description = "";
+	this.includeInAudit = false;
 }
 
 RolesCommandHandler.prototype.run = function(command, cParts, conn, screen, callback){
