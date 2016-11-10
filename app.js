@@ -39,11 +39,24 @@ var CenSql = function() {
      */
     this.settings = this.getSettings();
 
+    /**
+     * Init hana library
+     * @type {HDB}
+     */
+    this.hdb = new HDB();
+
     async.series([
         this.createFolderIfNeeded.bind(this),
         this.showHelpTextIfNeeded.bind(this),
         function(callback) {
             this.createScreen(this.settings, callback);
+        }.bind(this),
+        function(callback) {
+            /**
+             * Create a new command handler
+             */
+            this.commandHandler = new CommandHandler(this.screen, this.hdb, argv.command, this.settings);
+            callback(null, null);
         }.bind(this)
 
     ], function() {
@@ -292,8 +305,6 @@ CenSql.prototype.getSettings = function() {
 
 CenSql.prototype.connectToHdb = function(host, user, pass, port, tenant) {
 
-    this.hdb = new HDB();
-
     /**
      * Connect to HANA with the login info supplied by the user
      */
@@ -318,39 +329,46 @@ CenSql.prototype.connectToHdb = function(host, user, pass, port, tenant) {
             }
 
             /**
-             * If the user specified the command, we do not want to open an interactive session
+             * If the user specified the command run it, otherwise, open an interactive session
              */
             if (!argv.command) {
-
-                this.hdb.exec("conn", "SELECT (SELECT DATABASE_NAME FROM SYS.M_DATABASE) AS DATABASE_NAME, (SELECT USAGE FROM SYS.M_DATABASE) AS USAGE, CURRENT_SCHEMA FROM DUMMY", function(err, data) {
-
-                    if (err) {
-                        this.screen.ready(this.hdb, user, null, null, null);
-                        return;
-                    } else {
-                        this.screen.ready(this.hdb, user, data[0].DATABASE_NAME, data[0].USAGE, data[0].CURRENT_SCHEMA);
-                    }
-
-                }.bind(this))
-
+                this.startCLI(user);
             } else {
-                this.screen.readyBatch();
+                this.runBatchCommand();
             }
-
-            /**
-             * Create a new command handler
-             */
-            this.commandHandler = new CommandHandler(this.screen, this.hdb, argv.command, this.settings);
-
-            /**
-             * Allow user inpput from now on
-             * @type {Boolean}
-             */
-            global.censql.RUNNING_PROCESS = false;
 
         }.bind(this))
 
     }.bind(this))
+}
+
+CenSql.prototype.startCLI = function(user) {
+    this.hdb.exec("conn", "SELECT (SELECT DATABASE_NAME FROM SYS.M_DATABASE) AS DATABASE_NAME, (SELECT USAGE FROM SYS.M_DATABASE) AS USAGE, CURRENT_SCHEMA FROM DUMMY", function(err, data) {
+
+        /**
+         * Allow user inpput from now on
+         * @type {Boolean}
+         */
+        global.censql.RUNNING_PROCESS = false;
+
+        if (err) {
+            this.screen.ready(this.hdb, user, null, null, null);
+            return;
+        } else {
+            this.screen.ready(this.hdb, user, data[0].DATABASE_NAME, data[0].USAGE, data[0].CURRENT_SCHEMA);
+        }
+
+    }.bind(this))
+}
+
+CenSql.prototype.runBatchCommand = function() {
+    this.screen.readyBatch();
+    
+    this.commandHandler.onCommand(argv.command, function(err, output) {
+        this.screen.printCommandOutput(argv.command, output, function() {
+            process.exit(0)
+        });
+    }.bind(this));
 }
 
 CenSql.prototype.setConnectionMetaData = function(connId, callback) {

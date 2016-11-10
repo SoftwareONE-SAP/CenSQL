@@ -7,18 +7,6 @@ var CommandHandler = function(screen, hdb, command, settings) {
     this.settings = settings;
 
     this.loadCommandHandlers();
-
-    /**
-     * If in batch mode, run command and exit
-     */
-    if (command) {
-        this.onCommand(command, function(err, output) {
-            this.screen.printCommandOutput(command, output, function() {
-                process.exit(0)
-            });
-        }.bind(this));
-    }
-
 }
 
 /**
