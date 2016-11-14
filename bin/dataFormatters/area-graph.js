@@ -12,7 +12,7 @@ var AreaGraph = function(command, data, title, screen) {
     this.emptyPointChar = "-";
     this.widthRatio = Math.floor((global.censql.graphWidth - 3) / (this.data.length));
 
-    this.chars = [this.screen.cci.codes.block_faded_min.blue, this.screen.cci.codes.block_whole.green, this.screen.cci.codes.block_faded_mid.cyan, this.screen.cci.codes.block_faded_max]
+    this.chars = [this.screen.cci.codes.block_faded_min.blue, this.screen.cci.codes.block_whole.green, this.screen.cci.codes.block_faded_mid.cyan, this.screen.cci.codes.block_faded_max.red, this.screen.cci.codes.block_faded_max.yellow]
 
     /**
      * get this.keys
@@ -62,19 +62,19 @@ AreaGraph.prototype.render = function() {
     /**
      * Build top of phraph
      */
-    this.lines.push(this.screen.cci.codes.double_corner_top_left + (new Array(this.output[0].length * this.widthRatio + 1).join(this.screen.cci.codes.double_pipe_h)) + this.screen.cci.codes.double_corner_top_right)
+    this.lines.push((this.screen.cci.codes.double_corner_top_left + (new Array(this.output[0].length * this.widthRatio + 1).join(this.screen.cci.codes.double_pipe_h)) + this.screen.cci.codes.double_corner_top_right).green)
 
     /**
      * Write data
      */
     for (var i = 0; i < this.output.length; i++) {
 
-        var line = this.screen.cci.codes.double_pipe;
+        var line = this.screen.cci.codes.double_pipe.green;
 
         for (var j = 0; j < this.output[i].length; j++) {
 
             if(this.output[i][j] == this.emptyPointChar){
-                this.output[i][j] = this.emptyPointChar.red;
+                this.output[i][j] = this.emptyPointChar.grey;
             }
 
             for (var k = 0; k < this.widthRatio; k++) {
@@ -82,7 +82,7 @@ AreaGraph.prototype.render = function() {
             }
         }
 
-        line += this.screen.cci.codes.double_pipe
+        line += this.screen.cci.codes.double_pipe.green
 
         this.lines.push(line);
     }
@@ -90,7 +90,7 @@ AreaGraph.prototype.render = function() {
     /**
      * Build bottom of pgraph
      */
-    this.lines.push(this.screen.cci.codes.double_corner_bottom_left + (new Array(this.output[0].length * this.widthRatio + 1).join(this.screen.cci.codes.double_pipe_h)) + this.screen.cci.codes.double_corner_bottom_right)
+    this.lines.push((this.screen.cci.codes.double_corner_bottom_left + (new Array(this.output[0].length * this.widthRatio + 1).join(this.screen.cci.codes.double_pipe_h)) + this.screen.cci.codes.double_corner_bottom_right).green)
 
     /**
      * Draw footer
@@ -141,8 +141,6 @@ AreaGraph.prototype.drawSeries = function(max) {
                     this.output[rowIndex][i] = this.chars[k];
                 }
             }
-
-
         }
     }
 }
