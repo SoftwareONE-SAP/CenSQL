@@ -82,6 +82,7 @@ ScreenManager.prototype.loadDataFormatters = function() {
     this.formatters["kvbc"] = require("./dataFormatters/kvbc.js");
     this.formatters["lg"] = require("./dataFormatters/lg.js");
     this.formatters["line-graph"] = require("./dataFormatters/line-graph.js");
+    this.formatters["area-graph"] = require("./dataFormatters/area-graph.js");
     this.formatters["message"] = require("./dataFormatters/message.js");
     this.formatters["m"] = require("./dataFormatters/m.js");
     this.formatters["pretty-json"] = require("./dataFormatters/pretty-json.js");
