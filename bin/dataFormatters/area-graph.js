@@ -12,7 +12,14 @@ var AreaGraph = function(command, data, title, screen) {
     this.emptyPointChar = "-";
     this.widthRatio = Math.floor((global.censql.graphWidth - 3) / (this.data.length));
 
-    this.chars = [this.screen.cci.codes.block_faded_min.blue, this.screen.cci.codes.block_whole.green, this.screen.cci.codes.block_faded_mid.cyan, this.screen.cci.codes.block_faded_max.red, this.screen.cci.codes.block_faded_max.yellow]
+    this.chars = [
+        this.screen.cci.codes.block_faded_min.red,
+        this.screen.cci.codes.block_whole.green,
+        this.screen.cci.codes.block_faded_mid.cyan,
+        this.screen.cci.codes.block_faded_max.red,
+        this.screen.cci.codes.block_faded_max.yellow,
+        "-"
+    ]
 
     /**
      * get this.keys
@@ -73,7 +80,7 @@ AreaGraph.prototype.render = function() {
 
         for (var j = 0; j < this.output[i].length; j++) {
 
-            if(this.output[i][j] == this.emptyPointChar){
+            if (this.output[i][j] == this.emptyPointChar) {
                 this.output[i][j] = this.emptyPointChar.grey;
             }
 
@@ -126,16 +133,16 @@ AreaGraph.prototype.drawSeries = function(max) {
 
     for (var i = 0; i < this.data.length; i++) {
         for (var k = 0; k < this.keys.length; k++) {
-            
+
             var value = Math.floor(this.data[i][this.keys[k]]);
             var percOfMax = value / max;
             var heightInGraph = Math.floor(heightValue * percOfMax);
             var rowIndex = this.screen.settings.plotHeight;
 
-            while(heightInGraph > 0 && rowIndex > 0){
+            while (heightInGraph > 0 && rowIndex > 0) {
                 rowIndex -= 1;
 
-                if(this.output[rowIndex][i] == this.emptyPointChar){
+                if (this.output[rowIndex][i] == this.emptyPointChar) {
                     heightInGraph -= 1;
 
                     this.output[rowIndex][i] = this.chars[k];

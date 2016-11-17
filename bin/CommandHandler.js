@@ -56,7 +56,6 @@ CommandHandler.prototype.loadCommandHandlers = function() {
     this.handlers["roles"] = new(require("./baseCommands/roles.js"))(this);
     this.handlers["row"] = new(require("./baseCommands/row.js"))(this);
     this.handlers["rs"] = new(require("./baseCommands/rs.js"))(this);
-    this.handlers["rvc"] = new(require("./baseCommands/rvc.js"))(this);
     this.handlers["save"] = new(require("./baseCommands/save.js"))(this);
     this.handlers["sbh"] = new(require("./baseCommands/sbh.js"))(this);
     this.handlers["sc"] = new(require("./baseCommands/sc.js"))(this);
