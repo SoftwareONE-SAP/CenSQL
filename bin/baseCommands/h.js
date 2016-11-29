@@ -20,6 +20,7 @@ HelpCommandHandler.prototype.run = function(command, cParts, conn, screen, callb
                 "\t\\ta, \\dt {SCHEMA_NAME}" + "\t\t\t- To list tables for a schema",
                 "\t\\vs, \\dv {SCHEMA_NAME}" + "\t\t\t- To list views for a schema",
                 "\t\\col, \\di {SCHEMA_NAME}.{TABLE_NAME}" + "\t- To show columns/indexes for a table",
+                "\t\\part {SCHEMA_NAME}.{TABLE_NAME}" + "\t- To show the partitions of a table",
                 "\t\\in\t\t\t\t\t- To list instances",
                 "",
                 colors.bold("\tHistory:"),
