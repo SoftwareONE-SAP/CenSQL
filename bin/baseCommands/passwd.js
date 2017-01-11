@@ -76,7 +76,7 @@ PasswordCommandHandler.prototype.setPassword = function(password) {
 		/*
 		 * Save new password to file
 		 */
-		if(!err){
+		if(!err && this.user == this.conn.getClientConfig("conn").user){
 
 			var connDetails = this.conn.getClientConfig("conn");
 
