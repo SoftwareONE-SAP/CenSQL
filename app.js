@@ -3,6 +3,7 @@
 var ScreenManager = require("./bin/ScreenManager.js");
 var CommandHandler = require("./bin/CommandHandler.js");
 var HDB = require("./lib/HdbHandler.js");
+var SettingsHandler = require("./lib/SettingsHandler.js");
 var argv = require('optimist').argv;
 var mkdirp = require('mkdirp');
 var path = require('path');
@@ -37,7 +38,8 @@ var CenSql = function() {
      * Get settings
      * @type {Object}
      */
-    this.settings = this.getSettings();
+    this.settingsHandler = new SettingsHandler();
+    this.settings = this.settingsHandler.getSettings();
 
     /**
      * Init hana library
@@ -224,84 +226,7 @@ CenSql.prototype.setTitle = function(isStudio) {
     process.title = title;
 }
 
-CenSql.prototype.getSettings = function() {
-    /**
-     * Load settings
-     */
-    var settings = {};
 
-    var settingsFilePath = path.join(osHomedir(), ".censql", "censql_settings");
-
-    /**
-     * Save settings to file
-     */
-    settings.save = function() {
-        var self = JSON.parse(JSON.stringify(this));
-
-        delete self.save;
-        delete self.load;
-        delete self.colour;
-        delete self.studio;
-
-        var folderLocation = path.dirname(settingsFilePath);
-
-        if (!fs.existsSync(folderLocation)) {
-            fs.mkdirSync(folderLocation);
-        }
-
-        fs.writeFileSync(settingsFilePath, JSON.stringify(self, null, 4));
-    }
-
-    /**
-     * load settings from file
-     */
-    settings.load = function() {
-
-        try {
-            var data = JSON.parse(fs.readFileSync(settingsFilePath).toString());
-
-            var keys = Object.keys(data);
-
-            for (var i = keys.length - 1; i >= 0; i--) {
-                this[keys[i]] = data[keys[i]];
-            };
-
-        } catch (e) {
-            /**
-             * Since we had an error, this is likely to do with the file not existing. Lets save a default file and then load that
-             */
-            this.save();
-            this.load();
-        }
-
-    }
-
-    settings.load();
-
-    /**
-     * Set defaults
-     */
-    if (!settings.plotHeight) settings.plotHeight = 11;
-    if (!settings.barHeight) settings.barHeight = 1;
-    if (!("relativeGraphs" in settings)) settings.relativeGraphs = false;
-
-    if (!("csv" in settings)) {
-        settings.csv = {};
-    }
-
-    if (!("delimeter" in settings.csv)) {
-        settings.csv.delimeter = ",";
-    }
-
-    if (!settings.promptDetail) settings.promptDetail = "full";
-
-    /**
-     * Save the defaults
-     */
-    settings.save();
-
-    return settings;
-}
 
 CenSql.prototype.connectToHdb = function(host, user, pass, port, tenant) {
 
