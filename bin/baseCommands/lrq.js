@@ -12,7 +12,7 @@ LongRunningQueriesCommandHandler.prototype.run = function(command, cParts, conn,
 		rowLimit = parseInt(argv._[1]);
 	}
 
-	conn.exec("conn", "SELECT USER_NAME, EXECUTION_COUNT, LAST_EXECUTION_TIMESTAMP, MAX_EXECUTION_TIME / 1000 / 1000 AS DURATION_SECONDS, STATEMENT_STRING FROM SYS.M_SQL_PLAN_CACHE WHERE MAX_EXECUTION_TIME >= " + (argv.t * 1000 * 1000) + " AND USER_NAME NOT IN ('_SYS_STATISTICS', 'SYS', '_SYS_BIC') ORDER BY AVG_EXECUTION_TIME DESC LIMIT " + rowLimit, function(err, data) {
+	conn.exec("conn", "SELECT USER_NAME, EXECUTION_COUNT, LAST_EXECUTION_TIMESTAMP, MAX_EXECUTION_TIME / 1000 / 1000 AS DURATION_SECONDS, STATEMENT_STRING FROM SYS.M_SQL_PLAN_CACHE WHERE MAX_EXECUTION_TIME >= ? AND USER_NAME NOT IN ('_SYS_STATISTICS', 'SYS', '_SYS_BIC') ORDER BY AVG_EXECUTION_TIME DESC LIMIT " + rowLimit, [(argv.t * 1000 * 1000)], function(err, data) {
 	    callback([err == null ? 0 : 1, err == null ? data : err, err == null ? "default" : "sql-error"]);
 	})
 }

@@ -44,6 +44,7 @@ HelpCommandHandler.prototype.run = function(command, cParts, conn, screen, callb
                 "",
                 colors.bold("\tCurrent Status:"),
                 "\t\\al " + colors.grey("{OPTIONAL_MIN_RATING}") + "\t- List active alerts",
+                "\t\\as " + colors.grey("{OPTIONAL_LIMIT}") + "\t\t- List active statements",
                 "\t\\st\t\t\t\t- List hosts for instance",
                 "\t\\con\t\t\t\t- List connections",
                 "\t\\serv\t\t\t\t- List services",

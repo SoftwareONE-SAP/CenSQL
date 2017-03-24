@@ -22,9 +22,9 @@ BlameCommandHandler.prototype.run = function(command, cParts, conn, screen, call
 		return;
 	}
 
-	var sql = "SELECT LAST_EXECUTION_TIMESTAMP AS TIME, STATEMENT_STRING AS STATEMENT FROM M_SQL_PLAN_CACHE WHERE USER_NAME = '" + user + "' ORDER BY LAST_EXECUTION_TIMESTAMP DESC LIMIT " + rowLimit;
+	var sql = "SELECT LAST_EXECUTION_TIMESTAMP AS TIME, STATEMENT_STRING AS STATEMENT FROM M_SQL_PLAN_CACHE WHERE USER_NAME = ? ORDER BY LAST_EXECUTION_TIMESTAMP DESC LIMIT " + rowLimit;
 
-	conn.exec("conn", sql, function(err, data) {
+	conn.exec("conn", sql, [user], function(err, data) {
 		callback([err == null ? 0 : 1, err == null ? data : err, err == null ? "default" : "sql-error"]);
 	})
 }

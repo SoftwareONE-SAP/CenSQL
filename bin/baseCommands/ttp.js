@@ -37,7 +37,7 @@ TopTablesPercentCommandHandler.prototype.getTotalSize = function(callback) {
 	/**
 	 * Get size of schema/whole database
 	 */
-	this.conn.exec("conn", "SELECT SUM(RECORD_COUNT) AS TOTAL_RECORD_COUNT, SUM(TABLE_SIZE) / 1024 / 1024 / 1024 AS TOTAL_SIZE_GB FROM M_TABLES " + (this.argv.s.length > 0 ? "WHERE SCHEMA_NAME = '" + this.argv.s + "'" : ""), function(err, data) {
+	this.conn.exec("conn", "SELECT SUM(RECORD_COUNT) AS TOTAL_RECORD_COUNT, SUM(TABLE_SIZE) / 1024 / 1024 / 1024 AS TOTAL_SIZE_GB FROM SYS.M_TABLES " + (this.argv.s.length > 0 ? "WHERE SCHEMA_NAME = ?" : ""), (this.argv.s.length > 0 ? [this.argv.s] : []), function(err, data) {
 
 		if (err) {
 			callback(err, null);
@@ -61,10 +61,10 @@ TopTablesPercentCommandHandler.prototype.getTableSizes = function(totalSize, cal
 	 * Get size of tables
 	 */
 	this.conn.exec("conn",
-		"SELECT SCHEMA_NAME, TABLE_NAME, RECORD_COUNT, (TABLE_SIZE / 1024 / 1024 / 1024) AS SIZE_GB FROM M_TABLES " +
-		(this.argv.s.length > 0 ? "WHERE SCHEMA_NAME = '" + this.argv.s + "'" : "") +
+		"SELECT SCHEMA_NAME, TABLE_NAME, RECORD_COUNT, (TABLE_SIZE / 1024 / 1024 / 1024) AS SIZE_GB FROM SYS.M_TABLES " +
+		(this.argv.s.length > 0 ? "WHERE SCHEMA_NAME = ?" : "") +
 		" ORDER BY " + (this.argv.c ? "RECORD_COUNT" : "SIZE_GB") + " DESC LIMIT " +
-		this.rowLimit,
+		this.rowLimit, (this.argv.s.length > 0 ? [this.argv.s] : []),
 		function(err, data) {
 
 			if (err) {
