@@ -59,7 +59,7 @@ SettingsCommandHandler.prototype.set = function(key, value, callback) {
 		 Check value is correct type for key
 		 */
 		if(typeof value !== this.settingsKeys[key].type){
-			if(!(this.settingsKeys[key].type === "boolean" && (value === 0 || value === 1))){
+			if(!(this.settingsKeys[key].type === "boolean" && (value === 0 || value === 1 || value === "false" || value === "true"))){
 				callback([0, "Can not set " + key + " to '" + value + "'", "message"]);
 				return;
 			}
@@ -82,8 +82,12 @@ SettingsCommandHandler.prototype.set = function(key, value, callback) {
 		/**
 		 * Turn boolean numbers into actual booleans
 		 */
-		if(this.settingsKeys[key].type === "boolean"){
+		if(this.settingsKeys[key].type === "boolean" && typeof value == "number"){
 			value = !!value;
+		}
+
+		if(this.settingsKeys[key].type === "boolean" && typeof value == "string"){
+			value = (value === "true" ? true: false);
 		}
 
 		Bro(this.settings).makeItHappen(this.settingsKeys[key].location, value);
