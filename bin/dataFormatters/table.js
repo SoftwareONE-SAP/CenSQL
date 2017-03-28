@@ -1,4 +1,4 @@
-var Table = require('cli-table');
+var Table = require('cli-table2');
 
 module.exports = function(command, data, title, screen) {
 
@@ -17,10 +17,8 @@ module.exports = function(command, data, title, screen) {
         truncate: false
     });
 
-    // table.push(data);
-
     for (var k = 0; k < data.length; k++) {
-        var rows = [];
+        var row = [];
 
         for (var j = 0; j < keys.length; j++) {
             
@@ -28,10 +26,14 @@ module.exports = function(command, data, title, screen) {
 
             if(value == null) value = "NULL";
 
-            rows.push(value)
+            if(value instanceof Buffer){
+                value = value.toString("utf8");
+            }
+
+            row.push(value)
         };
 
-        table.push(rows);
+        table.push(row);
     };
 
     return table.toString().split("\n");

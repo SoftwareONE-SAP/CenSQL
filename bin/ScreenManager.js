@@ -25,7 +25,7 @@ var ScreenManager = function(isBatch, settings, commandHandler) {
     });
 
     /**
-     * Info for the prompt
+     * Info for the prompt. This will be set shortly after connecting to the system.
      * @type {String}
      */
     this.current_schema = "UNKNOWN";
@@ -303,6 +303,9 @@ ScreenManager.prototype.ready = function(hdb, username, db_name, usage, schema) 
 
 }
 
+/**
+ * Set settings needed to run without a terminal
+ */
 ScreenManager.prototype.readyBatch = function() {
     global.censql.graphWidth = 80;
 }
@@ -323,6 +326,10 @@ ScreenManager.prototype.getPromptText = function() {
         prompt = this.current_database_name + "> ";
     } else {
         prompt = "> "
+    }
+
+    if (!this.settings.colour || this.settings.force_nocolour) {
+       prompt = stripColorCodes(prompt);
     }
 
     this.rl.setPrompt(prompt);
@@ -458,7 +465,7 @@ ScreenManager.prototype.error = function(message, callback) {
 }
 
 ScreenManager.prototype.print = function(message, callback) {
-    if (!this.settings.colour) {
+    if (!this.settings.colour || this.settings.force_nocolour) {
         process.stdout.write(stripColorCodes(message), callback ? callback : null);
     } else {
         process.stdout.write(message, callback ? callback : null);

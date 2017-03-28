@@ -66,6 +66,7 @@ CommandHandler.prototype.loadCommandHandlers = function() {
     this.handlers["sc"] = new(require("./baseCommands/sc.js"))(this);
     this.handlers["scpu"] = new(require("./baseCommands/scpu.js"))(this);
     this.handlers["serv"] = new(require("./baseCommands/serv.js"))(this);
+    this.handlers["settings"] = new(require("./baseCommands/settings.js"))(this);
     this.handlers["sgh"] = new(require("./baseCommands/sgh.js"))(this);
     this.handlers["smem"] = new(require("./baseCommands/smem.js"))(this);
     this.handlers["spec"] = new(require("./baseCommands/spec.js"))(this);

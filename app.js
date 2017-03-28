@@ -11,7 +11,7 @@ var async = require("async");
 var osHomedir = require('os-homedir');
 var fs = require("fs");
 var SavedConnectionManager = require("./bin/SavedConnectionManager.js");
-var CliTable = require('cli-table');
+var CliTable = require('cli-table2');
 var pkg = require("./package.json");
 var username = require('username');
 
@@ -319,10 +319,10 @@ CenSql.prototype.setConnectionMetaData = function(connId, callback) {
 CenSql.prototype.createScreen = function(settings, callback) {
 
     /**
-     * keep the colour var in settings just to make it easy to use, but we wont actually save it
-     * @type {[type]}
+     * keep the force_nocolour var in settings for easy access
+     * @type {boolean}
      */
-    settings.colour = argv['no-colour'] || argv['no-color'] ? false : true;
+    settings.force_nocolour = argv['no-colour'] || argv['no-color'] ? true : false;
     settings.studio = !!argv['studio'] || !!argv['s'];
 
     /**
