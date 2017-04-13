@@ -1,4 +1,3 @@
-var ms = require("ms");
 var deasync = require('deasync');
 
 var JsCommandHandler = function(commandHandler) {
@@ -6,7 +5,7 @@ var JsCommandHandler = function(commandHandler) {
 
     this.commandHandler = commandHandler;
 
-    this.description = "Run JavaScript in the command line with access to the 'db' object";
+    this.description = "Run JavaScript in the command line with access to the 'exec' object";
 }
 
 JsCommandHandler.prototype.run = function(command, cParts, conn, screen, callback) {
