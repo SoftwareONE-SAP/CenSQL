@@ -1,6 +1,8 @@
 var ms = require("ms");
 
 var TimeCommandHandler = function(commandHandler) {
+    this.includeInAudit = false
+    
     this.commandHandler = commandHandler;
 
     this.description = "Run a command over and over again displaying the output";

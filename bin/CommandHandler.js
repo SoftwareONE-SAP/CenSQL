@@ -47,6 +47,7 @@ CommandHandler.prototype.loadCommandHandlers = function() {
     this.handlers["imem"] = new(require("./baseCommands/imem.js"))(this);
     this.handlers["in"] = new(require("./baseCommands/in.js"))(this);
     this.handlers["ips"] = new(require("./baseCommands/ips.js"))(this);
+    this.handlers["js"] = new(require("./baseCommands/js.js"))(this);
     this.handlers["li"] = new(require("./baseCommands/li.js"))(this);
     this.handlers["logb"] = new(require("./baseCommands/logb.js"))(this);
     this.handlers["logs"] = new(require("./baseCommands/logs.js"))(this);
@@ -214,6 +215,13 @@ CommandHandler.prototype.runInternalCommand = function(command, cParts, callback
 
 // inspired by: http://stackoverflow.com/a/12920211/3110929
 CommandHandler.prototype.splitStringBySemicolon = function(s) {
+
+    /**
+     * Dont split javascript by semicolon, this is a rubbish fix and should be replaced.
+     */
+    if(s.substring(4, -1) === "\\js "){
+        return [s];
+    }
 
     /**
      * Reverse the string
