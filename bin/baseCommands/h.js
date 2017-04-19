@@ -86,7 +86,7 @@ HelpCommandHandler.prototype.run = function(command, cParts, conn, screen, callb
                 "\t\\tail {SCHEMA.TABLE} {ORDER_COLUMN} " + colors.grey("{OPTIONAL_LIMIT}") + "\t- View the last N tows of a table ordered by a column",
                 "\t\\watch " + colors.grey("-i {DELAY_IN_SECONDS}") + " {COMMAND}\t\t\t- Run a command over and over again with a delay",
                 "\t\\time " + "{COMMAND}\t\t- Run a command and return the time taken with the results",
-                "\t\\js {JAVASCRIPT_CODE}\t- Run JavaDcript in CenSQL with access to the 'exec' function which runs sql and returns the output",
+                "\t\\js {JAVASCRIPT_CODE}\t- Run JavaScript in CenSQL with access to the 'exec' function which runs sql and returns the output",
                 "",
                 colors.bold("\tSettings:") + colors.grey(" Internal commands for censql settings and config"),
                 "\t\\save {ALIAS}\t\t\t - Save current connection to use later with --use argument",
