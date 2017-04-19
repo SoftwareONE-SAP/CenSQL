@@ -57,7 +57,7 @@ var CenSql = function() {
             /**
              * Create a new command handler
              */
-            this.commandHandler = new CommandHandler(this.screen, this.hdb, argv.command, this.settings);
+            this.commandHandler = new CommandHandler(this.screen, this.hdb, this.settings);
             callback(null, null);
         }.bind(this)
 
