@@ -289,8 +289,17 @@ CenSql.prototype.startCLI = function(user) {
 CenSql.prototype.runBatchCommand = function() {
     this.screen.readyBatch();
     
-    this.commandHandler.onCommand(argv.command, function(err, output) {
-        this.screen.printCommandOutput(argv.command, output, function() {
+    var command = argv.command;
+
+    /**
+     * Odd input can occur when running from some terminals
+     */
+    if(typeof command !== "string"){
+        command = "";
+    }
+
+    this.commandHandler.onCommand(command, function(err, output) {
+        this.screen.printCommandOutput(command, output, function() {
             process.exit(0)
         });
     }.bind(this));

@@ -92,7 +92,6 @@ CommandHandler.prototype.loadCommandHandlers = function() {
 }
 
 CommandHandler.prototype.onCommand = function(enteredCommand, allCallback) {
-
     /**
      * Run all commands in the command given
      */
