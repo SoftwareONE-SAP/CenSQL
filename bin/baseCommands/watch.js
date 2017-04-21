@@ -25,11 +25,15 @@ WatchCommandHandler.prototype.run = function(command, cParts, conn, screen, call
         return;
     }
 
+    var argv = require('optimist')(cParts.splice(1)).default("i", 1).alias('t', 'tail').boolean('t').argv;
+
     /**
      * Find delay
      */
-    this.delay = this.getDelay(wParts);
+    this.delay = ((argv.i > 0 ? argv.i : 0.1) * 1000)
 
+    this.shouldClear = !(argv.t)
+    
     /**
      * Save that we're now running
      * @type {Boolean}
@@ -39,7 +43,7 @@ WatchCommandHandler.prototype.run = function(command, cParts, conn, screen, call
     /**
      * Start the main loops
      */
-    this.loop(wParts.join(" "), screen, callback);
+    this.loop(argv._.join(" "), screen, callback);
     this.listenForExit();
 
 }
@@ -91,7 +95,7 @@ WatchCommandHandler.prototype.listenForExit = function() {
         /**
          * We should exit now!
          */
-        
+
         // console.log("Done listening for exit!");
 
         /**
@@ -102,45 +106,13 @@ WatchCommandHandler.prototype.listenForExit = function() {
     }.bind(this))
 }
 
-WatchCommandHandler.prototype.getDelay = function(wParts) {
-    var minDelay = 0.1;
-    var defaultTime = 2000;
-
-    for (var i = 0; i < wParts.length - 1; i++) {
-        if (wParts[i] == "-i" || wParts[i] == "--interval") {
-
-            /**
-             * Get the delay
-             */
-            var delay = parseFloat(wParts[i + 1]);
-
-            if (isNaN(delay)) {
-                delay = 1;
-            }
-
-            if (delay < minDelay) {
-                delay = minDelay;
-            }
-
-            /**
-             * Remove both parts of the delay arg from wParts
-             */
-            wParts.splice(i, 2);
-
-            return delay * 1000;
-        }
-    };
-
-    return defaultTime;
-}
-
 WatchCommandHandler.prototype.runCommand = function(command, screen, callback) {
 
     this.commandHandler.onCommand(command, function(err, output) {
-        screen.clear();
+        if (this.shouldClear) screen.clear();
 
         screen.printCommandOutput(command, output, callback, true);
-    });
+    }.bind(this));
 }
 
 module.exports = WatchCommandHandler;
