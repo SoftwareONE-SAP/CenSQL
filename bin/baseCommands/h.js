@@ -41,6 +41,8 @@ HelpCommandHandler.prototype.run = function(command, cParts, conn, screen, callb
                 "\t\\csc " + colors.grey("-r (relative)") + "\t- Graph column table record count over the last 3 days",
                 "\t\\csm " + colors.grey("-r (relative)") + "\t- Graph column storage memory size total (incl delta) over the last 3 days",
                 "\t\\blame {USER_NAME} " + colors.grey("{OPTIONAL_LIMIT}") + " - List recent commands run by a user",
+                "\t\\tasks\t\t\t- To list tasks with their last exit status",
+                "\t\\tasklog " + colors.grey("{OPTIONAL_LIMIT}") + "\t- To list tasks run recently",
                 "",
                 colors.bold("\tCurrent Status:"),
                 "\t\\al " + colors.grey("{OPTIONAL_MIN_RATING}") + "\t- List active alerts",
