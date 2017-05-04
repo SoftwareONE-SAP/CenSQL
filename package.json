@@ -39,6 +39,7 @@
     "optimist": "^0.6.1",
     "os-homedir": "^1.0.2",
     "pad": "^1.0.2",
+    "sparkline": "^0.1.2",
     "stripcolorcodes": "^0.1.0",
     "update-notifier": "^1.0.2",
     "username": "^2.2.2"

@@ -2,11 +2,8 @@ var Table = require('cli-table2');
 
 module.exports = function(command, data, title, screen) {
 
-    var lines = [];
-
     if (!data || data.length == 0 || !data[0]) {
-        lines.push("No Results\n");
-        return lines;
+        return ["No Results"];
     }
 
     var keys = Object.keys(data[0]);
