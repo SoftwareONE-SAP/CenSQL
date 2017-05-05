@@ -61,6 +61,7 @@ ScreenManager.prototype.loadPipeHandlers = function() {
     this.pipeHandlers["rev"] = require("./pipeCommands/rev.js");
     this.pipeHandlers["write"] = require("./pipeCommands/write.js");
     this.pipeHandlers["spark"] = require("./pipeCommands/spark.js");
+    this.pipeHandlers["line"] = require("./pipeCommands/line.js");
 
     this.pipeHandlersNames = Object.keys(this.pipeHandlers);
 
@@ -444,7 +445,7 @@ ScreenManager.prototype.processPipes = function(linesIn, commandParts) {
             continue;
         }
 
-        linesOut = this.pipeHandlers[commandName](linesOut, commandParts[j])
+        linesOut = this.pipeHandlers[commandName](linesOut, commandParts[j], this)
 
     }
 
