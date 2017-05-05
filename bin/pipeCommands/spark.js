@@ -19,5 +19,5 @@ module.exports = function(linesIn, command){
 
     }
 
-    return [sparkline(items)];
+    return [sparkline(items).split("").reverse().join("")];
 }
