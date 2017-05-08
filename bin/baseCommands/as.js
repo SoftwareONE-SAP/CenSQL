@@ -16,7 +16,6 @@ ActiveStatementsCommandHandler.prototype.run = function(command, cParts, conn, s
 
 	/**
 	 * Generate a random string which is very unlikely to be involved in another running query. (We do this so we can filter out our query checking for queries)
-	 * @type {[type]}
 	 */
 	var token = crypto.randomBytes(64).toString('hex');
 
