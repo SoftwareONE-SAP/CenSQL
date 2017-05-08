@@ -15,7 +15,7 @@ module.exports = function(linesIn, command){
             num = 0;
         }
 
-        items.push(num);
+        items.push();
 
     }
 
