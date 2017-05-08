@@ -92,10 +92,15 @@ SettingsCommandHandler.prototype.set = function(key, value, callback) {
 
 		Bro(this.settings).makeItHappen(this.settingsKeys[key].location, value);
 
-		this.settings.save();
+		this.settings.save(function(err){
+			if(err){
+				callback([0, "Error Saving Settings: '" + err.message, "message"]);
+				return;
+			}
 
-		callback([0, "Done", "message"]);
-
+			callback([0, "Done", "message"]);
+		});
+		
 	} else {
 		callback([0, "Error: '" + key + "' is not a setting", "message"]);
 	}

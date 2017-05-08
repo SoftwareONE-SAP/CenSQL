@@ -35,13 +35,6 @@ var CenSql = function() {
     global.censql.RUNNING_PROCESS = true;
 
     /**
-     * Get settings
-     * @type {Object}
-     */
-    this.settingsHandler = new SettingsHandler();
-    this.settings = this.settingsHandler.getSettings();
-
-    /**
      * Init hana library
      * @type {HDB}
      */
@@ -49,10 +42,9 @@ var CenSql = function() {
 
     async.series([
         this.createFolderIfNeeded.bind(this),
+        this.loadSettings.bind(this),
         this.showHelpTextIfNeeded.bind(this),
-        function(callback) {
-            this.createScreen(this.settings, callback);
-        }.bind(this),
+        this.createScreen.bind(this),
         function(callback) {
             /**
              * Create a new command handler
@@ -120,6 +112,24 @@ var CenSql = function() {
         }
 
     }.bind(this))
+}
+
+CenSql.prototype.loadSettings = function(callback){
+    /**
+     * Get settings
+     * @type {Object}
+     */
+    this.settingsHandler = new SettingsHandler();
+    this.settingsHandler.getSettings(function(err, settings){
+        if(err){
+            callback(err);
+            return
+        }
+
+        this.settings = settings;
+
+        callback(null);
+    }.bind(this));
 }
 
 CenSql.prototype.testSavedConnections = function() {
@@ -325,14 +335,13 @@ CenSql.prototype.setConnectionMetaData = function(connId, callback) {
     })
 }
 
-CenSql.prototype.createScreen = function(settings, callback) {
-
+CenSql.prototype.createScreen = function(callback) {
     /**
      * keep the force_nocolour var in settings for easy access
      * @type {boolean}
      */
-    settings.force_nocolour = argv['no-colour'] || argv['no-color'] ? true : false;
-    settings.studio = !!argv['studio'] || !!argv['s'];
+    this.settings.force_nocolour = argv['no-colour'] || argv['no-color'] ? true : false;
+    this.settings.studio = !!argv['studio'] || !!argv['s'];
 
     /**
      * Create screen object adn give it the command handler to handle user input
@@ -340,7 +349,7 @@ CenSql.prototype.createScreen = function(settings, callback) {
     this.screen = new ScreenManager(
         // Command if given
         !!argv.command,
-        settings,
+        this.settings,
 
         // Command Handler
         {
@@ -357,7 +366,7 @@ CenSql.prototype.createScreen = function(settings, callback) {
     )
 
     if (!argv.command) {
-        this.setTitle(settings.studio);
+        this.setTitle(this.settings.studio);
     }
 
     callback.call(this, null);
