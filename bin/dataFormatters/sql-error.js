@@ -61,6 +61,10 @@ module.exports = function(command, data) {
 		var errorKey = toTitleCase(data.message.substring(0, data.message.indexOf(":"))).replace("Sql", "SQL");
 		output.push(" ERROR: ".bold.red + errorKey.trim())
 
+		if (data.code) {
+			output.push(" CODE: ".bold.red + data.code)
+		}
+
 		var errorPos = "";
 
 		errorMessage = errorMessage.replace(/line\ \d+\ col\ \d+\ \(at\ pos\ \d+\)/, function(v) {
