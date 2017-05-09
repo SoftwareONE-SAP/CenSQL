@@ -35,7 +35,7 @@ DLMCommandHandler.prototype.showProfiles = function(command, cParts, conn, scree
 		rowLimit = parseInt(this.argv._[2]);
 	}
 
-	conn.exec("conn", 'SELECT * FROM SAP_HDM_DLM."sap.hdm.dlm.core.db::DLM_PROFILE" ORDER BY ID ASC LIMIT ' + rowLimit, function(err, data) {
+	conn.exec("conn", 'SELECT P.ID, P.NAME, PS.NAME AS PERSISTENCE_SERVICE FROM SAP_HDM_DLM."sap.hdm.dlm.core.db::DLM_PROFILE" AS P JOIN SAP_HDM_DLM."sap.hdm.dlm.persistenceservice.db::DLM_PERSISTENCE_SERVICE" AS PS ON (PS.ID = P.PERSISTENCE_SERVICE_ID) JOIN SAP_HDM_DLM."sap.hdm.dlm.core.db::DLM_PROFILE_VERSION" AS V ON (V.PROFILE_ID = P.ID AND V.ACTIVATION_STATUS = 1) ORDER BY P.ID ASC LIMIT ' + rowLimit, function(err, data) {
 		callback([err == null ? 0 : 1, err == null ? data : err, err == null ? "default" : "sql-error"]);
 	})
 }
