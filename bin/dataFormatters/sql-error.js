@@ -1,5 +1,5 @@
 var colors = require("colors");
-var stripColorCodes = require('stripcolorcodes');
+var stripAnsi = require('strip-ansi');
 
 var centerPad = function(s, w, c) {
 
@@ -12,7 +12,7 @@ var centerPad = function(s, w, c) {
 	 */
 	var side = false;
 
-	while (stripColorCodes(s).length < w) {
+	while (stripAnsi(s).length < w) {
 		if (side) {
 			s = s + c;
 		} else {

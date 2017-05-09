@@ -3,7 +3,6 @@ var colors = require("colors");
 var _ = require('lodash');
 var pad = require('pad');
 var cliTable = require('cli-table2');
-var stripColorCodes = require('stripcolorcodes');
 var ansiSubstr = require('ansi-substring');
 var async = require('async');
 

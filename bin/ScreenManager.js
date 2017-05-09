@@ -3,7 +3,7 @@ var charm = require('charm')(process.stdout);
 var colors = require("colors");
 var path = require('path');
 var async = require('async');
-var stripColorCodes = require('stripcolorcodes');
+var stripAnsi = require('strip-ansi');
 var osHomedir = require('os-homedir');
 var StudioSession = require("./studio/StudioSession.js");
 var StudioGraphics = require("./studio/StudioGraphics.js");
@@ -331,7 +331,7 @@ ScreenManager.prototype.getPromptText = function() {
     }
 
     if (!this.settings.colour || this.settings.force_nocolour) {
-       prompt = stripColorCodes(prompt);
+       prompt = stripAnsi(prompt);
     }
 
     this.rl.setPrompt(prompt);
@@ -468,7 +468,7 @@ ScreenManager.prototype.error = function(message, callback) {
 
 ScreenManager.prototype.print = function(message, callback) {
     if (!this.settings.colour || this.settings.force_nocolour) {
-        process.stdout.write(stripColorCodes(message), callback ? callback : null);
+        process.stdout.write(stripAnsi(message), callback ? callback : null);
     } else {
         process.stdout.write(message, callback ? callback : null);
     }
