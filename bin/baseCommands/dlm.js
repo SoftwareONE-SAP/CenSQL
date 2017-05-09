@@ -48,7 +48,7 @@ DLMCommandHandler.prototype.showRunLog = function(command, cParts, conn, screen,
 		rowLimit = parseInt(this.argv._[2]);
 	}
 
-	conn.exec("conn", 'SELECT R.ID, P.NAME, R.START_TIME, R.END_TIME, SECONDS_BETWEEN(R.START_TIME, R.END_TIME) AS DURATION, R.RUN_STATUS, R.ESTIMATED_RECORDS_PROCESS_COUNT FROM SAP_HDM_DLM."sap.hdm.dlm.core.db::DLM_RUN" AS R JOIN SAP_HDM_DLM."sap.hdm.dlm.core.db::DLM_PROFILE" AS P ON (R.DLM_PROFILE_ID = P.ID) ORDER BY R.START_TIME DESC LIMIT ' + rowLimit, function(err, data) {
+	conn.exec("conn", 'SELECT R.ID, DLM_PROFILE_ID, P.NAME, R.START_TIME, R.END_TIME, SECONDS_BETWEEN(R.START_TIME, R.END_TIME) AS DURATION, R.RUN_STATUS, R.ESTIMATED_RECORDS_PROCESS_COUNT FROM SAP_HDM_DLM."sap.hdm.dlm.core.db::DLM_RUN" AS R JOIN SAP_HDM_DLM."sap.hdm.dlm.core.db::DLM_PROFILE" AS P ON (R.DLM_PROFILE_ID = P.ID) ORDER BY R.START_TIME DESC LIMIT ' + rowLimit, function(err, data) {
 		callback([err == null ? 0 : 1, err == null ? data : err, err == null ? "default" : "sql-error"]);
 	})
 }
