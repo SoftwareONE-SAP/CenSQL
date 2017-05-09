@@ -72,7 +72,7 @@ HelpCommandHandler.prototype.run = function(command, cParts, conn, screen, callb
                 "\t\\ad\t\t\t- List all registered SDI adapters",
                 "\t\\rs\t\t\t- List all remote sources",
                 "",
-                colors.bold("\tData Lifecycle Management (DLM):"),
+                colors.bold("\tData Lifecycle Management (DLM):") + " You will likely need the 'sap.hdm.dlm.role::Display' role.".dim,
                 "\t\\dlm profiles " + colors.grey("{OPTIONAL_LIMIT}") + "\t\t- List DLM profiles",
                 "\t\\dlm logs " + colors.grey("{OPTIONAL_LIMIT}") + "\t\t- Show log of DLM jobs",
                 "\t\\dlm destincations " + colors.grey("{OPTIONAL_LIMIT}") + "\t- List configured storage destinations",
