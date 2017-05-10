@@ -132,7 +132,7 @@ SavedConnectionManager.prototype.updateAllForInstanceUser = function(host, user,
     var keys = Object.keys(this.contents);
 
     for (var i = keys.length - 1; i >= 0; i--) {
-        if (this.contents[keys[i]].host == host && this.contents[keys[i]].user == this.contents[keys[i]].user && this.contents[keys[i]].port == this.contents[keys[i]].port) {
+        if (this.contents[keys[i]].host == host && user == this.contents[keys[i]].user && port == this.contents[keys[i]].port) {
 
             var entry = this.contents[keys[i]];
 
