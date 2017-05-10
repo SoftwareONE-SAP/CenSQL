@@ -31,6 +31,7 @@ CommandHandler.prototype.loadCommandHandlers = function() {
     this.handlers["csm"] = new(require("./baseCommands/csm.js"))(this);
     this.handlers["csr"] = new(require("./baseCommands/csr.js"))(this);
     this.handlers["csw"] = new(require("./baseCommands/csw.js"))(this);
+    this.handlers["dbs"] = new(require("./baseCommands/dbs.js"))(this);
     this.handlers["df"] = new(require("./baseCommands/df.js"))(this);
     this.handlers["di"] = new(require("./baseCommands/di.js"))(this);
     this.handlers["disk"] = new(require("./baseCommands/disk.js"))(this);
