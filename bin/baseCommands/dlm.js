@@ -1,5 +1,5 @@
 var DLMCommandHandler = function() {
-	this.includeInAudit = true
+	this.includeInAudit = false
 }
 
 DLMCommandHandler.prototype.run = function(command, cParts, conn, screen, callback) {
