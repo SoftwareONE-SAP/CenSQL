@@ -30,6 +30,7 @@ var ScreenManager = function(isBatch, settings, commandHandler) {
      */
     this.current_schema = "UNKNOWN";
     this.current_username = "UNKNOWN";
+    this.current_system_id = "UNKNOWN";
     this.current_database_name = "UNKNOWN";
     this.current_instance_usage = "UNKNOWN";
 
@@ -253,11 +254,12 @@ ScreenManager.prototype.setupInput = function() {
 /**
  * The rest of the program is ready for user input, start listening on stdin
  */
-ScreenManager.prototype.ready = function(hdb, username, db_name, usage, schema) {
+ScreenManager.prototype.ready = function(hdb, username, system_id, db_name, usage, schema) {
 
     this.clear()
 
     this.current_username = username;
+    this.current_system_id = system_id
     this.current_database_name = db_name;
     this.current_schema = schema;
     this.current_instance_usage = usage;
@@ -319,6 +321,7 @@ ScreenManager.prototype.getPromptText = function() {
         prompt = "";
         prompt += (this.current_username == "SYSTEM" ? this.current_username.red : this.current_username.cyan).bold;
         prompt += "@".bold;
+        prompt += (this.current_system_id != this.current_database_name ? (this.current_instance_usage == "PRODUCTION" ? this.current_system_id.red : (this.current_instance_usage == "TEST" ? this.current_system_id.yellow : this.current_system_id.green)).bold + ">".green.bold : "");
         prompt += (this.current_instance_usage == "PRODUCTION" ? this.current_database_name.red : (this.current_instance_usage == "TEST" ? this.current_database_name.yellow : this.current_database_name.green)).bold;
         prompt += ":";
         prompt += this.current_schema.cyan;

@@ -278,7 +278,7 @@ CenSql.prototype.connectToHdb = function(host, user, pass, port, tenant) {
 }
 
 CenSql.prototype.startCLI = function(user) {
-    this.hdb.exec("conn", "SELECT (SELECT DATABASE_NAME FROM SYS.M_DATABASE) AS DATABASE_NAME, (SELECT USAGE FROM SYS.M_DATABASE) AS USAGE, CURRENT_SCHEMA FROM DUMMY", function(err, data) {
+    this.hdb.exec("conn", "SELECT (SELECT SYSTEM_ID FROM SYS.M_DATABASE) AS SYSTEM_ID, (SELECT DATABASE_NAME FROM SYS.M_DATABASE) AS DATABASE_NAME, (SELECT USAGE FROM SYS.M_DATABASE) AS USAGE, CURRENT_SCHEMA FROM DUMMY", function(err, data) {
 
         /**
          * Allow user inpput from now on
@@ -290,7 +290,7 @@ CenSql.prototype.startCLI = function(user) {
             this.screen.ready(this.hdb, user, null, null, null);
             return;
         } else {
-            this.screen.ready(this.hdb, user, data[0].DATABASE_NAME, data[0].USAGE, data[0].CURRENT_SCHEMA);
+            this.screen.ready(this.hdb, user, data[0].SYSTEM_ID, data[0].DATABASE_NAME, data[0].USAGE, data[0].CURRENT_SCHEMA);
         }
 
     }.bind(this))
