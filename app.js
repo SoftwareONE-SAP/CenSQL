@@ -11,7 +11,7 @@ var async = require("async");
 var osHomedir = require('os-homedir');
 var fs = require("fs");
 var SavedConnectionManager = require("./bin/SavedConnectionManager.js");
-var CliTable = require('cli-table2');
+var CliTable = require('cli-table3');
 var pkg = require("./package.json");
 var username = require('username');
 
