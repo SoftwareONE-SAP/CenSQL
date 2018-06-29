@@ -1,4 +1,4 @@
-var Table = require('cli-table2');
+var Table = require('cli-table3');
 
 module.exports = function(command, data, title, screen) {
 
