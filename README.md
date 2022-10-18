@@ -9,7 +9,7 @@ CenSQL (Pronounced "<i>Sen-Sea-Quel</i>") is an unofficial replacement by Centiq
 
 As well as having a smoother user interface, CenSQL also provides a lot more functionality which is not present in hdbsql, such as shortcuts for sql queries useful for any DB admin or developer for example <code>\al</code> for viewing open alerts on the instance you are connected to.
 
-Finally, CenSQL has support for bar charts and line graphs inside the CLI interface for showing a 'at-a-glanse' view of the status and history of the instance, for example <code>\cpu</code> for showing the CPU usage for each host for the instance and <code>\smem</code> for showing the current shared memory.
+Finally, CenSQL has support for bar charts and line graphs inside the CLI interface for showing a 'at-a-glance' view of the status and history of the instance, for example <code>\cpu</code> for showing the CPU usage for each host for the instance and <code>\smem</code> for showing the current shared memory.
 
 
 <a href="http://scn.sap.com/community/developer-center/hana/blog/2015/09/18/announcing-censql-a-cli-client-for-sap-hana">See an SCN article about CenSQL</a>
@@ -63,7 +63,7 @@ No: 1 -------------------
 ```
 
 #### CenSQL Commands
-Any CenSQL command is prefixed with a '\'. This stops the input from being sent directly to HANA and instead runs the CenSQL command.
+Any CenSQL command is prefixed with a '\\'. This stops the input from being sent directly to HANA and instead runs the CenSQL command.
 
 ```
 > \st
