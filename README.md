@@ -24,7 +24,7 @@ Note: CenSQL has been tested on Ubuntu, Debian, SLES, SLES4SAP, Windows Server 2
 </ol>
 
 #### Statically Compile to run without NodeJS (Optional)
-<img src="http://i.giphy.com/3o7TKI8PcyvI78VmKI.gif"></img>
+
 <ol>
   <li><code>sudo npm install -g nexe</code></li>
   <li><code>git clone git@github.com:Centiq/CenSQL.git</code></li>
